@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="MovementPreset" format=3 uid="uid://xgtsudii2bi4"]
+
+[ext_resource type="Script" uid="uid://ow3xahd6b0m8" path="res://scripts/core/movement/movement_preset.gd" id="1_s237x"]
+
+[resource]
+script = ExtResource("1_s237x")
+max_speed = 8.0
+acceleration_time = 0.3
+deceleration_time = 0.2
+metadata/_custom_type_script = "uid://ow3xahd6b0m8"

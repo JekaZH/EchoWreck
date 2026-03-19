@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="PlayerConditions" format=3 uid="uid://sw287bs0lrn2"]
+
+[ext_resource type="Script" uid="uid://ckah27cm5m4ly" path="res://scripts/core/animation/player_conditions.gd" id="1_p182c"]
+
+[resource]
+script = ExtResource("1_p182c")
+is_idle = false
+metadata/_custom_type_script = "uid://ckah27cm5m4ly"

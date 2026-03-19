@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://cf6xk11stvqxl"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4rhad"]
+albedo_color = Color(0.39572972, 0.32123318, 0.25094575, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_4rhad"]
+material = SubResource("StandardMaterial3D_4rhad")
+size = Vector2(200, 200)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_4rhad"]
+
+[node name="World" type="Node3D" unique_id=532535475]
+
+[node name="Ground" type="MeshInstance3D" parent="." unique_id=372198166]
+mesh = SubResource("PlaneMesh_4rhad")
+
+[node name="TerrainDetails" type="Node3D" parent="." unique_id=1536069428]
+
+[node name="Tree1" type="MeshInstance3D" parent="TerrainDetails" unique_id=1913250187]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 10)
+mesh = SubResource("CylinderMesh_4rhad")
+
+[node name="Tree2" type="MeshInstance3D" parent="TerrainDetails" unique_id=638764945]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.130127, 0.5, 4.213187)
+mesh = SubResource("CylinderMesh_4rhad")
+
+[node name="Tree3" type="MeshInstance3D" parent="TerrainDetails" unique_id=1257369686]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 1.2263699)
+mesh = SubResource("CylinderMesh_4rhad")
+
+[node name="Tree4" type="MeshInstance3D" parent="TerrainDetails" unique_id=638181041]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.4387074, 0.5, -1.916543)
+mesh = SubResource("CylinderMesh_4rhad")
+
+[node name="WaterAreas" type="Node3D" parent="." unique_id=223744742]
+
+[node name="StaticProps" type="Node3D" parent="." unique_id=960840098]
+
+[node name="SpawnPoints" type="Node3D" parent="." unique_id=1595975308]
