@@ -58,6 +58,26 @@ func clear_slot(index: int) -> void:
 	slots[index] = null
 	changed.emit()
 
+func can_fit_item(item: ItemData, amount: int) -> bool:
+	var remaining = amount
+
+	# 1. Проверяем существующие стеки
+	for stack in slots:
+		if stack and stack.item == item:
+			var space = item.max_stack - stack.count
+			if space > 0:
+				var taken = min(space, remaining)
+				remaining -= taken
+				if remaining <= 0:
+					return true
+
+	# 2. Проверяем пустые слоты
+	var empty_slots = slots.count(null)
+	var needed_slots = ceil(remaining / float(item.max_stack))
+
+	return empty_slots >= needed_slots
+
+
 # Для drop на землю (игрок может выбросить)
 func drop_from_slot(index: int, amount: int = -1, spawn_pos: Vector3 = Vector3.ZERO, look_dir: Vector3 = Vector3.ZERO) -> void:
 	var stack = get_slot(index)

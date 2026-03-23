@@ -44,24 +44,46 @@ func _ready() -> void:
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("inventory"):
-		# Если открыт сундук — закрываем оба окна
-		if get_tree().get_nodes_in_group("chest_ui").size() > 0:
-			var chests = get_tree().get_nodes_in_group("chest_ui")
-			for c in chests:
-				c.close_windows() if c.has_method("close_windows") else c.queue_free()
+		# Если открыт любой сундук — НЕ открываем инвентарь, а закрываем всё
+		var all_uis = get_tree().get_nodes_in_group("inventory_ui")
+		var has_chest = false
+		for ui in all_uis:
+			if ui.title == "Сундук" and is_instance_valid(ui):
+				has_chest = true
+				break
+		
+		if has_chest:
+			# Закрываем все окна сундука и игрока
+			for ui in all_uis:
+				if is_instance_valid(ui):
+					ui.queue_free()
+			current_inventory_ui = null
+			print("Сундук открыт — закрываем все окна")
 			return
 		
-		# Обычное открытие инвентаря игрока (если сундук закрыт)
+		# Обычное открытие/закрытие инвентаря игрока
 		if current_inventory_ui and is_instance_valid(current_inventory_ui):
 			current_inventory_ui.queue_free()
 			current_inventory_ui = null
+			print("Инвентарь закрыт")
 		else:
 			var ui = preload("res://scenes/inventory/universal_inventory.tscn").instantiate()
 			ui.inventory = $Inventory
 			ui.title = "Инвентарь"
 			ui.columns = 6
+			ui.add_to_group("inventory_ui")  # ← группа для поиска
 			$UI_Layer.add_child(ui)
 			current_inventory_ui = ui
+			print("Инвентарь открыт")
+	elif event.is_action_pressed("ui_cancel"):
+		# Esc — закрываем всё, что открыто
+		var all_uis = get_tree().get_nodes_in_group("inventory_ui")
+		for ui in all_uis:
+			if is_instance_valid(ui):
+				ui.queue_free()
+		current_inventory_ui = null
+		print("Esc — все окна закрыты")
+	
 
 func _physics_process(delta: float) -> void:
 	if camera == null: return

@@ -11,6 +11,7 @@ extends Control
 @onready var slots_grid: GridContainer = $Background/SlotsGrid
 
 func _ready() -> void:
+	add_to_group("inventory_ui")
 	mouse_filter = Control.MOUSE_FILTER_PASS
 	
 	for child in get_children():
