@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://q6hw3cxy32pk"]
+
+[ext_resource type="Texture2D" uid="uid://bn45uv27pc84m" path="res://assets/icons/stylized_item/Materials/SODA_Icon_Materials_Wood.png" id="1_earcf"]
+[ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="1_ma1ub"]
+
+[resource]
+script = ExtResource("1_ma1ub")
+id = "wood_log"
+display_name = "Бревно"
+description = "Бревно связка тест"
+icon = ExtResource("1_earcf")
+max_stack = 20
+width = 2
+shape = Array[Vector2i]([Vector2i(0, 0), Vector2i(0, 1)])
+metadata/_custom_type_script = "uid://p3b1q13fmee1"

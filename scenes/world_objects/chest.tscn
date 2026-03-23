@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://cluc3fjss7afb"]
+
+[ext_resource type="Script" uid="uid://byoi2lf1t3wrk" path="res://scripts/world_objects/chest.gd" id="1_5dkos"]
+[ext_resource type="Script" uid="uid://darvx2nhweubn" path="res://scripts/inventory/inventory.gd" id="1_07bys"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mp3cv"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_mp3cv"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_07bys"]
+albedo_color = Color(1, 0.64705884, 0, 1)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_mp3cv"]
+radius = 1.5
+
+[node name="Chest" type="StaticBody3D" unique_id=2050241417]
+script = ExtResource("1_5dkos")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=921282149]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("BoxShape3D_mp3cv")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1460220210]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("BoxMesh_mp3cv")
+surface_material_override/0 = SubResource("StandardMaterial3D_07bys")
+
+[node name="InteractArea" type="Area3D" parent="." unique_id=519799943]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractArea" unique_id=934370214]
+shape = SubResource("SphereShape3D_mp3cv")
+
+[node name="Inventory" type="Node" parent="." unique_id=1169982324]
+script = ExtResource("1_07bys")
+slots_count = 12
+inventory_type = "CHEST"

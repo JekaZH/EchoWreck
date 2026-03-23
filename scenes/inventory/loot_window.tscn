@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://txoth403qns3"]
+
+[ext_resource type="Script" uid="uid://dg5erdwqsvofd" path="res://scripts/inventory/inventory_UI.gd" id="1_7liov"]
+
+[node name="LootWindow" type="Control" unique_id=1379408990 node_paths=PackedStringArray("grid")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7liov")
+grid = NodePath("Background/LootGrid")
+
+[node name="Background" type="Panel" parent="." unique_id=931978048]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LootGrid" type="GridContainer" parent="Background" unique_id=1406847487]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+columns = 4
+
+[node name="Label" type="Label" parent="." unique_id=593194333]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Добыча"

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" format=3 uid="uid://c2gak6edral1y"]
+
+[sub_resource type="GDScript" id="GDScript_axmc3"]
+script/source = "# loot_table.gd
+class_name LootTable
+extends Resource
+
+@export var entries: Array[LootEntry] = []
+
+class LootEntry extends Resource:
+	@export var item: ItemData
+	@export var chance: float = 1.0          # 0.0–1.0
+	@export var min_count: int = 1
+	@export var max_count: int = 3
+"
+
+[resource]
+script = SubResource("GDScript_axmc3")
+metadata/_custom_type_script = "uid://fbnax6jp6py2"

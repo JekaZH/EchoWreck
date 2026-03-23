@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://bbequu47ef4nc"]
+
+[ext_resource type="Script" uid="uid://pjlpl5f3eqlu" path="res://scripts/dropped_item/dropped_item.gd" id="1_cdvnd"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_yk015"]
+radius = 0.3
+height = 0.3
+is_hemisphere = true
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yk015"]
+size = Vector3(0.5, 0.5, 0.5)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_yk015"]
+radius = 1.0
+
+[node name="DroppedItem" type="Node3D" unique_id=203633381]
+script = ExtResource("1_cdvnd")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=437279346]
+mesh = SubResource("SphereMesh_yk015")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1010392270]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1260932615]
+shape = SubResource("BoxShape3D_yk015")
+
+[node name="PickupArea" type="Area3D" parent="." unique_id=573666898]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PickupArea" unique_id=1768174636]
+shape = SubResource("SphereShape3D_yk015")
+debug_color = Color(0.92098826, 0.18908104, 0.5241634, 0.41960785)
+
+[node name="Label3D" type="Label3D" parent="." unique_id=1194138830]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+visible = false
+billboard = 1
+text = "E to collect"
+
+[connection signal="body_entered" from="PickupArea" to="." method="_on_body_entered"]
+[connection signal="body_exited" from="PickupArea" to="." method="_on_body_exited"]

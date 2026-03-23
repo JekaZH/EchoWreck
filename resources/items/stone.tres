@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://1gq0ards1dq4"]
+
+[ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="1_6yv2l"]
+[ext_resource type="Texture2D" uid="uid://ct206w42ogme6" path="res://assets/icons/stylized_item/Materials/SODA_Icon_Materials_Rock.png" id="1_q1oyt"]
+
+[resource]
+script = ExtResource("1_6yv2l")
+id = "stone"
+display_name = "Камень"
+description = "Камень дескр"
+icon = ExtResource("1_q1oyt")
+metadata/_custom_type_script = "uid://p3b1q13fmee1"

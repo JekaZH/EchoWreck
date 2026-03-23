@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://caq2bte1idhpd"]
+
+[ext_resource type="Script" uid="uid://cilxv6tehtmsy" path="res://scripts/inventory/drag_preview.gd" id="1_lfh3s"]
+
+[node name="DragPreviewRoot" type="Node" unique_id=2043802994]
+script = ExtResource("1_lfh3s")
+
+[node name="DragPreviewLayer" type="CanvasLayer" parent="." unique_id=102480736]
+layer = 128
+
+[node name="PreviewIcon" type="TextureRect" parent="DragPreviewLayer" unique_id=2108015239]
+custom_minimum_size = Vector2(64, 64)
+offset_right = 64.0
+offset_bottom = 64.0
+stretch_mode = 5
+
+[node name="CountLabel" type="Label" parent="DragPreviewLayer/PreviewIcon" unique_id=1075155690]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
+horizontal_alignment = 2
+vertical_alignment = 2

@@ -1,5 +1,9 @@
 [gd_scene format=3 uid="uid://cf6xk11stvqxl"]
 
+[ext_resource type="PackedScene" uid="uid://c8mj0quninl67" path="res://scenes/world_objects/tree_basic.tscn" id="1_dphjl"]
+[ext_resource type="PackedScene" uid="uid://cc3xch787bmp4" path="res://scenes/world_objects/stone_basic.tscn" id="2_1fp7r"]
+[ext_resource type="PackedScene" uid="uid://cluc3fjss7afb" path="res://scenes/world_objects/chest.tscn" id="2_sl2e5"]
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4rhad"]
 albedo_color = Color(0.39572972, 0.32123318, 0.25094575, 1)
 
@@ -32,8 +36,29 @@ mesh = SubResource("CylinderMesh_4rhad")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.4387074, 0.5, -1.916543)
 mesh = SubResource("CylinderMesh_4rhad")
 
+[node name="Tree" parent="TerrainDetails" unique_id=968043563 instance=ExtResource("1_dphjl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.92474747, 0, 8.123716)
+
+[node name="Tree5" parent="TerrainDetails" unique_id=372294775 instance=ExtResource("1_dphjl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.659622, 0, 4.9785004)
+
+[node name="Tree6" parent="TerrainDetails" unique_id=1264716857 instance=ExtResource("1_dphjl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.658374, 0, 6.625602)
+
+[node name="Tree7" parent="TerrainDetails" unique_id=944169610 instance=ExtResource("1_dphjl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2296505, 0, 4.9785004)
+
+[node name="Stone" parent="TerrainDetails" unique_id=1622818754 instance=ExtResource("2_1fp7r")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.778479, 0, 8.603111)
+
+[node name="Stone2" parent="TerrainDetails" unique_id=1086062938 instance=ExtResource("2_1fp7r")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.174623, 0, 1.076848)
+
 [node name="WaterAreas" type="Node3D" parent="." unique_id=223744742]
 
 [node name="StaticProps" type="Node3D" parent="." unique_id=960840098]
 
 [node name="SpawnPoints" type="Node3D" parent="." unique_id=1595975308]
+
+[node name="Chest" parent="." unique_id=2050241417 instance=ExtResource("2_sl2e5")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.471974, -4.7683716e-07, 1.3949251)

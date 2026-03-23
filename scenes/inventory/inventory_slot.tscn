@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://b72dkgunk3vtu"]
+
+[ext_resource type="Script" uid="uid://bkk3ptgbv68e3" path="res://scripts/inventory/inventory_slot.gd" id="1_5agom"]
+
+[node name="Slot" type="PanelContainer" unique_id=1139954649]
+custom_minimum_size = Vector2(64, 64)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_5agom")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=266779694]
+layout_mode = 2
+stretch_mode = 5
+
+[node name="Count" type="Label" parent="." unique_id=73267643]
+layout_mode = 2
+horizontal_alignment = 2
+vertical_alignment = 2
