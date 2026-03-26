@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="1_6yv2l"]
 [ext_resource type="Texture2D" uid="uid://ct206w42ogme6" path="res://assets/icons/stylized_item/Materials/SODA_Icon_Materials_Rock.png" id="1_q1oyt"]
+[ext_resource type="PackedScene" uid="uid://bbequu47ef4nc" path="res://scenes/world_objects/dropped_item/dropped_item.tscn" id="2_eq1bm"]
 
 [resource]
 script = ExtResource("1_6yv2l")
@@ -9,4 +10,21 @@ id = "stone"
 display_name = "Камень"
 description = "Камень дескр"
 icon = ExtResource("1_q1oyt")
+width = null
+height = null
+shape = null
+mesh_on_ground = ExtResource("2_eq1bm")
+category = "material"
+tool_efficiency = null
+tool_durability = null
+is_weapon = null
+damage = null
+attack_speed = null
+is_consumable = null
+hunger_restore = null
+thirst_restore = null
+health_restore = null
+use_time = null
+weight = null
+custom_properties = null
 metadata/_custom_type_script = "uid://p3b1q13fmee1"

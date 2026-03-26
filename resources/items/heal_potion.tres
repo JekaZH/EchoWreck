@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bdic6aqkjko7e"]
+
+[ext_resource type="Script" uid="uid://dm6xxi7css0sq" path="res://scripts/inventory/item_effect.gd" id="1_h42t0"]
+[ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="2_o7c7a"]
+[ext_resource type="Texture2D" uid="uid://bae1c3i7rfl0q" path="res://assets/icons/stylized_item/Potions_Herbs/SODA_Icon_PortionsHerbs_Potion_Red.png" id="2_t2ees"]
+[ext_resource type="PackedScene" uid="uid://bbequu47ef4nc" path="res://scenes/world_objects/dropped_item/dropped_item.tscn" id="3_t2ees"]
+
+[sub_resource type="Resource" id="Resource_t2ees"]
+script = ExtResource("1_h42t0")
+health_restore = 50.0
+metadata/_custom_type_script = "uid://dm6xxi7css0sq"
+
+[resource]
+script = ExtResource("2_o7c7a")
+id = "heal_potion"
+display_name = "Зелье здоровья"
+description = "Лечиться"
+icon = ExtResource("2_t2ees")
+max_stack = 5
+mesh_on_ground = ExtResource("3_t2ees")
+category = "Consumable"
+rarity = "Uncommon"
+is_consumable = true
+use_time = 3.0
+effects = Array[ExtResource("1_h42t0")]([SubResource("Resource_t2ees")])
+metadata/_custom_type_script = "uid://p3b1q13fmee1"

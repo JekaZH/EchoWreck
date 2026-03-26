@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bdgotffirhnbm"]
+
+[ext_resource type="Script" uid="uid://dm6xxi7css0sq" path="res://scripts/inventory/item_effect.gd" id="1_hu4kq"]
+[ext_resource type="Texture2D" uid="uid://clvpwdudpucr3" path="res://assets/icons/stylized_item/Adventure_Items/SODA_Icon_AdventureItems_Pick.png" id="2_044m5"]
+[ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="2_onaj4"]
+
+[resource]
+script = ExtResource("2_onaj4")
+id = "pickaxe"
+display_name = "Кирка"
+description = "Кирка обычная"
+icon = ExtResource("2_044m5")
+max_stack = 1
+category = "Tool"
+max_count = 1
+tool_type = "pickaxe"
+is_weapon = true
+damage = 12.0
+metadata/_custom_type_script = "uid://p3b1q13fmee1"

@@ -4,11 +4,26 @@ extends PanelContainer
 @onready var icon: TextureRect = $Icon
 @onready var count_label: Label = $Count
 
+@onready var selection: Panel = get_node_or_null("Selection")
+
 var inventory: Inventory
 var slot_index: int = -1
 
 # Явный доступ к глобальному менеджеру (это решает проблему с сундуком)
 @onready var manager = get_node("/root/InventoryManager")
+
+# Для выделения предмета
+var is_selected: bool = false
+
+# Для применения через E
+var use_progress_ui: UseProgressUI = null
+var is_being_used: bool = false
+var use_timer: float = 0.0
+
+
+
+
+
 
 func setup(inv: Inventory, idx: int):
 	inventory = inv
@@ -27,13 +42,61 @@ func update_display():
 		count_label.text = ""
 		count_label.visible = false
 
+
+func _ready():
+	# Создаём прогресс-бар один раз
+	if not use_progress_ui:
+		use_progress_ui = preload("res://scenes/ui/use_progress.tscn").instantiate()
+		get_tree().root.call_deferred("add_child", use_progress_ui)
+		use_progress_ui.hide()
+	
+	mouse_entered.connect(_on_mouse_entered)
+	mouse_exited.connect(_on_mouse_exited)
+
+
+func _process(delta):
+	# Обработка зажатия E для применения
+	if is_selected and Input.is_action_pressed("interact"):
+		var stack = inventory.get_slot(slot_index)
+		if stack and stack.item and stack.item.is_consumable:
+			if not is_being_used:
+				is_being_used = true
+				use_timer = 0.0
+				var progress_ui = manager.get_use_progress_ui()
+				if progress_ui:
+					progress_ui.start_use(stack.item.display_name, stack.item.use_time)
+
+			use_timer += delta
+			
+			var progress_ui = manager.get_use_progress_ui()
+			if progress_ui:
+				progress_ui.update_progress(use_timer)
+
+			if use_timer >= stack.item.use_time:
+				apply_item(stack)
+				is_being_used = false
+				use_timer = 0.0
+		else:
+			cancel_use()
+	else:
+		cancel_use()
+	
+	var tooltip = manager.tooltip
+	if tooltip and tooltip.visible:
+		tooltip.global_position = get_global_mouse_position() + Vector2(25, 25)
+
+
 func _gui_input(event: InputEvent) -> void:
+	
 	if not (event is InputEventMouseButton and event.pressed):
 		return
 
 	var current = inventory.get_slot(slot_index)
-
+	
 	if event.button_index == MOUSE_BUTTON_LEFT:
+		if not get_viewport().gui_get_hovered_control() is InventorySlot:
+				manager.clear_selected_slot()
+		
 		if Input.is_key_pressed(KEY_SHIFT) and current:
 			# ───── SHIFT + ЛКМ = ПЕРЕЛОЖИТЬ В ДРУГОЙ ИНВЕНТАРЬ ─────
 			var other_inventory = null
@@ -64,27 +127,33 @@ func _gui_input(event: InputEvent) -> void:
 			return
 
 		# Обычный левый клик (взять / положить)
-		if manager.held_item:
-			if current == null:
-				inventory.set_slot(slot_index, manager.held_item)
-				manager.clear_held_item()
-			elif current.can_stack_with(manager.held_item):
-				var added = current.try_add(manager.held_item.count)
-				manager.held_item.count -= added
-				if manager.held_item.count <= 0:
-					manager.clear_held_item()
-				else:
-					manager.set_held_item(manager.held_item)
-			else:
-				var temp = current
-				inventory.set_slot(slot_index, manager.held_item)
-				manager.set_held_item(temp)
-			
-			inventory.changed.emit()
-		elif current:
-			manager.set_held_item(current)
-			inventory.clear_slot(slot_index)
-			inventory.changed.emit()
+		#if manager.held_item:
+			#if current == null:
+				#inventory.set_slot(slot_index, manager.held_item)
+				#manager.clear_held_item()
+			#elif current.can_stack_with(manager.held_item):
+				#var added = current.try_add(manager.held_item.count)
+				#manager.held_item.count -= added
+				#if manager.held_item.count <= 0:
+					#manager.clear_held_item()
+				#else:
+					#manager.set_held_item(manager.held_item)
+			#else:
+				#var temp = current
+				#inventory.set_slot(slot_index, manager.held_item)
+				#manager.set_held_item(temp)
+			#
+			#inventory.changed.emit()
+		#elif current:
+			#manager.set_held_item(current)
+			#inventory.clear_slot(slot_index)
+			#inventory.changed.emit()
+		if current:
+			manager.set_selected_slot(self)
+			print("Выделен предмет:", current.item.display_name)
+			return
+		else:
+			manager.clear_selected_slot()
 
 	elif event.button_index == MOUSE_BUTTON_RIGHT:
 		# Правый клик (кладём 1 или разделяем) — без изменений
@@ -110,6 +179,7 @@ func _gui_input(event: InputEvent) -> void:
 			if split_stack:
 				manager.set_held_item(split_stack)
 				inventory.changed.emit()
+
 
 func _get_drag_data(at_position):
 	var stack = inventory.get_slot(slot_index)
@@ -175,3 +245,68 @@ func get_other_inventory() -> Inventory:
 			return ui.inventory
 	
 	return null
+
+func _on_mouse_entered():
+	var stack = inventory.get_slot(slot_index)
+	if stack and stack.item:
+		var tooltip = manager.get_tooltip()
+		
+		if not tooltip.is_ready:
+			await tooltip.ready
+		
+		tooltip.show_tooltip(stack.item)
+
+func _on_mouse_exited():
+	if manager.tooltip:
+		manager.tooltip.hide_tooltip()
+
+func update_selection():
+	if selection:
+		selection.visible = is_selected
+
+
+func apply_item(stack: ItemStack):
+	if not stack or not stack.item or not stack.item.is_consumable:
+		return
+	
+	var player = get_tree().get_first_node_in_group("player")
+	if not player:
+		print("Ошибка: Player не найден")
+		return
+	
+	var stats_comp = player.get_node_or_null("PlayerStatsComponent")
+	if not stats_comp or not stats_comp.stats:
+		print("Ошибка: PlayerStatsComponent не найден")
+		return
+	
+	# Применяем все эффекты
+	for effect in stack.item.effects:
+		stats_comp.stats.hunger += effect.hunger_restore
+		stats_comp.stats.thirst += effect.thirst_restore
+		stats_comp.stats.health += effect.health_restore
+		# Можно добавить другие эффекты позже
+	
+	stats_comp.stats.hunger = clamp(stats_comp.stats.hunger, 0, stats_comp.stats.max_hunger)
+	stats_comp.stats.thirst = clamp(stats_comp.stats.thirst, 0, stats_comp.stats.max_thirst)
+	stats_comp.stats.health = clamp(stats_comp.stats.health, 0, stats_comp.stats.max_health)
+	
+	# Убираем 1 предмет из стака
+	if stack.count > 1:
+		stack.count -= 1
+	else:
+		inventory.clear_slot(slot_index)
+
+	inventory.changed.emit()
+	print("Применён предмет:", stack.item.display_name)
+	
+	cancel_use()
+	
+
+
+func cancel_use():
+	if is_being_used:
+		is_being_used = false
+		use_timer = 0.0
+		var progress_ui = manager.get_use_progress_ui()
+		if progress_ui:
+			progress_ui.cancel()

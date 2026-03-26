@@ -13,6 +13,7 @@ extends CharacterBody3D
 @onready var anim_tree: AnimationTree = $PlayerAnimTree
 @onready var interact_ray: RayCast3D = $InteractRay
 
+@onready var stats_component: PlayerStatsComponent = $PlayerStatsComponent
 
 var current_inventory_ui: Control = null
 @onready var inventory: Inventory = $Inventory
@@ -28,6 +29,8 @@ var last_running: bool = false
 var is_tree_chopping_now: bool = false
 
 func _ready() -> void:
+	stats_component.stats = PlayerStats.new()  # или загружай сохранённые статы
+	
 	anim_tree.active = true
 	await get_tree().process_frame
 	await get_tree().process_frame

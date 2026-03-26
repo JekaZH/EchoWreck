@@ -3,6 +3,10 @@
 [ext_resource type="PackedScene" uid="uid://c8mj0quninl67" path="res://scenes/world_objects/tree_basic.tscn" id="1_dphjl"]
 [ext_resource type="PackedScene" uid="uid://cc3xch787bmp4" path="res://scenes/world_objects/stone_basic.tscn" id="2_1fp7r"]
 [ext_resource type="PackedScene" uid="uid://cluc3fjss7afb" path="res://scenes/world_objects/chest.tscn" id="2_sl2e5"]
+[ext_resource type="PackedScene" uid="uid://bbequu47ef4nc" path="res://scenes/world_objects/dropped_item/dropped_item.tscn" id="3_v5dby"]
+[ext_resource type="Resource" uid="uid://bdgotffirhnbm" path="res://resources/items/pickaxe.tres" id="4_t5ptc"]
+[ext_resource type="Resource" uid="uid://b6efp0tkhclpi" path="res://resources/items/apple.tres" id="5_t5ptc"]
+[ext_resource type="Resource" uid="uid://bdic6aqkjko7e" path="res://resources/items/heal_potion.tres" id="6_bq33v"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4rhad"]
 albedo_color = Color(0.39572972, 0.32123318, 0.25094575, 1)
@@ -53,6 +57,20 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.778479, 0, 8.603111)
 
 [node name="Stone2" parent="TerrainDetails" unique_id=1086062938 instance=ExtResource("2_1fp7r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.174623, 0, 1.076848)
+
+[node name="GroundItems" type="Node3D" parent="." unique_id=622216375]
+
+[node name="DroppedItem" parent="GroundItems" unique_id=203633381 instance=ExtResource("3_v5dby")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.820032, 0.49465227, -0.69523716)
+item_data = ExtResource("4_t5ptc")
+
+[node name="DroppedItem2" parent="GroundItems" unique_id=1343817600 instance=ExtResource("3_v5dby")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.1425085, 0, -2.6471825)
+item_data = ExtResource("5_t5ptc")
+
+[node name="DroppedItem3" parent="GroundItems" unique_id=90887012 instance=ExtResource("3_v5dby")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.154822, 0, -5.178507)
+item_data = ExtResource("6_bq33v")
 
 [node name="WaterAreas" type="Node3D" parent="." unique_id=223744742]
 

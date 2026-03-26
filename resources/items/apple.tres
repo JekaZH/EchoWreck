@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://b6efp0tkhclpi"]
+
+[ext_resource type="Script" uid="uid://dm6xxi7css0sq" path="res://scripts/inventory/item_effect.gd" id="1_2oqkr"]
+[ext_resource type="Texture2D" uid="uid://ce5mt2gaew5oe" path="res://assets/icons/stylized_item/Food/SODA_Icon_Food_Apple.png" id="2_8nbq6"]
+[ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="2_yw5el"]
+[ext_resource type="PackedScene" uid="uid://bbequu47ef4nc" path="res://scenes/world_objects/dropped_item/dropped_item.tscn" id="3_pdbyo"]
+
+[sub_resource type="Resource" id="Resource_8nbq6"]
+script = ExtResource("1_2oqkr")
+hunger_restore = 25.0
+health_restore = 5.0
+metadata/_custom_type_script = "uid://dm6xxi7css0sq"
+
+[resource]
+script = ExtResource("2_yw5el")
+id = "apple"
+display_name = "Яблоко"
+description = "Будет + давать"
+icon = ExtResource("2_8nbq6")
+mesh_on_ground = ExtResource("3_pdbyo")
+category = "Food"
+is_consumable = true
+effects = Array[ExtResource("1_2oqkr")]([SubResource("Resource_8nbq6")])
+metadata/_custom_type_script = "uid://p3b1q13fmee1"
