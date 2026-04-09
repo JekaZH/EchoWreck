@@ -17,23 +17,31 @@ func show_tooltip(item: ItemData):
 		hide()
 		return
 
+	# Название с цветом редкости
 	name_label.text = item.display_name
 	name_label.add_theme_color_override("font_color", item.get_rarity_color())
-	
+
 	type_label.text = item.category
 	icon_rect.texture = item.icon
 	description_label.text = item.description if item.description else "Нет описания"
 
-	# Очищаем старые статы
+	# Очищаем старые строки
 	for child in stats_container.get_children():
 		child.queue_free()
 
+	# Инструмент
 	if item.tool_type != "":
 		add_stat_line("Инструмент", item.tool_type.capitalize(), Color.LIGHT_BLUE)
-	
-	if item.is_weapon and item.damage > 0:
-		add_stat_line("Урон", "+" + str(item.damage), Color.ORANGE)	
 
+	# Урон по блокам (для инструментов)
+	if item.block_damage > 0:
+		add_stat_line("Урон по блокам", "+" + str(item.block_damage), Color.ORANGE)
+
+	# Урон по существам (для оружия)
+	if item.entity_damage > 0:
+		add_stat_line("Урон по врагам", "+" + str(item.entity_damage), Color.ORANGE)
+
+	# Эффекты из массива
 	for effect in item.effects:
 		add_effect_line(effect)
 

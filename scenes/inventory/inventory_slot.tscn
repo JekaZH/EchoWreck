@@ -2,6 +2,14 @@
 
 [ext_resource type="Script" uid="uid://bkk3ptgbv68e3" path="res://scripts/inventory/inventory_slot.gd" id="1_5agom"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5agom"]
+bg_color = Color(0, 0, 0, 0.5411765)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.99999994, 0.3766579, 0.21443424, 1)
+
 [node name="Slot" type="PanelContainer" unique_id=1139954649]
 custom_minimum_size = Vector2(64, 64)
 anchors_preset = 15
@@ -12,6 +20,11 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_5agom")
+
+[node name="ActiveFrame" type="Panel" parent="." unique_id=1293912490]
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_5agom")
 
 [node name="Selection" type="Panel" parent="." unique_id=1057841528]
 visible = false

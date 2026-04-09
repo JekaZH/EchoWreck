@@ -14,6 +14,7 @@ var slot_index: int = -1
 
 # Для выделения предмета
 var is_selected: bool = false
+var is_active: bool = false   # новый флаг для активного слота хотбара
 
 # Для применения через E
 var use_progress_ui: UseProgressUI = null
@@ -263,6 +264,11 @@ func _on_mouse_exited():
 func update_selection():
 	if selection:
 		selection.visible = is_selected
+	
+	# Новая рамка для активного слота
+	var active_frame = get_node_or_null("ActiveFrame")
+	if active_frame:
+		active_frame.visible = is_active
 
 
 func apply_item(stack: ItemStack):

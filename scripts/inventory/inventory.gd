@@ -5,7 +5,7 @@ signal changed()
 signal item_dropped(stack: ItemStack, total_drop: int, spawn_pos: Vector3, look_dir: Vector3)
 
 @export var slots_count: int = 24
-@export_enum("PLAYER", "CHEST", "LOOT") var inventory_type: String = "PLAYER"
+@export_enum("PLAYER", "CHEST", "LOOT", "HOTBAR") var inventory_type: String = "PLAYER"
 
 var slots: Array[ItemStack] = []   # null = пустой слот
 

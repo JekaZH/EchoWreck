@@ -1,46 +1,83 @@
-# harvestable.gd
 class_name Harvestable
 extends Node
 
 @onready var outline_mesh: MeshInstance3D = $"../OutlineMesh"
 
 @export var loot_table: LootTable
-@export var required_tool_type: String = ""     # "axe", "pickaxe" или пусто
-@export var health: int = 3
+@export var max_health: float = 10.0
+var current_health: float = 0.0
+
 @export var harvest_time: float = 1.5
 
-signal harvested(drops: Array[Dictionary])      # [{item: ItemData, count: int}]
+# ─── Tier-система сбора ───
+@export var required_tool_type: String = ""      # "pickaxe", "axe", "shovel"
+@export var required_tier: int = 0
+@export var required_harvest_type: String = ""
+
+signal harvested(drops: Array[Dictionary])
+
+func _ready():
+	current_health = max_health
 
 func try_harvest(player) -> bool:
-	print("Вызван try_harvest на ", name, " | health до: ", health)
+	if not player or not player.has_node("ToolEquipper"):
+		print("Harvestable: Player или ToolEquipper не найден")
+		return false
+
+	var tool_equipper = player.get_node("ToolEquipper")
 	
-	health -= 1
+	# === НОВАЯ ЛОГИКА ПОЛУЧЕНИЯ ItemData ===
+	var equipped_item: ItemData = null
 	
-	if health <= 0:
+	if tool_equipper.current_tool:
+		# Вариант 1: Ищем ItemData через owner или metadata (самый надёжный)
+		if tool_equipper.current_tool.has_meta("item_data"):
+			equipped_item = tool_equipper.current_tool.get_meta("item_data")
+		
+		# Вариант 2: Ищем вверх по дереву
+		if not equipped_item:
+			var node = tool_equipper.current_tool
+			while node and not equipped_item:
+				if node is ItemData:
+					equipped_item = node
+				node = node.get_parent()
+
+	# Если инструмент не найден
+	if not equipped_item or not equipped_item.is_equippable:
+		print("Нужен правильный инструмент! (equipped_item не найден)")
+		return false
+
+	# Проверка типа инструмента
+	if required_tool_type != "" and equipped_item.tool_type != required_tool_type:
+		print("Нужен инструмент типа:", required_tool_type, ". У вас:", equipped_item.tool_type)
+		return false
+
+	# Проверка tier
+	if equipped_item.tool_tier < required_tier:
+		print("Нужен инструмент уровня", required_tier, "или выше. Текущий:", equipped_item.tool_tier)
+		return false
+
+	# === НАНОСИМ ДРОБНЫЙ УРОН ===
+	var damage = equipped_item.block_damage if equipped_item.block_damage > 0 else 1.0
+	current_health -= damage
+
+	print("Удар по блоку! Урон:", damage, " | Здоровье осталось:", current_health)
+
+	if current_health <= 0:
+		print("Блок полностью уничтожен!")
 		var drops = generate_drops()
 		harvested.emit(drops)
-		print("Объект уничтожен, лут: ", drops)
 		
-		# Находим root инстанса дерева (самый надёжный способ)
-		var tree_root = self
-		while tree_root.get_owner() != null:
-			tree_root = tree_root.get_owner()
-		
-		# Дополнительная проверка: если поднялись слишком высоко — берём родителя StaticBody3D
-		if tree_root == get_tree().root or tree_root == get_tree().current_scene:
-			tree_root = get_parent()  # берём родителя StaticBody3D (это TreeX)
-		
-		if tree_root and tree_root != self:
-			print("Удаляю root дерева: ", tree_root.name, " | путь: ", tree_root.get_path())
-			tree_root.queue_free()
+		# Полностью удаляем весь объект (включая mesh)
+		var root = get_parent()  # StaticBody3D или корень камня
+		if root and root != self:
+			root.queue_free()
 		else:
-			print("Не нашёл root — удаляю ближайшего родителя")
-			get_parent().queue_free()  # fallback — удаляем StaticBody3D
-		
+			queue_free()
 		return true
-	
-	print("health после: ", health)
+
 	return false
+
 
 func generate_drops() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
@@ -49,27 +86,28 @@ func generate_drops() -> Array[Dictionary]:
 		if randf() < entry.chance:
 			var count = randi_range(entry.min_count, entry.max_count)
 			if count > 0:
-				# Запоминаем позицию ДО удаления
 				var center_pos = get_parent().global_position
-				
 				for i in range(count):
-					# Разносим каждый предмет отдельно
 					var offset = Vector3(
-						randf_range(-1.5, 1.5),
-						1.0,  # чуть выше земли
-						randf_range(-1.5, 1.5)
+						randf_range(-1.2, 1.2),
+						0.8,
+						randf_range(-1.2, 1.2)
 					)
-					
 					var spawn_pos = center_pos + offset
-					
-					# Спавним отдельный DroppedItem
 					call_deferred("_spawn_dropped_item", entry.item, 1, spawn_pos)
-					
-					# Добавляем в результат для лога/инвентаря (если нужно)
 					result.append({"item": entry.item, "count": 1})
-	
-	print("Сгенерировано лута: ", result)
 	return result
+
+
+func _spawn_dropped_item(item: ItemData, count: int, spawn_pos: Vector3):
+	var dropped_scene = preload("res://scenes/world_objects/dropped_item/dropped_item.tscn")
+	var dropped = dropped_scene.instantiate() as DroppedItem
+	dropped.item_data = item
+	dropped.count = count
+	get_tree().current_scene.add_child(dropped)
+	dropped.global_position = spawn_pos
+	dropped.add_to_group("dropped_items")
+
 
 func set_highlight(enabled: bool) -> void:
 	if outline_mesh:
@@ -84,54 +122,3 @@ func _on_highlight_area_body_entered(body: Node3D) -> void:
 func _on_highlight_area_body_exited(body: Node3D) -> void:
 	if body.is_in_group("player"):
 		set_highlight(false)
-
-
-# Вспомогательная функция — находит позицию без наложения
-func _find_free_position(center: Vector3, max_radius: float, min_distance: float) -> Vector3:
-	var attempts = 0
-	var max_attempts = 10
-	
-	while attempts < max_attempts:
-		attempts += 1
-		
-		var angle = randf() * PI * 2
-		var distance = randf_range(0.5, max_radius)  # не ближе 0.5 м к центру
-		var offset = Vector3(cos(angle) * distance, 1.0, sin(angle) * distance)
-		
-		var candidate = center + offset
-		
-		# Проверяем расстояние до уже существующих предметов
-		var too_close = false
-		for item in get_tree().get_nodes_in_group("dropped_items"):
-			if candidate.distance_to(item.global_position) < min_distance:
-				too_close = true
-				break
-		
-		if not too_close:
-			return candidate
-	
-	# Если не нашли — возвращаем случайную точку
-	var fallback_angle = randf() * PI * 2
-	var fallback_dist = randf_range(0.5, max_radius)
-	return center + Vector3(cos(fallback_angle) * fallback_dist, 1.0, sin(fallback_angle) * fallback_dist)
-
-# Вспомогательная функция (добавь в конец harvestable.gd)
-func _spawn_dropped_item(item: ItemData, count: int, spawn_pos: Vector3) -> void:
-	var dropped_scene = preload("res://scenes/world_objects/dropped_item/dropped_item.tscn")
-	var dropped = dropped_scene.instantiate() as DroppedItem
-	dropped.item_data = item
-	dropped.count = count  # всегда 1
-	
-	get_tree().current_scene.add_child(dropped)
-	dropped.global_position = spawn_pos
-	
-	dropped.add_to_group("dropped_items")  # для проверки расстояния
-	
-	print("Спавн отдельного предмета: ", item.display_name, " в позиции: ", spawn_pos)
-
-
-func _on_harvested(drops: Array[Dictionary]) -> void:
-	print("Дерево срублено! Выпало предметов на землю: ", drops.size())
-	# НИЧЕГО не добавляем в инвентарь здесь!
-	# Предметы уже выпали на землю через harvestable/tree_basic
-	# Добавление будет ТОЛЬКО при нажатии E (в DroppedItem.pickup())

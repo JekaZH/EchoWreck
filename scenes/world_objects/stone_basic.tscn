@@ -45,10 +45,13 @@ mesh = SubResource("SphereMesh_a2twf")
 surface_material_override/0 = ExtResource("1_a2twf")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1428753839 groups=["harvestable"]]
-collision_layer = 16
+collision_layer = 17
 collision_mask = 16
 script = ExtResource("2_8w0kp")
 loot_table = SubResource("Resource_st1mx")
+max_health = 3.0
+required_tool_type = "pickaxe"
+required_harvest_type = "stone"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=160892960]
 shape = SubResource("SphereShape3D_a2twf")

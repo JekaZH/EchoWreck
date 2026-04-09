@@ -22,6 +22,15 @@ var current_inventory_ui: Control = null
 @onready var inventory_ui_scene: PackedScene = preload("res://scenes/inventory/universal_inventory.tscn")
 
 
+@onready var hotbar_ui: Hotbar = null
+@onready var hotbar_inventory: Inventory = null
+var equipped_slot_index: int = -1   # текущий выбранный слот hotbar
+
+
+@onready var tool_equipper: ToolEquipper = $ToolEquipper
+
+
+
 var nearby_dropped_items: Array[DroppedItem] = []
 var direction: Vector3 = Vector3.ZERO
 var last_moving: bool = false
@@ -37,6 +46,16 @@ func _ready() -> void:
 	
 	inventory.item_dropped.connect(_on_item_dropped)
 	
+	# === Создаём отдельный инвентарь для Hotbar ===
+	hotbar_inventory = $HotbarInventory
+
+	# === Загружаем и настраиваем Hotbar UI ===
+	hotbar_ui = preload("res://scenes/ui/hotbar.tscn").instantiate()
+	ui_layer.add_child(hotbar_ui)
+	hotbar_ui.setup(self, hotbar_inventory)
+	
+	print("Hotbar успешно инициализирован с 5 слотами")
+	
 	var harvestables = get_tree().get_nodes_in_group("harvestable")
 	print("Найдено harvestable: ", harvestables.size())
 	for h in harvestables:
@@ -46,6 +65,34 @@ func _ready() -> void:
 				print("Подключил harvested к ", h.name)
 
 func _input(event: InputEvent) -> void:
+	
+	if Input.is_action_just_pressed("ui_accept"):  # клавиша Enter для теста
+		#var test_item = preload("res://resources/items/pickaxe_wood.tres") # поменяй путь на свой
+		var test_item = preload("res://resources/items/axe_wood.tres") # поменяй путь на свой
+		if test_item:
+			tool_equipper.equip_tool(test_item)
+			print("Тест: пытаемся экипировать кирку")
+	
+	
+	
+	# === ВЫБОР СЛОТОВ HOTBAR КЛАВИШАМИ 1-5 ===
+	for i in 5:
+		if event.is_action_pressed("hotbar_slot_" + str(i + 1)):
+			if hotbar_ui:
+				hotbar_ui.select_slot(i)
+			print("Hotbar: выбран слот", i + 1)
+			break
+	
+	
+	if event.is_action_pressed("interact"):
+		if hotbar_ui and hotbar_ui.active_slot_index >= 0:
+			var active_slot = hotbar_ui.slots_container.get_child(hotbar_ui.active_slot_index) as InventorySlot
+			if active_slot:
+				# Запускаем ту же логику зарядки, что и в слоте
+				active_slot.is_selected = true
+				active_slot.update_selection()
+				# Дальше _process в InventorySlot сам обработает зажатие E
+	
 	if event.is_action_pressed("inventory"):
 		# Если открыт любой сундук — НЕ открываем инвентарь, а закрываем всё
 		var all_uis = get_tree().get_nodes_in_group("inventory_ui")
@@ -86,6 +133,8 @@ func _input(event: InputEvent) -> void:
 				ui.queue_free()
 		current_inventory_ui = null
 		print("Esc — все окна закрыты")
+	
+	
 	
 
 func _physics_process(delta: float) -> void:
@@ -236,3 +285,48 @@ func _on_item_dropped(stack: ItemStack, total_drop: int, spawn_pos: Vector3, loo
 			rb.apply_central_impulse(look_dir * 4.0 + Vector3(0, 2.0, 0))
 		
 		print("Выброшен 1 предмет: ", stack.item.display_name, " на ", final_pos)
+
+func update_equipped_tool_from_hotbar():
+	if not hotbar_ui or hotbar_ui.active_slot_index < 0:
+		tool_equipper.clear_tool()
+		return
+
+	var stack = hotbar_inventory.get_slot(hotbar_ui.active_slot_index)
+	
+	if stack and stack.item and stack.item.is_equippable:
+		tool_equipper.equip_tool(stack.item)
+	else:
+		tool_equipper.clear_tool()
+
+
+func apply_consumable_from_hotbar(slot_index: int):
+	if slot_index < 0 or slot_index >= hotbar_inventory.slots_count:
+		return
+	
+	var stack = hotbar_inventory.get_slot(slot_index)
+	if not stack or not stack.item or not stack.item.is_consumable:
+		return
+
+	var stats_comp = stats_component
+	if not stats_comp:
+		return
+
+	# Применяем эффекты
+	for effect in stack.item.effects:
+		stats_comp.stats.hunger += effect.hunger_restore
+		stats_comp.stats.thirst += effect.thirst_restore
+		stats_comp.stats.health += effect.health_restore
+
+	# Ограничиваем
+	stats_comp.stats.hunger = clamp(stats_comp.stats.hunger, 0, stats_comp.stats.max_hunger)
+	stats_comp.stats.thirst = clamp(stats_comp.stats.thirst, 0, stats_comp.stats.max_thirst)
+	stats_comp.stats.health = clamp(stats_comp.stats.health, 0, stats_comp.stats.max_health)
+
+	# Уменьшаем стак
+	if stack.count > 1:
+		stack.count -= 1
+	else:
+		hotbar_inventory.clear_slot(slot_index)
+
+	hotbar_inventory.changed.emit()
+	print("Применено с hotbar (слот", slot_index + 1, "):", stack.item.display_name)

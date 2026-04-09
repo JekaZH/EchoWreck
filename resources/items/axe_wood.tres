@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://7o7hu281wogl"]
+
+[ext_resource type="Script" uid="uid://dm6xxi7css0sq" path="res://scripts/inventory/item_effect.gd" id="1_mvg3r"]
+[ext_resource type="PackedScene" uid="uid://dedym22hq3cf4" path="res://scenes/tools/axe_wood.tscn" id="2_1dxvt"]
+[ext_resource type="Texture2D" uid="uid://bby4tei3sl1wg" path="res://assets/icons/stylized_item/All/SODA_Icon_Weapons_Axe.png" id="2_nby3a"]
+[ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="2_rq8rl"]
+
+[resource]
+script = ExtResource("2_rq8rl")
+id = "axe_wood"
+display_name = "Деревянный топор"
+description = "топор рубить "
+icon = ExtResource("2_nby3a")
+max_stack = 1
+category = "Tool"
+max_count = 1
+is_equippable = true
+equipped_scene = ExtResource("2_1dxvt")
+hand_offset = Vector3(0, 0.08, 0.04)
+tool_type = "axe"
+block_damage = 3.0
+tool_harvest_type = "tree"
+is_weapon = true
+entity_damage = 5.0
+metadata/_custom_type_script = "uid://p3b1q13fmee1"
