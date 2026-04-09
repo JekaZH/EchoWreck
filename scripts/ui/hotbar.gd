@@ -44,18 +44,15 @@ func select_slot(index: int):
 	
 	active_slot_index = index
 
-	# Сбрасываем все выделения
 	for i in slots_container.get_child_count():
 		var slot = slots_container.get_child(i) as InventorySlot
 		if slot:
-			slot.is_selected = false
 			slot.is_active = (i == index)
+			
+			# Устанавливаем is_selected ТОЛЬКО если предмет consumable
+			var stack = hotbar_inventory.get_slot(i)
+			slot.is_selected = (i == index) and (stack and stack.item and stack.item.is_consumable)
+			
 			slot.update_selection()
-	
-	# Делаем активный слот "выделенным" для системы применения E
-	var active_slot = slots_container.get_child(index) as InventorySlot
-	if active_slot:
-		active_slot.is_selected = true   # ← важно для зарядки E
-		active_slot.update_selection()
 	
 	player.update_equipped_tool_from_hotbar()

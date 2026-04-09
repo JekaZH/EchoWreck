@@ -88,10 +88,11 @@ func _input(event: InputEvent) -> void:
 		if hotbar_ui and hotbar_ui.active_slot_index >= 0:
 			var active_slot = hotbar_ui.slots_container.get_child(hotbar_ui.active_slot_index) as InventorySlot
 			if active_slot:
-				# Запускаем ту же логику зарядки, что и в слоте
-				active_slot.is_selected = true
-				active_slot.update_selection()
-				# Дальше _process в InventorySlot сам обработает зажатие E
+				# Устанавливаем выделение только для применения E
+				var stack = hotbar_inventory.get_slot(hotbar_ui.active_slot_index)
+				if stack and stack.item and stack.item.is_consumable:
+					active_slot.is_selected = true
+					active_slot.update_selection()
 	
 	if event.is_action_pressed("inventory"):
 		# Если открыт любой сундук — НЕ открываем инвентарь, а закрываем всё
