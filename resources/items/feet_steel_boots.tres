@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/inventory/item_data.gd" id="1_item_data"]
+[ext_resource type="Texture2D" path="res://assets/icons/stylized_item/Armor/SODA_Icon_Armor_SteelBoots.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scenes/equipment/male_ranger_feet_boots.tscn" id="3_model"]
+
+[resource]
+script = ExtResource("1_item_data")
+id = "feet_steel_boots"
+display_name = "Стальные сапоги"
+description = "Тяжёлые сапоги, хорошая защита."
+icon = ExtResource("2_icon")
+max_stack = 1
+category = "Armor"
+rarity = "Uncommon"
+is_equipment = true
+equipment_slot = "Feet"
+armor_value = 5.0
+equipped_model = ExtResource("3_model")
+stat_multipliers = {
+"movement_speed": 0.98
+}

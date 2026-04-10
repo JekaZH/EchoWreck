@@ -30,6 +30,7 @@ window/size/viewport_height=1080
 player=""
 harvestable=""
 ui_layer=""
+equipment_slot=""
 
 [input]
 

@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://c6xmkjqktt774"]
+
+[ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="1_item_data"]
+[ext_resource type="Script" uid="uid://dm6xxi7css0sq" path="res://scripts/inventory/item_effect.gd" id="1_ki5wc"]
+[ext_resource type="Texture2D" uid="uid://c62g1gg0gj37o" path="res://assets/icons/stylized_item/Armor/SODA_Icon_Armor_SteelChestplate.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scenes/equipment/male_ranger_body.tscn" id="3_model"]
+
+[resource]
+script = ExtResource("1_item_data")
+id = "chest_steel_plate"
+display_name = "Стальной нагрудник"
+description = "Тяжёлый нагрудник. Сильная броня, но цена — голод/энергия."
+icon = ExtResource("2_icon")
+max_stack = 1
+category = "Armor"
+rarity = "Uncommon"
+is_equipment = true
+armor_value = 12.0
+equipped_model = ExtResource("3_model")
+stat_additives = {
+"max_energy": -5,
+"max_health": 25,
+"weight_reduction": -0.05
+}
+stat_multipliers = {
+"movement_speed": 0.95
+}

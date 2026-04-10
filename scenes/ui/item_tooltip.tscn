@@ -2,6 +2,20 @@
 
 [ext_resource type="Script" uid="uid://c7t4b3io5t0b7" path="res://scripts/ui/item_tooltip.gd" id="1_y56yc"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2r2x3"]
+bg_color = Color(0.06, 0.07, 0.09, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.25, 0.28, 0.35, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+shadow_size = 8
+shadow_color = Color(0, 0, 0, 0.35)
+
 [node name="ItemTooltip" type="Control" unique_id=134825072]
 z_index = 100
 layout_mode = 3
@@ -12,11 +26,17 @@ script = ExtResource("1_y56yc")
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_2r2x3")
+mouse_filter = 2
 
 [node name="MarginContainer" type="MarginContainer" parent="Background" unique_id=88904474]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Background/MarginContainer" unique_id=51993099]
 layout_mode = 2

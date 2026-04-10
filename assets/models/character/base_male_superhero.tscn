@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://bl3c62d8b8kcs"]
+
+[ext_resource type="PackedScene" uid="uid://8gotdlr45qkb" path="res://assets/base_character/Base Characters/Godot - UE/Superhero_Male_FullBody.gltf" id="1_g2y0c"]
+
+[node name="Superhero_Male_FullBody" unique_id=122775940 instance=ExtResource("1_g2y0c")]

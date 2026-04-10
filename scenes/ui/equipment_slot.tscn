@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://c8bs8xvtgpm4v"]
+
+[ext_resource type="Script" uid="uid://8b2mn44kbxdg" path="res://scripts/ui/equipment_slot.gd" id="1_lf8cf"]
+
+[node name="EquipmentSlot" type="PanelContainer" unique_id=1981050818 groups=["equipment_slot"]]
+custom_minimum_size = Vector2(64, 64)
+script = ExtResource("1_lf8cf")
+
+[node name="Placeholder" type="TextureRect" parent="." unique_id=1433919658]
+layout_mode = 2
+mouse_filter = 2
+modulate = Color(1, 1, 1, 0.12)
+stretch_mode = 5
+expand_mode = 1
+
+[node name="Icon" type="TextureRect" parent="." unique_id=1221526690]
+layout_mode = 2
+stretch_mode = 5
+expand_mode = 1
+
+[node name="SlotLabel" type="Label" parent="." unique_id=318722724]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 2
+theme_override_font_sizes/font_size = 11
+modulate = Color(1, 1, 1, 0.8)

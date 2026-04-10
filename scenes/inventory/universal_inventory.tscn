@@ -7,36 +7,36 @@ layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_5ci2s")
 
-[node name="Background" type="Panel" parent="." unique_id=499455584]
+[node name="Background" type="PanelContainer" parent="." unique_id=499455584]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 60.0
-offset_top = 60.0
-offset_right = 560.0
-offset_bottom = 460.0
+offset_left = -300.0
+offset_top = -220.0
+offset_right = 300.0
+offset_bottom = 220.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="TitleLabel" type="Label" parent="Background" unique_id=91091628]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -20.0
-offset_top = -40.0
-offset_right = 20.0
-offset_bottom = -17.0
-grow_horizontal = 2
+[node name="Margin" type="MarginContainer" parent="Background" unique_id=2031830985]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="VBox" type="VBoxContainer" parent="Background/Margin" unique_id=1792657844]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="Background/Margin/VBox" unique_id=91091628]
+layout_mode = 2
 horizontal_alignment = 1
 
-[node name="SlotsGrid" type="GridContainer" parent="Background" unique_id=1494327168]
+[node name="SlotsGrid" type="GridContainer" parent="Background/Margin/VBox" unique_id=1494327168]
 custom_minimum_size = Vector2(64, 64)
-layout_mode = 1
-offset_right = 64.0
-offset_bottom = 64.0
+layout_mode = 2
 columns = 6

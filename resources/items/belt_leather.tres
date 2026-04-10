@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bp62llw710gr3"]
+
+[ext_resource type="Script" uid="uid://dm6xxi7css0sq" path="res://scripts/inventory/item_effect.gd" id="1_m0l7q"]
+[ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="2_0rfci"]
+[ext_resource type="Texture2D" uid="uid://bqivuyn4m1dft" path="res://assets/icons/stylized_item/Armor/SODA_Icon_Armor_LeatherBelt.png" id="2_eq61u"]
+
+[resource]
+script = ExtResource("2_0rfci")
+id = "belt_leather"
+display_name = "Кожаный пояс"
+description = "123"
+icon = ExtResource("2_eq61u")
+max_stack = 1
+category = "Armor"
+max_count = 1
+rarity = "Uncommon"
+is_equipment = true
+equipment_slot = "Belt"
+stat_additives = {
+"extra_hotbar_slots": 0
+}
+metadata/_custom_type_script = "uid://p3b1q13fmee1"

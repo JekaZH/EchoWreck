@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://cpw5svbowg10p"]
+
+[ext_resource type="PackedScene" uid="uid://ce1427rdko0n6" path="res://assets/modular_character_outfit/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Peasant_Arms.gltf" id="1_gltf"]
+
+[node name="ArmsModel" type="Node3D" unique_id=1568325988]
+
+[node name="Male_Peasant_Arms" parent="." unique_id=329193489 instance=ExtResource("1_gltf")]

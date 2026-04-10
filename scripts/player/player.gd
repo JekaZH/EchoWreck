@@ -26,8 +26,23 @@ var current_inventory_ui: Control = null
 @onready var hotbar_inventory: Inventory = null
 var equipped_slot_index: int = -1   # текущий выбранный слот hotbar
 
+var base_hotbar_slots: int = 5
+var bonus_hotbar_slots: int = 0
+
 
 @onready var tool_equipper: ToolEquipper = $ToolEquipper
+
+
+
+@onready var player_equipment: PlayerEquipment = $PlayerEquipment
+@onready var equipment_panel_scene: PackedScene = preload("res://scenes/ui/equipment_panel.tscn")
+@onready var stats_summary_panel_scene: PackedScene = preload("res://scenes/ui/player_stats_summary_panel.tscn")
+
+var current_equipment_panel = null
+var current_stats_summary_panel = null
+
+@onready var stats_ui: PlayerStatsUI = null
+
 
 
 
@@ -48,11 +63,18 @@ func _ready() -> void:
 	
 	# === Создаём отдельный инвентарь для Hotbar ===
 	hotbar_inventory = $HotbarInventory
+	hotbar_inventory.slots_count = base_hotbar_slots
+	hotbar_inventory.item_dropped.connect(_on_item_dropped)
 
 	# === Загружаем и настраиваем Hotbar UI ===
 	hotbar_ui = preload("res://scenes/ui/hotbar.tscn").instantiate()
 	ui_layer.add_child(hotbar_ui)
 	hotbar_ui.setup(self, hotbar_inventory)
+
+	# === Player stats UI ===
+	stats_ui = preload("res://scenes/ui/player_stats_ui.tscn").instantiate()
+	ui_layer.add_child(stats_ui)
+	stats_ui.setup(stats_component.stats)
 	
 	print("Hotbar успешно инициализирован с 5 слотами")
 	
@@ -64,17 +86,44 @@ func _ready() -> void:
 				h.harvested.connect(_on_harvested)
 				print("Подключил harvested к ", h.name)
 
-func _input(event: InputEvent) -> void:
+func handle_hotbar_shrink(target_slots_count: int) -> void:
+	if not hotbar_inventory:
+		return
+	if target_slots_count >= hotbar_inventory.slots_count:
+		return
+	if not inventory:
+		return
 	
-	if Input.is_action_just_pressed("ui_accept"):  # клавиша Enter для теста
-		#var test_item = preload("res://resources/items/pickaxe_wood.tres") # поменяй путь на свой
-		var test_item = preload("res://resources/items/axe_wood.tres") # поменяй путь на свой
+	var angle := rotation.y
+	var look_dir := Vector3(sin(angle), 0, cos(angle)).normalized()
+	var spawn_pos := global_position + look_dir * 2.5 + Vector3(0, 0.8, 0)
+	
+	for idx in range(target_slots_count, hotbar_inventory.slots_count):
+		var stack := hotbar_inventory.get_slot(idx)
+		if not stack or not stack.item or stack.count <= 0:
+			continue
+		
+		var item := stack.item
+		var remaining := stack.count
+		
+		# Try to move to main inventory first (as much as possible).
+		while remaining > 0 and inventory.can_fit_item(item, 1):
+			inventory.add_item(item, 1)
+			remaining -= 1
+		
+		# Drop what's left.
+		if remaining > 0:
+			hotbar_inventory.drop_from_slot(idx, remaining, spawn_pos, look_dir)
+		else:
+			hotbar_inventory.clear_slot(idx)
+
+func _input(event: InputEvent) -> void:
+	if Input.is_action_just_pressed("ui_accept"): # клавиша Enter для теста
+		var test_item = preload("res://resources/items/axe_wood.tres")
 		if test_item:
 			tool_equipper.equip_tool(test_item)
 			print("Тест: пытаемся экипировать кирку")
-	
-	
-	
+
 	# === ВЫБОР СЛОТОВ HOTBAR КЛАВИШАМИ 1-5 ===
 	for i in 5:
 		if event.is_action_pressed("hotbar_slot_" + str(i + 1)):
@@ -82,61 +131,83 @@ func _input(event: InputEvent) -> void:
 				hotbar_ui.select_slot(i)
 			print("Hotbar: выбран слот", i + 1)
 			break
-	
-	
+
 	if event.is_action_pressed("interact"):
 		if hotbar_ui and hotbar_ui.active_slot_index >= 0:
 			var active_slot = hotbar_ui.slots_container.get_child(hotbar_ui.active_slot_index) as InventorySlot
 			if active_slot:
-				# Устанавливаем выделение только для применения E
 				var stack = hotbar_inventory.get_slot(hotbar_ui.active_slot_index)
 				if stack and stack.item and stack.item.is_consumable:
 					active_slot.is_selected = true
 					active_slot.update_selection()
-	
+
+	# ====================== ИНВЕНТАРЬ ======================
 	if event.is_action_pressed("inventory"):
-		# Если открыт любой сундук — НЕ открываем инвентарь, а закрываем всё
 		var all_uis = get_tree().get_nodes_in_group("inventory_ui")
 		var has_chest = false
 		for ui in all_uis:
-			if ui.title == "Сундук" and is_instance_valid(ui):
-				has_chest = true
-				break
-		
+			if is_instance_valid(ui):
+				var title = ui.get("title")
+				if title == "Сундук":
+					has_chest = true
+					break
+
 		if has_chest:
-			# Закрываем все окна сундука и игрока
-			for ui in all_uis:
-				if is_instance_valid(ui):
-					ui.queue_free()
-			current_inventory_ui = null
+			close_all_ui()
 			print("Сундук открыт — закрываем все окна")
 			return
-		
-		# Обычное открытие/закрытие инвентаря игрока
+
+		# Обычное переключение инвентаря
 		if current_inventory_ui and is_instance_valid(current_inventory_ui):
 			current_inventory_ui.queue_free()
 			current_inventory_ui = null
+			if current_equipment_panel and is_instance_valid(current_equipment_panel):
+				current_equipment_panel.queue_free()
+				current_equipment_panel = null
+			if current_stats_summary_panel and is_instance_valid(current_stats_summary_panel):
+				current_stats_summary_panel.queue_free()
+				current_stats_summary_panel = null
 			print("Инвентарь закрыт")
 		else:
 			var ui = preload("res://scenes/inventory/universal_inventory.tscn").instantiate()
 			ui.inventory = $Inventory
 			ui.title = "Инвентарь"
 			ui.columns = 6
-			ui.add_to_group("inventory_ui")  # ← группа для поиска
+			ui.add_to_group("inventory_ui")
 			$UI_Layer.add_child(ui)
 			current_inventory_ui = ui
 			print("Инвентарь открыт")
+
+			# Добавляем панель экипировки
+			var eq_panel = equipment_panel_scene.instantiate()
+			eq_panel.setup(player_equipment)
+			eq_panel.add_to_group("inventory_ui")   # ← ВАЖНО
+			$UI_Layer.add_child(eq_panel)
+			current_equipment_panel = eq_panel
+			
+			# Позиционируем панель справа от окна инвентаря (чтобы не перекрывалась)
+			if eq_panel.has_method("place_next_to"):
+				eq_panel.place_next_to(ui, "RIGHT")
+			
+			# Отдельная панель параметров (отдельное окно, не ребёнок экипировки)
+			var stats_panel = stats_summary_panel_scene.instantiate()
+			stats_panel.add_to_group("inventory_ui")
+			$UI_Layer.add_child(stats_panel)
+			current_stats_summary_panel = stats_panel
+			if stats_panel is PlayerStatsSummaryPanel:
+				(stats_panel as PlayerStatsSummaryPanel).setup(player_equipment, stats_component)
+				(stats_panel as PlayerStatsSummaryPanel).place_next_to(eq_panel, "RIGHT")
+			
+			# Принудительно обновляем все слоты экипировки
+			for child in eq_panel.get_children():
+				if child is EquipmentSlot:
+					child.update_display()
+			
+
+	# ====================== ESC ======================
 	elif event.is_action_pressed("ui_cancel"):
-		# Esc — закрываем всё, что открыто
-		var all_uis = get_tree().get_nodes_in_group("inventory_ui")
-		for ui in all_uis:
-			if is_instance_valid(ui):
-				ui.queue_free()
-		current_inventory_ui = null
+		close_all_ui()
 		print("Esc — все окна закрыты")
-	
-	
-	
 
 func _physics_process(delta: float) -> void:
 	if camera == null: return
@@ -331,3 +402,23 @@ func apply_consumable_from_hotbar(slot_index: int):
 
 	hotbar_inventory.changed.emit()
 	print("Применено с hotbar (слот", slot_index + 1, "):", stack.item.display_name)
+
+
+
+func close_all_ui():
+	var all_uis = get_tree().get_nodes_in_group("inventory_ui")
+	for ui in all_uis:
+		if is_instance_valid(ui):
+			ui.queue_free()
+
+	if current_inventory_ui and is_instance_valid(current_inventory_ui):
+		current_inventory_ui.queue_free()
+		current_inventory_ui = null
+
+	if current_equipment_panel and is_instance_valid(current_equipment_panel):
+		current_equipment_panel.queue_free()
+		current_equipment_panel = null
+	
+	if current_stats_summary_panel and is_instance_valid(current_stats_summary_panel):
+		current_stats_summary_panel.queue_free()
+		current_stats_summary_panel = null

@@ -13,6 +13,24 @@ func _ready() -> void:
 	slots.resize(slots_count)
 	slots.fill(null)
 
+func set_slots_count(new_count: int) -> void:
+	new_count = max(0, new_count)
+	if new_count == slots_count:
+		return
+	
+	# Keep items that still fit into the new range.
+	var new_slots: Array[ItemStack]
+	new_slots.resize(new_count)
+	new_slots.fill(null)
+	
+	var copy_count: int = mini(slots_count, new_count)
+	for i in copy_count:
+		new_slots[i] = slots[i]
+	
+	slots_count = new_count
+	slots = new_slots
+	changed.emit()
+
 func add_item(new_item: ItemData, amount: int = 1) -> bool:
 	if not new_item or amount <= 0:
 		return false

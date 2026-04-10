@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://cbevq5b6xwqf3"]
+
+[ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="1_item_data"]
+[ext_resource type="Script" uid="uid://dm6xxi7css0sq" path="res://scripts/inventory/item_effect.gd" id="1_rg8qq"]
+[ext_resource type="Texture2D" uid="uid://bmt43l75domsu" path="res://assets/icons/stylized_item/Armor/SODA_Icon_Armor_ClothHat.png" id="2_icon"]
+[ext_resource type="PackedScene" uid="uid://kuyvkcsrkxtk" path="res://scenes/equipment/male_ranger_head_hood.tscn" id="3_model"]
+
+[resource]
+script = ExtResource("1_item_data")
+id = "head_cloth_hat"
+display_name = "Тканевая шапка"
+description = "Лёгкий головной убор."
+icon = ExtResource("2_icon")
+max_stack = 1
+category = "Armor"
+is_equipment = true
+equipment_slot = "Head"
+armor_value = 2.0
+equipped_model = ExtResource("3_model")
+stat_additives = {
+"max_energy": 5
+}

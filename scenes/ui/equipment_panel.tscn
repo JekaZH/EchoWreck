@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://pwvctqibnru5"]
+
+[ext_resource type="PackedScene" uid="uid://c8bs8xvtgpm4v" path="res://scenes/ui/equipment_slot.tscn" id="1_oyfco"]
+[ext_resource type="Script" uid="uid://dr1s4gx8oh6hq" path="res://scripts/ui/equipment_panel.gd" id="1_scefq"]
+
+[node name="EquipmentPanel" type="Control" unique_id=292354395]
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+grow_horizontal = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+script = ExtResource("1_scefq")
+
+[node name="Background" type="PanelContainer" parent="." unique_id=1154352210]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Margin" type="MarginContainer" parent="Background" unique_id=176907836]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Background/Margin" unique_id=131352266]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="Background/Margin/VBoxContainer" unique_id=1787123964]
+layout_mode = 2
+text = "Экипировка"
+
+[node name="StatsRow" type="HBoxContainer" parent="Background/Margin/VBoxContainer" unique_id=1291255200]
+layout_mode = 2
+
+[node name="LeftSlots" type="GridContainer" parent="Background/Margin/VBoxContainer/StatsRow" unique_id=777613334]
+layout_mode = 2
+columns = 2
+
+[node name="EquipmentSlot" parent="Background/Margin/VBoxContainer/StatsRow/LeftSlots" unique_id=1981050818 instance=ExtResource("1_oyfco")]
+layout_mode = 2
+slot_type = "Head"
+
+[node name="EquipmentSlot2" parent="Background/Margin/VBoxContainer/StatsRow/LeftSlots" unique_id=2124462219 instance=ExtResource("1_oyfco")]
+layout_mode = 2
+slot_type = "Chest"
+
+[node name="EquipmentSlot3" parent="Background/Margin/VBoxContainer/StatsRow/LeftSlots" unique_id=1743285495 instance=ExtResource("1_oyfco")]
+layout_mode = 2
+slot_type = "Hands"
+
+[node name="EquipmentSlot4" parent="Background/Margin/VBoxContainer/StatsRow/LeftSlots" unique_id=882900085 instance=ExtResource("1_oyfco")]
+layout_mode = 2
+slot_type = "Legs"
+
+[node name="EquipmentSlot5" parent="Background/Margin/VBoxContainer/StatsRow/LeftSlots" unique_id=1517788380 instance=ExtResource("1_oyfco")]
+layout_mode = 2
+slot_type = "Feet"
+
+[node name="EquipmentSlot6" parent="Background/Margin/VBoxContainer/StatsRow/LeftSlots" unique_id=1524376282 instance=ExtResource("1_oyfco")]
+layout_mode = 2
+
+[node name="EquipmentSlot7" parent="Background/Margin/VBoxContainer/StatsRow/LeftSlots" unique_id=74503162 instance=ExtResource("1_oyfco")]
+layout_mode = 2
+slot_type = "Ring"
+
+[node name="EquipmentSlot8" parent="Background/Margin/VBoxContainer/StatsRow/LeftSlots" unique_id=41025269 instance=ExtResource("1_oyfco")]
+layout_mode = 2
+slot_type = "Amulet"

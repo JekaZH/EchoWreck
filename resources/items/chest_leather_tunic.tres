@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dcmwpoq0tbrla"]
+
+[ext_resource type="Script" uid="uid://dm6xxi7css0sq" path="res://scripts/inventory/item_effect.gd" id="1_baqag"]
+[ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="1_item_data"]
+[ext_resource type="Texture2D" uid="uid://bv1ygha1bxwol" path="res://assets/icons/stylized_item/Armor/SODA_Icon_Armor_LeatherTunic.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scenes/equipment/male_ranger_body.tscn" id="3_model"]
+
+[resource]
+script = ExtResource("1_item_data")
+id = "chest_leather_tunic"
+display_name = "Кожаный нагрудник"
+description = "Простой нагрудник. Добавляет выносливость и немного брони."
+icon = ExtResource("2_icon")
+max_stack = 1
+category = "Armor"
+is_equipment = true
+armor_value = 5.0
+equipped_model = ExtResource("3_model")
+stat_additives = {
+"max_energy": 5,
+"max_health": 10,
+"weight_reduction": 0.05
+}

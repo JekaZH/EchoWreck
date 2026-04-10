@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://assets/modular_character_outfit/Exports/glTF (Godot-Unreal)/Modular Parts/Male_Peasant_Feet.gltf" id="1_gltf"]
+
+[node name="FeetModel" type="Node3D"]
+
+[node name="Male_Peasant_Feet" parent="." instance=ExtResource("1_gltf")]

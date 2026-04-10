@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemData" format=3]
+
+[ext_resource type="Script" path="res://scripts/inventory/item_data.gd" id="1_item_data"]
+[ext_resource type="Texture2D" path="res://assets/icons/stylized_item/Armor/SODA_Icon_Armor_SteelGauntlet.png" id="2_icon"]
+[ext_resource type="PackedScene" path="res://scenes/equipment/male_ranger_arms.tscn" id="3_model"]
+
+[resource]
+script = ExtResource("1_item_data")
+id = "hands_steel_gauntlet"
+display_name = "Стальные рукавицы"
+description = "Тяжёлые рукавицы для боя."
+icon = ExtResource("2_icon")
+max_stack = 1
+category = "Armor"
+rarity = "Uncommon"
+is_equipment = true
+equipment_slot = "Hands"
+armor_value = 4.0
+equipped_model = ExtResource("3_model")
+stat_additives = {
+"max_health": 5
+}
+stat_multipliers = {
+"attack_speed": 0.97
+}

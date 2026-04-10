@@ -6,9 +6,12 @@ extends Control
 @export var columns: int = 6
 @export var slot_size: Vector2 = Vector2(64, 64)
 @export var read_only: bool = false  # нельзя класть/брать, только смотреть
+@export_enum("CENTER", "LEFT", "RIGHT", "CUSTOM") var placement: String = "CENTER"
+@export var screen_margin: Vector2 = Vector2(24, 24)
 
-@onready var title_label: Label = $Background/TitleLabel
-@onready var slots_grid: GridContainer = $Background/SlotsGrid
+@onready var background: Control = $Background
+@onready var title_label: Label = $Background/Margin/VBox/TitleLabel
+@onready var slots_grid: GridContainer = $Background/Margin/VBox/SlotsGrid
 
 func _ready() -> void:
 	add_to_group("inventory_ui")
@@ -59,6 +62,70 @@ func _ready() -> void:
 	inventory.changed.emit()
 	# Можно закрывать по Esc
 	# (добавь в Input Map действие "ui_cancel" = Esc, если нужно)
+
+	call_deferred("_fit_background_to_grid")
+
+func _fit_background_to_grid() -> void:
+	if not is_instance_valid(background) or not is_instance_valid(title_label) or not is_instance_valid(slots_grid):
+		return
+	
+	var total_slots: int = inventory.slots_count
+	var cols: int = max(1, columns)
+	var rows: int = int(ceili(float(total_slots) / float(cols)))
+	
+	# GridContainer spacing
+	var hsep: int = slots_grid.get_theme_constant("h_separation")
+	var vsep: int = slots_grid.get_theme_constant("v_separation")
+	
+	var cell_w: float = slot_size.x
+	var cell_h: float = slot_size.y
+	
+	var grid_w: float = cols * cell_w + max(0, cols - 1) * float(hsep)
+	var grid_h: float = rows * cell_h + max(0, rows - 1) * float(vsep)
+	
+	# Let containers do the internal layout; here we only center the panel around its minimum size.
+	slots_grid.custom_minimum_size = Vector2(grid_w, grid_h)
+	
+	await get_tree().process_frame
+	var size: Vector2 = background.get_combined_minimum_size()
+	size.x = max(size.x, 1.0)
+	size.y = max(size.y, 1.0)
+	
+	# Background becomes a fixed-size panel inside this Control.
+	background.anchor_left = 0.0
+	background.anchor_top = 0.0
+	background.anchor_right = 0.0
+	background.anchor_bottom = 0.0
+	background.offset_left = 0.0
+	background.offset_top = 0.0
+	background.offset_right = size.x
+	background.offset_bottom = size.y
+	
+	self.custom_minimum_size = size
+	self.size = size
+	
+	var vp: Vector2 = get_viewport_rect().size
+	var margin := screen_margin
+	margin.x = max(0.0, margin.x)
+	margin.y = max(0.0, margin.y)
+	
+	var desired_pos := position
+	match placement:
+		"CENTER":
+			desired_pos = (vp - size) * 0.5
+		"LEFT":
+			desired_pos = Vector2(margin.x, margin.y)
+		"RIGHT":
+			desired_pos = Vector2(vp.x - size.x - margin.x, margin.y)
+		"CUSTOM":
+			desired_pos = position
+	
+	# Clamp to viewport so it never goes off-screen.
+	var max_x := vp.x - size.x - margin.x
+	var max_y := vp.y - size.y - margin.y
+	desired_pos.x = clampf(desired_pos.x, margin.x, max_x)
+	desired_pos.y = clampf(desired_pos.y, margin.y, max_y)
+	position = desired_pos
 
 #func _input(event: InputEvent) -> void:
 	#if event.is_action_pressed("ui_cancel"):

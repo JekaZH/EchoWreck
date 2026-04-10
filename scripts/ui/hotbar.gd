@@ -3,11 +3,14 @@ extends Control
 
 @export var slot_count: int = 5
 
-@onready var slots_container: HBoxContainer = $Background/SlotsContainer
-
 var hotbar_inventory: Inventory = null
 var player: Player = null
 var active_slot_index: int = -1
+
+var inventory: Inventory
+@export var slot_scene: PackedScene = preload("res://scenes/inventory/inventory_slot.tscn")
+@onready var background: Control = $Background
+@onready var slots_container: HBoxContainer = $Background/Margin/SlotsContainer
 
 
 func _process(delta):
@@ -24,6 +27,10 @@ func setup(p: Player, hotbar_inv: Inventory):
 	hotbar_inventory = hotbar_inv
 	hotbar_inventory.changed.connect(_on_hotbar_changed)
 	create_slots()
+	
+	inventory = hotbar_inv
+	refresh_slots()
+	
 
 func create_slots():
 	for child in slots_container.get_children():
@@ -56,3 +63,31 @@ func select_slot(index: int):
 			slot.update_selection()
 	
 	player.update_equipped_tool_from_hotbar()
+
+
+func refresh_slots():
+	for child in slots_container.get_children():
+		child.queue_free()
+	
+	for i in inventory.slots_count:
+		var scene := slot_scene
+		if scene == null:
+			scene = preload("res://scenes/inventory/inventory_slot.tscn")
+		var slot = scene.instantiate()
+		slots_container.add_child(slot)
+		slot.setup(inventory, i)
+	
+	print("REFRESH HOTBAR UI")
+	
+	call_deferred("_fit_background")
+
+func _fit_background() -> void:
+	if not is_instance_valid(background) or not is_instance_valid(slots_container):
+		return
+	await get_tree().process_frame
+	var size := background.get_combined_minimum_size()
+	background.offset_left = 0
+	background.offset_top = 0
+	background.offset_right = size.x
+	background.offset_bottom = size.y
+	

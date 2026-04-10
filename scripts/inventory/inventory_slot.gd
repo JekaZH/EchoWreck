@@ -21,6 +21,10 @@ var use_progress_ui: UseProgressUI = null
 var is_being_used: bool = false
 var use_timer: float = 0.0
 
+var _is_hovered: bool = false
+var _last_compare_ctrl: bool = false
+var _last_tooltip_item_id: String = ""
+
 
 
 
@@ -36,12 +40,26 @@ func update_display():
 	var stack = inventory.get_slot(slot_index)
 	if stack and stack.item:
 		icon.texture = stack.item.icon
+		icon.modulate = _get_item_tint(stack.item)
 		count_label.text = str(stack.count) if stack.count > 1 else ""
 		count_label.visible = stack.count > 1
 	else:
 		icon.texture = null
+		icon.modulate = Color.WHITE
 		count_label.text = ""
 		count_label.visible = false
+
+func _get_item_tint(item: ItemData) -> Color:
+	# Subtle deterministic tint so even Common items differ.
+	if not item:
+		return Color.WHITE
+	
+	# Prefer rarity color for non-common
+	if item.rarity != "Common":
+		return item.get_rarity_color()
+	
+	var h: float = float(abs(item.id.hash()) % 360) / 360.0
+	return Color.from_hsv(h, 0.22, 1.0, 1.0)
 
 
 func _ready():
@@ -85,6 +103,14 @@ func _process(delta):
 	var tooltip = manager.tooltip
 	if tooltip and tooltip.visible:
 		tooltip.global_position = get_global_mouse_position() + Vector2(25, 25)
+	
+	# Live tooltip compare (Ctrl) without re-hovering.
+	if _is_hovered:
+		var stack2 := inventory.get_slot(slot_index)
+		if stack2 and stack2.item and manager.tooltip and manager.tooltip.visible:
+			var ctrl_now: bool = Input.is_key_pressed(KEY_CTRL)
+			if ctrl_now != _last_compare_ctrl or stack2.item.id != _last_tooltip_item_id:
+				_refresh_tooltip()
 
 
 func _gui_input(event: InputEvent) -> void:
@@ -105,8 +131,11 @@ func _gui_input(event: InputEvent) -> void:
 			# Ищем открытый другой инвентарь
 			var all_uis = get_tree().get_nodes_in_group("inventory_ui")  # добавим группу позже
 			for ui in all_uis:
-				if ui.inventory != inventory and is_instance_valid(ui):
-					other_inventory = ui.inventory
+				if not is_instance_valid(ui):
+					continue
+				var maybe_inv = ui.get("inventory")
+				if maybe_inv is Inventory and maybe_inv != inventory:
+					other_inventory = maybe_inv
 					break
 			
 			if other_inventory:
@@ -117,15 +146,23 @@ func _gui_input(event: InputEvent) -> void:
 				else:
 					print("Нет места в другом инвентаре → ничего не делаем")
 				
+				return
 			else:
-				# Сундук не открыт — обычный выброс
+				# ───── Сундук не открыт: если это экипировка — надеть/заменить ─────
+				if current.item and current.item.is_equipment:
+					var player = get_tree().get_first_node_in_group("player")
+					if player and player.player_equipment:
+						player.player_equipment.equip_from_inventory(inventory, slot_index)
+					return
+				
+				# Иначе — обычный выброс
 				var player = get_tree().get_first_node_in_group("player")
 				if player and player.is_inside_tree():
-					var angle = player.rotation.y
-					var look_dir = Vector3(sin(angle), 0, cos(angle)).normalized()
-					var spawn_pos = player.global_position + look_dir * 2.5 + Vector3(0, 0.8, 0)
+					var angle: float = player.rotation.y
+					var look_dir: Vector3 = Vector3(sin(angle), 0.0, cos(angle)).normalized()
+					var spawn_pos: Vector3 = player.global_position + look_dir * 2.5 + Vector3(0.0, 0.8, 0.0)
 					inventory.drop_from_slot(slot_index, current.count, spawn_pos, look_dir)
-			return
+				return
 
 		# Обычный левый клик (взять / положить)
 		#if manager.held_item:
@@ -199,9 +236,38 @@ func _get_drag_data(at_position):
 	}
 
 func _can_drop_data(at_position, data):
-	return typeof(data) == TYPE_DICTIONARY and data.has("stack")
+	if typeof(data) != TYPE_DICTIONARY:
+		return false
+	
+	# 🔥 из экипировки
+	if data.has("from") and data["from"] == "equipment":
+		return true
+	
+	# обычный инвентарь
+	if data.has("stack"):
+		return true
+	
+	return false
 
 func _drop_data(at_position, data):
+	# ================== ИЗ ЭКИПИРОВКИ ==================
+	if data.has("from") and data["from"] == "equipment":
+		var item = data["item"]
+		var slot = data["slot"]
+		
+		var player = get_tree().get_first_node_in_group("player")
+		if not player:
+			return
+		
+		# 🔥 СНАЧАЛА снимаем
+		var old_item = player.player_equipment.unequip_slot(slot)
+		
+		if old_item:
+			inventory.add_item(old_item, 1)
+		
+		inventory.changed.emit()
+		return
+	
 	var from_inv: Inventory = data["from_inventory"]
 	var from_index: int = data["from_index"]
 	var dragged: ItemStack = data["stack"]
@@ -239,27 +305,48 @@ func get_other_inventory() -> Inventory:
 		if not is_instance_valid(ui):
 			continue
 		
-		if ui.inventory == null:
+		var maybe_inv = ui.get("inventory")
+		if not (maybe_inv is Inventory):
 			continue
 		
-		if ui.inventory != inventory:
-			return ui.inventory
+		if maybe_inv != inventory:
+			return maybe_inv
 	
 	return null
 
 func _on_mouse_entered():
-	var stack = inventory.get_slot(slot_index)
-	if stack and stack.item:
-		var tooltip = manager.get_tooltip()
-		
-		if not tooltip.is_ready:
-			await tooltip.ready
-		
-		tooltip.show_tooltip(stack.item)
+	_is_hovered = true
+	_refresh_tooltip()
 
 func _on_mouse_exited():
+	_is_hovered = false
 	if manager.tooltip:
 		manager.tooltip.hide_tooltip()
+
+func _refresh_tooltip() -> void:
+	var stack = inventory.get_slot(slot_index)
+	if not stack or not stack.item:
+		if manager.tooltip:
+			manager.tooltip.hide_tooltip()
+		return
+	
+	var tooltip = manager.get_tooltip()
+	if not tooltip:
+		return
+	
+	if not tooltip.is_ready:
+		await tooltip.ready
+	
+	var ctrl_now: bool = Input.is_key_pressed(KEY_CTRL)
+	var compare_item: ItemData = null
+	if ctrl_now and stack.item.is_equipment:
+		var player = get_tree().get_first_node_in_group("player")
+		if player and player.player_equipment:
+			compare_item = player.player_equipment.get_item_in_slot(stack.item.equipment_slot)
+	
+	_last_compare_ctrl = ctrl_now
+	_last_tooltip_item_id = stack.item.id
+	tooltip.show_tooltip(stack.item, compare_item)
 
 func update_selection():
 	if selection:

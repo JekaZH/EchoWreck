@@ -1,0 +1,126 @@
+[gd_scene format=3 uid="uid://h8pktck81w6m"]
+
+[ext_resource type="Script" uid="uid://c3423s3usc4gm" path="res://scripts/ui/player_stats_ui.gd" id="1_suxkn"]
+[ext_resource type="Texture2D" uid="uid://dpuix8bsqqdh5" path="res://assets/icons/stylized_item/All/SODA_Icon_Status_MHP.png" id="2_wuvb1"]
+[ext_resource type="Texture2D" uid="uid://lx4t1kjbqsbp" path="res://assets/icons/stylized_item/All/SODA_Icon_System_Misc_Electric.png" id="3_kil65"]
+[ext_resource type="Texture2D" uid="uid://q7rvpcmfqqra" path="res://assets/icons/stylized_item/All/SODA_Icon_Food_Bread.png" id="3_mqe4x"]
+[ext_resource type="Texture2D" uid="uid://78w0yp1h5xpt" path="res://assets/icons/stylized_item/All/SODA_Icon_System_Misc_Water.png" id="3_x581n"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cqj8j"]
+bg_color = Color(0.55106926, 0, 0.06378329, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_suxkn"]
+bg_color = Color(1, 0.26666668, 0.26666668, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wuvb1"]
+bg_color = Color(0.6078695, 0.36898056, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kil65"]
+bg_color = Color(1, 0.6666667, 0.26666668, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_x581n"]
+bg_color = Color(1.347661e-06, 0.28579435, 0.72886825, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mqe4x"]
+bg_color = Color(0.26666668, 0.53333336, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f3vu4"]
+bg_color = Color(0.61131203, 0.51651126, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tv8o5"]
+bg_color = Color(1, 0.8666667, 0.26666668, 1)
+
+[node name="PlayerStatsUI" type="Control" unique_id=1587030714]
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+script = ExtResource("1_suxkn")
+
+[node name="StatsContainer" type="VBoxContainer" parent="." unique_id=24419165]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = -130.0
+offset_right = 308.0
+offset_bottom = -14.0
+grow_vertical = 0
+theme_override_constants/separation = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="StatsContainer" unique_id=1638072768]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="StatsContainer/HBoxContainer" unique_id=1812675352]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("2_wuvb1")
+expand_mode = 3
+
+[node name="HealthBar" type="ProgressBar" parent="StatsContainer/HBoxContainer" unique_id=923939119]
+custom_minimum_size = Vector2(200, 20)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_cqj8j")
+theme_override_styles/fill = SubResource("StyleBoxFlat_suxkn")
+
+[node name="HealthLabel" type="Label" parent="StatsContainer/HBoxContainer" unique_id=501375847]
+layout_mode = 2
+text = "100/100"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="StatsContainer" unique_id=413964153]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="StatsContainer/HBoxContainer2" unique_id=1065282267]
+layout_mode = 2
+texture = ExtResource("3_mqe4x")
+expand_mode = 3
+
+[node name="HungerBar" type="ProgressBar" parent="StatsContainer/HBoxContainer2" unique_id=1139620306]
+custom_minimum_size = Vector2(200, 20)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_wuvb1")
+theme_override_styles/fill = SubResource("StyleBoxFlat_kil65")
+
+[node name="HungerLabel" type="Label" parent="StatsContainer/HBoxContainer2" unique_id=593456817]
+layout_mode = 2
+text = "100/100"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="StatsContainer" unique_id=1760731010]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="StatsContainer/HBoxContainer3" unique_id=1464129071]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("3_x581n")
+expand_mode = 3
+
+[node name="ThirstBar" type="ProgressBar" parent="StatsContainer/HBoxContainer3" unique_id=295507560]
+custom_minimum_size = Vector2(200, 20)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_x581n")
+theme_override_styles/fill = SubResource("StyleBoxFlat_mqe4x")
+
+[node name="ThirstLabel" type="Label" parent="StatsContainer/HBoxContainer3" unique_id=1729808713]
+layout_mode = 2
+text = "100/100"
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="StatsContainer" unique_id=600060484]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="StatsContainer/HBoxContainer4" unique_id=1481753375]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+texture = ExtResource("3_kil65")
+expand_mode = 3
+
+[node name="EnergyBar" type="ProgressBar" parent="StatsContainer/HBoxContainer4" unique_id=1221508362]
+custom_minimum_size = Vector2(200, 20)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_f3vu4")
+theme_override_styles/fill = SubResource("StyleBoxFlat_tv8o5")
+
+[node name="EnergyLabel" type="Label" parent="StatsContainer/HBoxContainer4" unique_id=1844676161]
+layout_mode = 2
+text = "100/100"

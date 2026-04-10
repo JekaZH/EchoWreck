@@ -1,0 +1,80 @@
+[gd_resource type="Resource" script_class="LootTable" format=3 uid="uid://duw72hvg76j8y"]
+
+[ext_resource type="Script" uid="uid://fbnax6jp6py2" path="res://scripts/inventory/loot_table.gd" id="1_loot_table"]
+[ext_resource type="Script" uid="uid://cn6bx4dcnt1nk" path="res://scripts/inventory/loot_entry.gd" id="2_loot_entry"]
+[ext_resource type="Resource" uid="uid://bp62llw710gr3" path="res://resources/items/belt_leather.tres" id="3_item"]
+[ext_resource type="Resource" uid="uid://djpurve614gpi" path="res://resources/items/belt_leather_small.tres" id="4_item"]
+[ext_resource type="Resource" uid="uid://dcmwpoq0tbrla" path="res://resources/items/chest_leather_tunic.tres" id="5_item"]
+[ext_resource type="Resource" uid="uid://c6xmkjqktt774" path="res://resources/items/chest_steel_plate.tres" id="6_item"]
+[ext_resource type="Resource" uid="uid://cbevq5b6xwqf3" path="res://resources/items/head_cloth_hat.tres" id="7_item"]
+[ext_resource type="Resource" path="res://resources/items/head_steel_helmet.tres" id="8_item"]
+[ext_resource type="Resource" path="res://resources/items/hands_brown_glove.tres" id="9_item"]
+[ext_resource type="Resource" path="res://resources/items/hands_steel_gauntlet.tres" id="10_item"]
+[ext_resource type="Resource" path="res://resources/items/legs_red_tunic.tres" id="11_item"]
+[ext_resource type="Resource" path="res://resources/items/legs_steel_bootcut.tres" id="12_item"]
+[ext_resource type="Resource" path="res://resources/items/feet_leather_boots.tres" id="13_item"]
+[ext_resource type="Resource" path="res://resources/items/feet_steel_boots.tres" id="14_item"]
+
+[sub_resource type="Resource" id="LootEntry_1"]
+script = ExtResource("2_loot_entry")
+item = ExtResource("3_item")
+max_count = 1
+
+[sub_resource type="Resource" id="LootEntry_2"]
+script = ExtResource("2_loot_entry")
+item = ExtResource("4_item")
+max_count = 1
+
+[sub_resource type="Resource" id="LootEntry_3"]
+script = ExtResource("2_loot_entry")
+item = ExtResource("5_item")
+max_count = 1
+
+[sub_resource type="Resource" id="LootEntry_4"]
+script = ExtResource("2_loot_entry")
+item = ExtResource("6_item")
+max_count = 1
+
+[sub_resource type="Resource" id="LootEntry_5"]
+script = ExtResource("2_loot_entry")
+item = ExtResource("7_item")
+max_count = 1
+
+[sub_resource type="Resource" id="LootEntry_6"]
+script = ExtResource("2_loot_entry")
+item = ExtResource("8_item")
+max_count = 1
+
+[sub_resource type="Resource" id="LootEntry_7"]
+script = ExtResource("2_loot_entry")
+item = ExtResource("9_item")
+max_count = 1
+
+[sub_resource type="Resource" id="LootEntry_8"]
+script = ExtResource("2_loot_entry")
+item = ExtResource("10_item")
+max_count = 1
+
+[sub_resource type="Resource" id="LootEntry_9"]
+script = ExtResource("2_loot_entry")
+item = ExtResource("11_item")
+max_count = 1
+
+[sub_resource type="Resource" id="LootEntry_10"]
+script = ExtResource("2_loot_entry")
+item = ExtResource("12_item")
+max_count = 1
+
+[sub_resource type="Resource" id="LootEntry_11"]
+script = ExtResource("2_loot_entry")
+item = ExtResource("13_item")
+max_count = 1
+
+[sub_resource type="Resource" id="LootEntry_12"]
+script = ExtResource("2_loot_entry")
+item = ExtResource("14_item")
+max_count = 1
+
+[resource]
+script = ExtResource("1_loot_table")
+entries = Array[ExtResource("2_loot_entry")]([SubResource("LootEntry_1"), SubResource("LootEntry_2"), SubResource("LootEntry_3"), SubResource("LootEntry_4"), SubResource("LootEntry_5"), SubResource("LootEntry_6"), SubResource("LootEntry_7"), SubResource("LootEntry_8"), SubResource("LootEntry_9"), SubResource("LootEntry_10"), SubResource("LootEntry_11"), SubResource("LootEntry_12")])

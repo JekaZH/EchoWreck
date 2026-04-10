@@ -4,10 +4,18 @@ extends Node
 @export var stats: PlayerStats = null
 
 var active_effects: Array[StatusEffect] = []
+var _base_max: Dictionary = {}
 
 func _ready():
 	if not stats:
 		stats = PlayerStats.new()
+	
+	_base_max = {
+		"max_health": stats.max_health,
+		"max_hunger": stats.max_hunger,
+		"max_thirst": stats.max_thirst,
+		"max_energy": stats.max_energy,
+	}
 
 func _process(delta: float):
 	# Естественное уменьшение статов
@@ -46,3 +54,31 @@ func apply_item_effects(item: ItemData):
 	stats.hunger = clamp(stats.hunger, 0, stats.max_hunger)
 	stats.thirst = clamp(stats.thirst, 0, stats.max_thirst)
 	stats.health = clamp(stats.health, 0, stats.max_health)
+
+func apply_equipment_modifiers(additives: Dictionary, multipliers: Dictionary) -> void:
+	# Reset max stats to baseline.
+	stats.max_health = float(_base_max.get("max_health", stats.max_health))
+	stats.max_hunger = float(_base_max.get("max_hunger", stats.max_hunger))
+	stats.max_thirst = float(_base_max.get("max_thirst", stats.max_thirst))
+	stats.max_energy = float(_base_max.get("max_energy", stats.max_energy))
+	
+	# Apply additive modifiers (flat)
+	stats.max_health += float(additives.get("max_health", 0))
+	stats.max_hunger += float(additives.get("max_hunger", 0))
+	stats.max_thirst += float(additives.get("max_thirst", 0))
+	stats.max_energy += float(additives.get("max_energy", 0))
+	
+	# Store the rest in custom_stats (for UI / future combat calc)
+	stats.custom_stats = {}
+	for k in additives.keys():
+		if k in ["max_health", "max_hunger", "max_thirst", "max_energy"]:
+			continue
+		stats.custom_stats[k] = additives[k]
+	for k2 in multipliers.keys():
+		stats.custom_stats[k2] = multipliers[k2]
+	
+	# Clamp current values to new maxima.
+	stats.health = clamp(stats.health, 0, stats.max_health)
+	stats.hunger = clamp(stats.hunger, 0, stats.max_hunger)
+	stats.thirst = clamp(stats.thirst, 0, stats.max_thirst)
+	stats.energy = clamp(stats.energy, 0, stats.max_energy)

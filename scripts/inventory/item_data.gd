@@ -50,6 +50,28 @@ extends Resource
 @export var is_consumable: bool = false
 @export var use_time: float = 1.5
 
+
+# ==================== ЭКИПИРОВКА (броня, ремень и т.д.) ====================
+@export_group("Экипировка (броня, одежда)")
+@export var is_equipment: bool = false
+@export_enum("Head", "Chest", "Legs", "Feet", "Hands", "Belt", "Ring", "Amulet") var equipment_slot: String = "Chest"
+
+@export var armor_value: float = 0.0
+@export var weight_reduction: float = 0.0
+@export var equipped_model: PackedScene
+
+# Бонусы к статам
+@export var stat_additives: Dictionary = {}      # плоские добавления
+@export var stat_multipliers: Dictionary = {}    # множители
+
+# Сеты (база на будущее)
+@export var set_name: String = ""                        # "Iron Set", "Explorer Set"
+@export var set_bonus_threshold: int = 0                 # сколько предметов нужно для бонуса
+@export var set_bonus_additives: Dictionary = {}
+@export var set_bonus_multipliers: Dictionary = {}
+@export var set_bonus_description: String = ""
+
+
 # ==================== ЭФФЕКТЫ ====================
 @export var effects: Array[ItemEffect] = []
 
