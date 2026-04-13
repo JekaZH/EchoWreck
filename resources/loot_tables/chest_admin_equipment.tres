@@ -8,7 +8,7 @@
 [ext_resource type="Resource" uid="uid://c6xmkjqktt774" path="res://resources/items/chest_steel_plate.tres" id="6_item"]
 [ext_resource type="Resource" uid="uid://cbevq5b6xwqf3" path="res://resources/items/head_cloth_hat.tres" id="7_item"]
 [ext_resource type="Resource" path="res://resources/items/head_steel_helmet.tres" id="8_item"]
-[ext_resource type="Resource" path="res://resources/items/hands_brown_glove.tres" id="9_item"]
+[ext_resource type="Resource" uid="uid://dlycgfh1m2nf8" path="res://resources/items/hands_brown_glove.tres" id="9_item"]
 [ext_resource type="Resource" path="res://resources/items/hands_steel_gauntlet.tres" id="10_item"]
 [ext_resource type="Resource" path="res://resources/items/legs_red_tunic.tres" id="11_item"]
 [ext_resource type="Resource" path="res://resources/items/legs_steel_bootcut.tres" id="12_item"]
