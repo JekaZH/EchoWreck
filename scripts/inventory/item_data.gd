@@ -51,6 +51,11 @@ extends Resource
 @export var use_time: float = 1.5
 
 
+# ==================== ТОПЛИВО ====================
+@export_group("Топливо")
+@export_range(0.0, 3600.0, 0.1) var burn_seconds: float = 0.0
+
+
 # ==================== ЭКИПИРОВКА (броня, ремень и т.д.) ====================
 @export_group("Экипировка (броня, одежда)")
 @export var is_equipment: bool = false

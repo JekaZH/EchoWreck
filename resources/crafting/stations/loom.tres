@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CraftingStationType" format=3 uid="uid://bedwb1wxdiuqg"]
+
+[ext_resource type="Script" uid="uid://dyg5vmeyajfof" path="res://scripts/crafting/crafting_station_type.gd" id="1_8ktcn"]
+[ext_resource type="Texture2D" uid="uid://dpt708bp65olw" path="res://assets/icons/stylized_item/All/SODA_Icon_AdventureItems_Map.png" id="1_vbvpr"]
+
+[resource]
+script = ExtResource("1_8ktcn")
+id = &"loom"
+display_name = "Ткацкий станок"
+icon = ExtResource("1_vbvpr")
+supports_parallel_crafts = true
+metadata/_custom_type_script = "uid://dyg5vmeyajfof"

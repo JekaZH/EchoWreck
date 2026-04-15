@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://c3v2q6w5m1q2a"]
+
+[ext_resource type="Script" path="res://scripts/ui/interaction/interaction_prompt.gd" id="1_0p8nq"]
+
+[node name="InteractionPrompt" type="Control"]
+script = ExtResource("1_0p8nq")
+visible = false
+mouse_filter = 2
+
+[node name="Panel" type="PanelContainer" parent="."]
+
+[node name="Margin" type="MarginContainer" parent="Panel"]
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 6
+
+[node name="Label" type="Label" parent="Panel/Margin"]
+text = "Нажмите E"

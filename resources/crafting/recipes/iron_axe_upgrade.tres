@@ -1,0 +1,40 @@
+[gd_resource type="Resource" script_class="CraftRecipe" format=3 uid="uid://bcmror6iskyny"]
+
+[ext_resource type="Script" uid="uid://dk024qqlkvexx" path="res://scripts/crafting/craft_ingredient.gd" id="1_3vy3f"]
+[ext_resource type="Resource" uid="uid://1gq0ards1dq4" path="res://resources/items/stone.tres" id="2_aqr33"]
+[ext_resource type="Script" uid="uid://bsn0mfyq24mrx" path="res://scripts/crafting/craft_recipe.gd" id="2_qebup"]
+[ext_resource type="Resource" uid="uid://k7ucbfelka0f" path="res://resources/crafting/stations/forge.tres" id="2_re1fm"]
+[ext_resource type="Resource" uid="uid://7o7hu281wogl" path="res://resources/items/axe_wood.tres" id="3_h4gb6"]
+[ext_resource type="Resource" uid="uid://d27fvqi8w4nj3" path="res://resources/items/axe_iron.tres" id="5_qlefw"]
+[ext_resource type="Script" uid="uid://dvonqmahwvot5" path="res://scripts/crafting/craft_result.gd" id="6_0rlo1"]
+
+[sub_resource type="Resource" id="Resource_qlefw"]
+script = ExtResource("1_3vy3f")
+item = ExtResource("2_aqr33")
+amount = 2
+metadata/_custom_type_script = "uid://dk024qqlkvexx"
+
+[sub_resource type="Resource" id="Resource_0rlo1"]
+script = ExtResource("1_3vy3f")
+item = ExtResource("3_h4gb6")
+metadata/_custom_type_script = "uid://dk024qqlkvexx"
+
+[sub_resource type="Resource" id="Resource_m0ut6"]
+script = ExtResource("6_0rlo1")
+item = ExtResource("5_qlefw")
+metadata/_custom_type_script = "uid://dvonqmahwvot5"
+
+[resource]
+script = ExtResource("2_qebup")
+id = &"iron_axe_upgrade"
+display_name = "Железный топор"
+recipe_category = "Инструменты"
+recipe_tier = 2
+required_station = ExtResource("2_re1fm")
+craft_time_seconds = 10.0
+ingredients = Array[ExtResource("1_3vy3f")]([SubResource("Resource_qlefw"), SubResource("Resource_0rlo1")])
+result = SubResource("Resource_m0ut6")
+is_upgrade = true
+upgrade_base_item = ExtResource("3_h4gb6")
+requires_fuel = true
+metadata/_custom_type_script = "uid://bsn0mfyq24mrx"

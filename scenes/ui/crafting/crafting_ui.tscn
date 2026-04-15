@@ -1,0 +1,169 @@
+[gd_scene format=3 uid="uid://d0xq8c1m4u3y1"]
+
+[ext_resource type="Script" uid="uid://cw0u18uf7qkxq" path="res://scripts/ui/crafting/crafting_ui.gd" id="1_1m7m2"]
+
+[node name="CraftingUI" type="Control" unique_id=1100727130]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_1m7m2")
+
+[node name="Panel" type="PanelContainer" parent="." unique_id=1543032732]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -450.0
+offset_top = -260.0
+offset_right = 450.0
+offset_bottom = 260.0
+
+[node name="Margin" type="MarginContainer" parent="Panel" unique_id=2043275436]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Root" type="HBoxContainer" parent="Panel/Margin" unique_id=1163852983]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Left" type="VBoxContainer" parent="Panel/Margin/Root" unique_id=1050901597]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Categories" type="VBoxContainer" parent="Panel/Margin/Root/Left" unique_id=1904840393]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CategoryHeader" type="Label" parent="Panel/Margin/Root/Left/Categories" unique_id=1177908463]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Категории"
+
+[node name="CategoryList" type="ItemList" parent="Panel/Margin/Root/Left/Categories" unique_id=489747233]
+custom_minimum_size = Vector2(220, 260)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+fixed_icon_size = Vector2i(20, 20)
+
+[node name="RecipeList" type="ItemList" parent="Panel/Margin/Root/Left" unique_id=1660449481]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+allow_reselect = true
+fixed_icon_size = Vector2i(32, 32)
+
+[node name="Right" type="VBoxContainer" parent="Panel/Margin/Root" unique_id=1252196728]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TopRow" type="HBoxContainer" parent="Panel/Margin/Root/Right" unique_id=1010300517]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ResultIcon" type="TextureRect" parent="Panel/Margin/Root/Right/TopRow" unique_id=1949565109]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+stretch_mode = 4
+
+[node name="RecipeTitle" type="Label" parent="Panel/Margin/Root/Right/TopRow" unique_id=534929856]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "Рецепт"
+
+[node name="CloseButton" type="Button" parent="Panel/Margin/Root/Right/TopRow" unique_id=171991234]
+custom_minimum_size = Vector2(32, 28)
+layout_mode = 2
+focus_mode = 0
+text = "✕"
+flat = true
+
+[node name="RecipeDesc" type="Label" parent="Panel/Margin/Root/Right" unique_id=892463139]
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="IngredientsPanel" type="PanelContainer" parent="Panel/Margin/Root/Right" unique_id=1594523987]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="IngredientsMargin" type="MarginContainer" parent="Panel/Margin/Root/Right/IngredientsPanel" unique_id=186214924]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Ingredients" type="VBoxContainer" parent="Panel/Margin/Root/Right/IngredientsPanel/IngredientsMargin" unique_id=1733573980]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="FuelPanel" type="PanelContainer" parent="Panel/Margin/Root/Right" unique_id=2031169039]
+layout_mode = 2
+
+[node name="FuelMargin" type="MarginContainer" parent="Panel/Margin/Root/Right/FuelPanel" unique_id=288164896]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Fuel" type="VBoxContainer" parent="Panel/Margin/Root/Right/FuelPanel/FuelMargin" unique_id=837064498]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="FuelList" type="ItemList" parent="Panel/Margin/Root/Right/FuelPanel/FuelMargin/Fuel" unique_id=1215893884]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+allow_reselect = true
+fixed_icon_size = Vector2i(22, 22)
+
+[node name="FuelDetails" type="VBoxContainer" parent="Panel/Margin/Root/Right/FuelPanel/FuelMargin/Fuel" unique_id=526280368]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Result" type="Label" parent="Panel/Margin/Root/Right" unique_id=1538756931]
+layout_mode = 2
+text = "Результат:"
+
+[node name="CraftTime" type="Label" parent="Panel/Margin/Root/Right" unique_id=1684166514]
+layout_mode = 2
+text = "Время:"
+
+[node name="Buttons" type="HBoxContainer" parent="Panel/Margin/Root/Right" unique_id=1653344618]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Craft1" type="Button" parent="Panel/Margin/Root/Right/Buttons" unique_id=1049057864]
+layout_mode = 2
+text = "Крафт x1"
+
+[node name="Craft5" type="Button" parent="Panel/Margin/Root/Right/Buttons" unique_id=966902720]
+layout_mode = 2
+text = "Крафт x5"
+
+[node name="Craft10" type="Button" parent="Panel/Margin/Root/Right/Buttons" unique_id=1728289816]
+layout_mode = 2
+text = "Крафт x10"
+
+[node name="Progress" type="ProgressBar" parent="Panel/Margin/Root/Right" unique_id=1117604564]
+visible = false
+layout_mode = 2
+max_value = 1.0
+
+[node name="Status" type="Label" parent="Panel/Margin/Root/Right" unique_id=1287696670]
+layout_mode = 2

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="CraftingStationType" format=3 uid="uid://bqoan8n1ybutb"]
+
+[ext_resource type="Script" uid="uid://dyg5vmeyajfof" path="res://scripts/crafting/crafting_station_type.gd" id="1_e2wld"]
+[ext_resource type="Script" uid="uid://cq2nd6cjppoir" path="res://scripts/crafting/craft_fuel_entry.gd" id="1_jsdhu"]
+[ext_resource type="Texture2D" uid="uid://8cdn54fyi28h" path="res://assets/icons/building_asset_pack/Volcano.png" id="1_wt4xl"]
+
+[sub_resource type="Resource" id="Resource_k6l4f"]
+script = ExtResource("1_jsdhu")
+metadata/_custom_type_script = "uid://cq2nd6cjppoir"
+
+[resource]
+script = ExtResource("1_e2wld")
+id = &"campfire"
+display_name = "Костёр"
+icon = ExtResource("1_wt4xl")
+supports_fuel = true
+fuel_entries = Array[ExtResource("1_jsdhu")]([SubResource("Resource_k6l4f")])
+metadata/_custom_type_script = "uid://dyg5vmeyajfof"

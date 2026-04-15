@@ -16,6 +16,8 @@ extends CharacterBody3D
 @onready var stats_component: PlayerStatsComponent = $PlayerStatsComponent
 
 var current_inventory_ui: Control = null
+var current_crafting_ui: Control = null
+var current_crafting_station: CraftingStation = null
 @onready var inventory: Inventory = $Inventory
 @onready var ui_layer: CanvasLayer = $UI_Layer
 
@@ -42,6 +44,10 @@ var current_equipment_panel = null
 var current_stats_summary_panel = null
 
 @onready var stats_ui: PlayerStatsUI = null
+
+var _nearby_interactables: Array[Node3D] = []
+var _active_interactable: Node3D = null
+var _interaction_prompt: InteractionPrompt = null
 
 
 
@@ -75,6 +81,10 @@ func _ready() -> void:
 	stats_ui = preload("res://scenes/ui/player_stats_ui.tscn").instantiate()
 	ui_layer.add_child(stats_ui)
 	stats_ui.setup(stats_component.stats)
+
+	_interaction_prompt = preload("res://scenes/ui/interaction/interaction_prompt.tscn").instantiate()
+	ui_layer.add_child(_interaction_prompt)
+	_interaction_prompt.set_visible_prompt(false)
 	
 	print("Hotbar успешно инициализирован с 5 слотами")
 	
@@ -140,6 +150,14 @@ func _input(event: InputEvent) -> void:
 				if stack and stack.item and stack.item.is_consumable:
 					active_slot.is_selected = true
 					active_slot.update_selection()
+		
+		# Если рядом нет дропа — сначала пробуем интеракцию по "активному" объекту из Area3D,
+		# чтобы не было конфликтов при пересечении нескольких зон.
+		if nearby_dropped_items.is_empty():
+			if _active_interactable != null and is_instance_valid(_active_interactable) and _active_interactable.has_method("interact"):
+				_active_interactable.interact(self)
+			else:
+				_try_interact_raycast()
 
 	# ====================== ИНВЕНТАРЬ ======================
 	if event.is_action_pressed("inventory"):
@@ -169,10 +187,13 @@ func _input(event: InputEvent) -> void:
 				current_stats_summary_panel = null
 			print("Инвентарь закрыт")
 		else:
+			# Не накладываем интерфейсы друг на друга.
+			close_all_ui()
 			var ui = preload("res://scenes/inventory/universal_inventory.tscn").instantiate()
 			ui.inventory = $Inventory
 			ui.title = "Инвентарь"
 			ui.columns = 6
+			ui.show_close_button = true
 			ui.add_to_group("inventory_ui")
 			$UI_Layer.add_child(ui)
 			current_inventory_ui = ui
@@ -202,6 +223,17 @@ func _input(event: InputEvent) -> void:
 			for child in eq_panel.get_children():
 				if child is EquipmentSlot:
 					child.update_display()
+
+	# ====================== КРАФТ ======================
+	if event.is_action_pressed("crafting_menu"):
+		# K — меню крафта (пока без фильтра по станции)
+		if current_crafting_ui and is_instance_valid(current_crafting_ui):
+			current_crafting_ui.queue_free()
+			current_crafting_ui = null
+			print("Крафт закрыт")
+			return
+		open_crafting_ui(null)
+		print("Крафт открыт (K)")
 			
 
 	# ====================== ESC ======================
@@ -275,6 +307,7 @@ func _physics_process(delta: float) -> void:
 		velocity = velocity.move_toward(Vector3.ZERO, decel * delta)
 	
 	move_and_slide()
+	_update_interaction_prompt()
 	
 	# Условия анимации
 	var is_moving_now = direction.length() > 0.1 and wants_to_move
@@ -329,6 +362,7 @@ func _physics_process(delta: float) -> void:
 			closest.pickup()
 			print("Подобрано ближайший предмет: ", closest.item_data.display_name)
 		else:
+			# Если рядом нет дропа — уже попытались через RayCast выше.
 			print("Нет предметов в зоне")
 
 func _on_harvested(drops: Array[Dictionary]) -> void:
@@ -422,3 +456,132 @@ func close_all_ui():
 	if current_stats_summary_panel and is_instance_valid(current_stats_summary_panel):
 		current_stats_summary_panel.queue_free()
 		current_stats_summary_panel = null
+
+	if current_crafting_ui and is_instance_valid(current_crafting_ui):
+		current_crafting_ui.queue_free()
+		current_crafting_ui = null
+
+
+func open_crafting_ui(station_type: CraftingStationType = null, station: CraftingStation = null) -> void:
+	# Открываем так, чтобы окна не накладывались.
+	close_all_ui()
+	
+	var ui = preload("res://scenes/ui/crafting/crafting_ui.tscn").instantiate()
+	if ui is CraftingUI:
+		(ui as CraftingUI).setup(self, inventory, station_type, [hotbar_inventory], station)
+	ui.add_to_group("inventory_ui")
+	$UI_Layer.add_child(ui)
+	current_crafting_ui = ui
+	current_crafting_station = station
+	
+	# Если это станция — открываем окно выхода + инвентарь игрока (как сундук).
+	if station != null and is_instance_valid(station) and station.has_method("get_output_inventory"):
+		var out_inv: Inventory = station.get_output_inventory()
+		if out_inv != null:
+			var out_ui = preload("res://scenes/inventory/universal_inventory.tscn").instantiate()
+			out_ui.inventory = out_inv
+			out_ui.title = "Выход"
+			out_ui.columns = 3
+			out_ui.placement = "LEFT"
+			out_ui.take_only = true
+			out_ui.show_close_button = false
+			out_ui.add_to_group("inventory_ui")
+			get_tree().current_scene.add_child(out_ui)
+			
+			var player_ui = preload("res://scenes/inventory/universal_inventory.tscn").instantiate()
+			player_ui.inventory = inventory
+			player_ui.title = "Инвентарь"
+			player_ui.columns = 6
+			player_ui.placement = "RIGHT"
+			player_ui.show_close_button = false
+			player_ui.add_to_group("inventory_ui")
+			get_tree().current_scene.add_child(player_ui)
+
+
+func _try_interact_raycast() -> void:
+	if interact_ray == null:
+		return
+	if not interact_ray.is_colliding():
+		return
+	
+	var collider := interact_ray.get_collider()
+	if collider == null:
+		return
+	
+	# collider может быть CollisionObject3D, а скрипт висит на родителе
+	var target: Node = collider
+	if not target.has_method("interact") and target.get_parent() != null and target.get_parent().has_method("interact"):
+		target = target.get_parent()
+	
+	if target.has_method("interact"):
+		target.interact(self)
+
+
+func register_interactable(obj: Node3D) -> void:
+	if obj == null:
+		return
+	if not _nearby_interactables.has(obj):
+		_nearby_interactables.append(obj)
+	_update_active_interactable()
+
+
+func unregister_interactable(obj: Node3D) -> void:
+	if obj == null:
+		return
+	_nearby_interactables.erase(obj)
+	if _active_interactable == obj:
+		_active_interactable = null
+	_update_active_interactable()
+	
+	# Если отошли от станции, с которой открыт крафт — закрываем окно.
+	if current_crafting_station != null and obj == current_crafting_station:
+		close_all_ui()
+		current_crafting_station = null
+
+
+func _update_active_interactable() -> void:
+	# Выбираем ближайший валидный объект.
+	var best: Node3D = null
+	var best_d2 := INF
+	for obj in _nearby_interactables:
+		if obj == null or not is_instance_valid(obj):
+			continue
+		var d2 := global_position.distance_squared_to(obj.global_position)
+		if d2 < best_d2:
+			best_d2 = d2
+			best = obj
+	_active_interactable = best
+
+
+func _update_interaction_prompt() -> void:
+	if _interaction_prompt == null or not is_instance_valid(_interaction_prompt):
+		return
+	
+	_update_active_interactable()
+	
+	if _active_interactable == null or nearby_dropped_items.size() > 0:
+		_interaction_prompt.set_visible_prompt(false)
+		return
+	
+	var text := "Нажмите %s: Взаимодействие" % "E"
+	if _active_interactable.has_method("get_interaction_text"):
+		text = "Нажмите %s: %s" % ["E", _active_interactable.get_interaction_text()]
+	_interaction_prompt.set_text(text)
+	
+	# World -> Screen позиция
+	var world_pos: Vector3 = _active_interactable.global_position
+	if _active_interactable.has_method("get_prompt_world_position"):
+		world_pos = _active_interactable.get_prompt_world_position()
+	
+	if camera == null:
+		_interaction_prompt.set_visible_prompt(false)
+		return
+	
+	var screen := camera.unproject_position(world_pos)
+	# Простая отсечка "за камерой"
+	if camera.is_position_behind(world_pos):
+		_interaction_prompt.set_visible_prompt(false)
+		return
+	
+	_interaction_prompt.set_screen_position(screen + Vector2(-80, -30))
+	_interaction_prompt.set_visible_prompt(true)

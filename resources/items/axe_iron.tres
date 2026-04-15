@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://d27fvqi8w4nj3"]
+
+[ext_resource type="Script" uid="uid://dm6xxi7css0sq" path="res://scripts/inventory/item_effect.gd" id="1_0iu1h"]
+[ext_resource type="PackedScene" uid="uid://b2plntgqccnl2" path="res://scenes/tools/axe_iron.tscn" id="2_0iu1h"]
+[ext_resource type="Texture2D" uid="uid://cp0f86d0y7jor" path="res://assets/icons/stylized_item/Weapons/SODA_Icon_Weapons_BattleAxe.png" id="3_0iu1h"]
+[ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="4_fykeg"]
+
+[resource]
+script = ExtResource("4_fykeg")
+id = "axe_iron"
+display_name = "Железный топор"
+description = "топор рубить "
+icon = ExtResource("3_0iu1h")
+max_stack = 1
+category = "Tool"
+max_count = 1
+is_equippable = true
+equipped_scene = ExtResource("2_0iu1h")
+hand_offset = Vector3(0, 0.08, 0.04)
+tool_type = "axe"
+tool_efficiency = 2.0
+tool_durability = 200
+block_damage = 6.0
+tool_harvest_type = "tree"
+is_weapon = true
+entity_damage = 10.0
+attack_speed = 2.0
+metadata/_custom_type_script = "uid://p3b1q13fmee1"

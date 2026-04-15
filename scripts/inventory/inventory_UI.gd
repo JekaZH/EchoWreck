@@ -6,12 +6,15 @@ extends Control
 @export var columns: int = 6
 @export var slot_size: Vector2 = Vector2(64, 64)
 @export var read_only: bool = false  # нельзя класть/брать, только смотреть
+@export var take_only: bool = false  # можно только забирать (выход станции)
+@export var show_close_button: bool = false
 @export_enum("CENTER", "LEFT", "RIGHT", "CUSTOM") var placement: String = "CENTER"
 @export var screen_margin: Vector2 = Vector2(24, 24)
 
 @onready var background: Control = $Background
-@onready var title_label: Label = $Background/Margin/VBox/TitleLabel
+@onready var title_label: Label = $Background/Margin/VBox/Header/TitleLabel
 @onready var slots_grid: GridContainer = $Background/Margin/VBox/SlotsGrid
+@onready var close_button: Button = $Background/Margin/VBox/Header/CloseButton
 
 func _ready() -> void:
 	add_to_group("inventory_ui")
@@ -29,6 +32,12 @@ func _ready() -> void:
 	title_label.text = title
 	slots_grid.columns = columns
 	
+	# Close button visibility/behavior
+	if close_button:
+		close_button.visible = show_close_button
+		if show_close_button:
+			close_button.pressed.connect(_on_close_pressed)
+	
 	# Создаём слоты
 	for i in inventory.slots_count:
 		var slot_scene = preload("res://scenes/inventory/inventory_slot.tscn")
@@ -36,15 +45,14 @@ func _ready() -> void:
 		slots_grid.add_child(slot)
 		
 		slot.setup(inventory, i)
+		slot.take_only = take_only
 		
 		# Если read_only — отключаем взаимодействие
 		if read_only:
 			slot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			slot.modulate = Color(0.8, 0.8, 0.8, 1.0)  # слегка затемняем для вида
 	
-	# Закрытие по кнопке
-	if has_node("CloseButton"):
-		$CloseButton.pressed.connect(queue_free)
+	# (CloseButton подключаем выше, только если он показывается)
 	
 	
 	mouse_filter = Control.MOUSE_FILTER_PASS
@@ -64,6 +72,16 @@ func _ready() -> void:
 	# (добавь в Input Map действие "ui_cancel" = Esc, если нужно)
 
 	call_deferred("_fit_background_to_grid")
+
+
+func _on_close_pressed() -> void:
+	# If this is the player's inventory window, close the whole UI stack (inventory + equipment + stats).
+	if title == "Инвентарь":
+		var player = get_tree().get_first_node_in_group("player")
+		if player and player.has_method("close_all_ui"):
+			player.close_all_ui()
+			return
+	queue_free()
 
 func _fit_background_to_grid() -> void:
 	if not is_instance_valid(background) or not is_instance_valid(title_label) or not is_instance_valid(slots_grid):

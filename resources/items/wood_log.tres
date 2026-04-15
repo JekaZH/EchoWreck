@@ -13,5 +13,5 @@ description = "Бревно связка тест"
 icon = ExtResource("1_earcf")
 max_stack = 20
 mesh_on_ground = ExtResource("2_0r848")
-category = "material"
+burn_seconds = 20.0
 metadata/_custom_type_script = "uid://p3b1q13fmee1"

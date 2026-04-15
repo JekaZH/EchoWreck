@@ -15,6 +15,7 @@ var slot_index: int = -1
 # Для выделения предмета
 var is_selected: bool = false
 var is_active: bool = false   # новый флаг для активного слота хотбара
+var take_only: bool = false   # для выходного инвентаря станций: только забирать
 
 # Для применения через E
 var use_progress_ui: UseProgressUI = null
@@ -102,7 +103,27 @@ func _process(delta):
 	
 	var tooltip = manager.tooltip
 	if tooltip and tooltip.visible:
-		tooltip.global_position = get_global_mouse_position() + Vector2(25, 25)
+		var mouse := get_global_mouse_position()
+		var vp := get_viewport_rect().size
+		var margin := Vector2(10, 10)
+		var desired := mouse + Vector2(25, 25)
+		
+		# Tooltip size may update after deferred _fit_background; use current rect.
+		var tsize: Vector2 = tooltip.size
+		if tsize.x <= 1.0 or tsize.y <= 1.0:
+			tsize = tooltip.get_combined_minimum_size()
+		
+		# Clamp to viewport; if doesn't fit below cursor, show above.
+		if desired.x + tsize.x > vp.x - margin.x:
+			desired.x = vp.x - tsize.x - margin.x
+		if desired.y + tsize.y > vp.y - margin.y:
+			desired.y = mouse.y - tsize.y - 25
+		if desired.y < margin.y:
+			desired.y = margin.y
+		if desired.x < margin.x:
+			desired.x = margin.x
+		
+		tooltip.global_position = desired
 	
 	# Live tooltip compare (Ctrl) without re-hovering.
 	if _is_hovered:
@@ -139,6 +160,10 @@ func _gui_input(event: InputEvent) -> void:
 					break
 			
 			if other_inventory:
+				# Нельзя перекладывать В выход станции (туда только складывает крафт).
+				if other_inventory.inventory_type == "OUTPUT" and inventory.inventory_type != "OUTPUT":
+					print("Нельзя класть предметы в выход станции")
+					return
 				if other_inventory.can_fit_item(current.item, current.count):
 					other_inventory.add_item(current.item, current.count)
 					inventory.clear_slot(slot_index)
@@ -196,6 +221,8 @@ func _gui_input(event: InputEvent) -> void:
 	elif event.button_index == MOUSE_BUTTON_RIGHT:
 		# Правый клик (кладём 1 или разделяем) — без изменений
 		if manager.held_item:
+			if take_only or (inventory and inventory.inventory_type == "OUTPUT"):
+				return
 			if current == null:
 				var new_stack = ItemStack.new(manager.held_item.item, 1)
 				inventory.set_slot(slot_index, new_stack)
@@ -236,6 +263,8 @@ func _get_drag_data(at_position):
 	}
 
 func _can_drop_data(at_position, data):
+	if take_only or (inventory and inventory.inventory_type == "OUTPUT"):
+		return false
 	if typeof(data) != TYPE_DICTIONARY:
 		return false
 	
@@ -250,6 +279,8 @@ func _can_drop_data(at_position, data):
 	return false
 
 func _drop_data(at_position, data):
+	if take_only or (inventory and inventory.inventory_type == "OUTPUT"):
+		return
 	# ================== ИЗ ЭКИПИРОВКИ ==================
 	if data.has("from") and data["from"] == "equipment":
 		var item = data["item"]

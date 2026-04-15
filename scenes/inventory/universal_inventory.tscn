@@ -32,9 +32,20 @@ theme_override_constants/margin_bottom = 14
 [node name="VBox" type="VBoxContainer" parent="Background/Margin" unique_id=1792657844]
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="Background/Margin/VBox" unique_id=91091628]
+[node name="Header" type="HBoxContainer" parent="Background/Margin/VBox" unique_id=79029211]
 layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="Background/Margin/VBox/Header" unique_id=91091628]
+layout_mode = 2
+size_flags_horizontal = 3
 horizontal_alignment = 1
+
+[node name="CloseButton" type="Button" parent="Background/Margin/VBox/Header" unique_id=139951377]
+layout_mode = 2
+text = "✕"
+custom_minimum_size = Vector2(32, 28)
+flat = true
+focus_mode = 0
 
 [node name="SlotsGrid" type="GridContainer" parent="Background/Margin/VBox" unique_id=1494327168]
 custom_minimum_size = Vector2(64, 64)

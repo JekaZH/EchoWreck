@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="CraftRecipe" format=3 uid="uid://dnh68r0afqmns"]
+
+[ext_resource type="Script" uid="uid://dk024qqlkvexx" path="res://scripts/crafting/craft_ingredient.gd" id="1_heaja"]
+[ext_resource type="Script" uid="uid://bsn0mfyq24mrx" path="res://scripts/crafting/craft_recipe.gd" id="2_sxl3y"]
+[ext_resource type="Resource" uid="uid://pgvwrbnnk153" path="res://resources/items/wood_planks.tres" id="2_v61gw"]
+[ext_resource type="Resource" uid="uid://1gq0ards1dq4" path="res://resources/items/stone.tres" id="3_rqt0b"]
+[ext_resource type="Resource" uid="uid://bi6k1c1qmxqma" path="res://resources/crafting/stations/workbench.tres" id="4_ngnfj"]
+[ext_resource type="Resource" uid="uid://7o7hu281wogl" path="res://resources/items/axe_wood.tres" id="5_pbf6d"]
+[ext_resource type="Script" uid="uid://dvonqmahwvot5" path="res://scripts/crafting/craft_result.gd" id="6_vcyp6"]
+
+[sub_resource type="Resource" id="Resource_at2qr"]
+script = ExtResource("1_heaja")
+item = ExtResource("2_v61gw")
+amount = 2
+metadata/_custom_type_script = "uid://dk024qqlkvexx"
+
+[sub_resource type="Resource" id="Resource_jegtx"]
+script = ExtResource("1_heaja")
+item = ExtResource("3_rqt0b")
+amount = 3
+metadata/_custom_type_script = "uid://dk024qqlkvexx"
+
+[sub_resource type="Resource" id="Resource_0bpux"]
+script = ExtResource("6_vcyp6")
+item = ExtResource("5_pbf6d")
+metadata/_custom_type_script = "uid://dvonqmahwvot5"
+
+[resource]
+script = ExtResource("2_sxl3y")
+id = &"stone_axe"
+display_name = "Каменный топор"
+recipe_category = "Инструменты"
+recipe_tier = 1
+required_station = ExtResource("4_ngnfj")
+craft_time_seconds = 5.0
+ingredients = Array[ExtResource("1_heaja")]([SubResource("Resource_at2qr"), SubResource("Resource_jegtx")])
+result = SubResource("Resource_0bpux")
+metadata/_custom_type_script = "uid://bsn0mfyq24mrx"

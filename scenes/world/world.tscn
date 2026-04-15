@@ -12,6 +12,14 @@
 [ext_resource type="Resource" uid="uid://djpurve614gpi" path="res://resources/items/belt_leather_small.tres" id="6_dlabj"]
 [ext_resource type="Resource" uid="uid://dcmwpoq0tbrla" path="res://resources/items/chest_leather_tunic.tres" id="7_srmg5"]
 [ext_resource type="Resource" uid="uid://c6xmkjqktt774" path="res://resources/items/chest_steel_plate.tres" id="8_umvgx"]
+[ext_resource type="PackedScene" uid="uid://d34mheimbafc3" path="res://scenes/world_objects/crafting/station_workbench.tscn" id="9_workbench"]
+[ext_resource type="PackedScene" path="res://scenes/world_objects/crafting/station_campfire.tscn" id="10_campfire"]
+[ext_resource type="PackedScene" path="res://scenes/world_objects/crafting/station_forge.tscn" id="11_forge"]
+[ext_resource type="PackedScene" path="res://scenes/world_objects/crafting/station_loom.tscn" id="12_loom"]
+[ext_resource type="Resource" uid="uid://q6hw3cxy32pk" path="res://resources/items/wood_log.tres" id="13_wood_log"]
+[ext_resource type="Resource" uid="uid://pgvwrbnnk153" path="res://resources/items/wood_planks.tres" id="14_wood_planks"]
+[ext_resource type="Resource" uid="uid://yha7c2ubsuv6" path="res://resources/items/coal.tres" id="15_coal"]
+[ext_resource type="Resource" uid="uid://1gq0ards1dq4" path="res://resources/items/stone.tres" id="16_stone"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4rhad"]
 albedo_color = Color(0.39572972, 0.32123318, 0.25094575, 1)
@@ -38,7 +46,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.130127, 0.5, 4.213187)
 mesh = SubResource("CylinderMesh_4rhad")
 
 [node name="Tree3" type="MeshInstance3D" parent="TerrainDetails" unique_id=1257369686]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 1.2263699)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 0.5542207)
 mesh = SubResource("CylinderMesh_4rhad")
 
 [node name="Tree4" type="MeshInstance3D" parent="TerrainDetails" unique_id=638181041]
@@ -47,6 +55,15 @@ mesh = SubResource("CylinderMesh_4rhad")
 
 [node name="Tree" parent="TerrainDetails" unique_id=968043563 instance=ExtResource("1_dphjl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.92474747, 0, 8.123716)
+
+[node name="Tree8" parent="TerrainDetails" unique_id=633895497 instance=ExtResource("1_dphjl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.31979132, 0, 8.123716)
+
+[node name="Tree9" parent="TerrainDetails" unique_id=838919566 instance=ExtResource("1_dphjl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5557227, 0, 8.123716)
+
+[node name="Tree10" parent="TerrainDetails" unique_id=2030502708 instance=ExtResource("1_dphjl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0292106, 0, 8.123716)
 
 [node name="Tree5" parent="TerrainDetails" unique_id=372294775 instance=ExtResource("1_dphjl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.659622, 0, 4.9785004)
@@ -59,6 +76,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2296505, 0, 4.9785004)
 
 [node name="Stone" parent="TerrainDetails" unique_id=1622818754 instance=ExtResource("2_1fp7r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.778479, 0, 8.603111)
+
+[node name="Stone3" parent="TerrainDetails" unique_id=327877831 instance=ExtResource("2_1fp7r")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.981106, 0, 8.603111)
+
+[node name="Stone4" parent="TerrainDetails" unique_id=214149152 instance=ExtResource("2_1fp7r")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.564988, 0, 8.603111)
+
+[node name="Stone5" parent="TerrainDetails" unique_id=1086965110 instance=ExtResource("2_1fp7r")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.990689, 0, 8.603111)
 
 [node name="Stone2" parent="TerrainDetails" unique_id=1086062938 instance=ExtResource("2_1fp7r")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.174623, 0, 1.076848)
@@ -97,9 +123,43 @@ item_data = ExtResource("5_t5ptc")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.154822, 0, -5.178507)
 item_data = ExtResource("6_bq33v")
 
+[node name="DroppedWoodLogFuel" parent="GroundItems" unique_id=747217232 instance=ExtResource("3_v5dby")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0, 1)
+item_data = ExtResource("13_wood_log")
+count = 8
+
+[node name="DroppedWoodPlanksFuel" parent="GroundItems" unique_id=1407074244 instance=ExtResource("3_v5dby")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0, 1)
+item_data = ExtResource("14_wood_planks")
+count = 12
+
+[node name="DroppedCoalFuel" parent="GroundItems" unique_id=986748510 instance=ExtResource("3_v5dby")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 1)
+item_data = ExtResource("15_coal")
+count = 6
+
+[node name="DroppedStoneForTest" parent="GroundItems" unique_id=1728119172 instance=ExtResource("3_v5dby")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 0, 1)
+item_data = ExtResource("16_stone")
+count = 10
+
 [node name="WaterAreas" type="Node3D" parent="." unique_id=223744742]
 
 [node name="StaticProps" type="Node3D" parent="." unique_id=960840098]
+
+[node name="CraftingStations" type="Node3D" parent="StaticProps" unique_id=175147556]
+
+[node name="Workbench" parent="StaticProps/CraftingStations" unique_id=1479488025 instance=ExtResource("9_workbench")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 0, 2.2)
+
+[node name="Campfire" parent="StaticProps/CraftingStations" unique_id=791278923 instance=ExtResource("10_campfire")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 2.1)
+
+[node name="Forge" parent="StaticProps/CraftingStations" unique_id=1267860215 instance=ExtResource("11_forge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 2.2)
+
+[node name="Loom" parent="StaticProps/CraftingStations" unique_id=604548457 instance=ExtResource("12_loom")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.4, 0, 2)
 
 [node name="SpawnPoints" type="Node3D" parent="." unique_id=1595975308]
 

@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="CraftRecipe" format=3 uid="uid://yv1ixu0wj6u8"]
+
+[ext_resource type="Script" uid="uid://dk024qqlkvexx" path="res://scripts/crafting/craft_ingredient.gd" id="1_x7w4n"]
+[ext_resource type="Script" uid="uid://bsn0mfyq24mrx" path="res://scripts/crafting/craft_recipe.gd" id="2_j27gv"]
+[ext_resource type="Resource" uid="uid://bi6k1c1qmxqma" path="res://resources/crafting/stations/workbench.tres" id="2_lauor"]
+[ext_resource type="Resource" uid="uid://q6hw3cxy32pk" path="res://resources/items/wood_log.tres" id="2_n8l1i"]
+[ext_resource type="Resource" uid="uid://pgvwrbnnk153" path="res://resources/items/wood_planks.tres" id="4_f7yke"]
+[ext_resource type="Script" uid="uid://dvonqmahwvot5" path="res://scripts/crafting/craft_result.gd" id="5_jgi6k"]
+
+[sub_resource type="Resource" id="Resource_y1to0"]
+script = ExtResource("1_x7w4n")
+item = ExtResource("2_n8l1i")
+amount = 2
+metadata/_custom_type_script = "uid://dk024qqlkvexx"
+
+[sub_resource type="Resource" id="Resource_35isc"]
+script = ExtResource("5_jgi6k")
+item = ExtResource("4_f7yke")
+amount = 4
+metadata/_custom_type_script = "uid://dvonqmahwvot5"
+
+[resource]
+script = ExtResource("2_j27gv")
+id = &"planks_from_log"
+display_name = "Доски из брёвен"
+description = "Распиливаем брёвна на доски"
+recipe_tier = 1
+allow_without_station = true
+required_station = ExtResource("2_lauor")
+craft_time_seconds = 2.0
+ingredients = Array[ExtResource("1_x7w4n")]([SubResource("Resource_y1to0")])
+result = SubResource("Resource_35isc")
+metadata/_custom_type_script = "uid://bsn0mfyq24mrx"

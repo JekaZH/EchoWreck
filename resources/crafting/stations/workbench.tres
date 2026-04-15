@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CraftingStationType" format=3 uid="uid://bi6k1c1qmxqma"]
+
+[ext_resource type="Script" uid="uid://dyg5vmeyajfof" path="res://scripts/crafting/crafting_station_type.gd" id="1_1d166"]
+[ext_resource type="Texture2D" uid="uid://dee8rk0pi470f" path="res://assets/icons/stylized_item/Adventure_Items/SODA_Icon_AdventureItems_Grave.png" id="1_2myh2"]
+
+[resource]
+script = ExtResource("1_1d166")
+id = &"workbench"
+display_name = "Верстак"
+icon = ExtResource("1_2myh2")
+supports_parallel_crafts = true
+metadata/_custom_type_script = "uid://dyg5vmeyajfof"

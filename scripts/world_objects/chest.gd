@@ -93,6 +93,7 @@ func open_both_windows():
 	chest_ui.title = "Сундук"
 	chest_ui.columns = 4
 	chest_ui.placement = "LEFT"
+	chest_ui.show_close_button = false
 	chest_ui.add_to_group("inventory_ui")  # ← группа
 	get_tree().current_scene.add_child(chest_ui)
 	
@@ -102,6 +103,7 @@ func open_both_windows():
 	player_ui.title = "Инвентарь"
 	player_ui.columns = 6
 	player_ui.placement = "RIGHT"
+	player_ui.show_close_button = false
 	player_ui.add_to_group("inventory_ui")
 	get_tree().current_scene.add_child(player_ui)
 	

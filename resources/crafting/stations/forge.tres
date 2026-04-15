@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CraftingStationType" format=3 uid="uid://k7ucbfelka0f"]
+
+[ext_resource type="Script" uid="uid://dyg5vmeyajfof" path="res://scripts/crafting/crafting_station_type.gd" id="1_o5b6v"]
+[ext_resource type="Texture2D" uid="uid://cysuq8yahh7eb" path="res://assets/icons/stylized_item/All/SODA_Icon_Materials_Brick.png" id="1_rnfo6"]
+
+[resource]
+script = ExtResource("1_o5b6v")
+id = &"forge"
+display_name = "Кузница"
+icon = ExtResource("1_rnfo6")
+supports_fuel = true
+supports_queue = true
+supports_parallel_crafts = true
+metadata/_custom_type_script = "uid://dyg5vmeyajfof"

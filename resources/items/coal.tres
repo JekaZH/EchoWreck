@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://yha7c2ubsuv6"]
+
+[ext_resource type="Script" uid="uid://dm6xxi7css0sq" path="res://scripts/inventory/item_effect.gd" id="1_bdclq"]
+[ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="2_item_data"]
+[ext_resource type="Texture2D" uid="uid://dqvmdu88gmq4w" path="res://assets/icons/crafting_materials/resources_basic.png" id="2_onhrs"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uj6mt"]
+atlas = ExtResource("2_onhrs")
+region = Rect2(96, 0, 24, 24)
+
+[resource]
+script = ExtResource("2_item_data")
+id = "coal"
+display_name = "Уголь"
+description = "Топливо для костра и кузницы."
+icon = SubResource("AtlasTexture_uj6mt")
+max_stack = 50
+burn_seconds = 60.0
+metadata/_custom_type_script = "uid://p3b1q13fmee1"
