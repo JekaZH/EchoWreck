@@ -36,6 +36,9 @@ var _fuel_choice_user_locked: bool = false
 @onready var progress: ProgressBar = $Panel/Margin/Root/Right/Progress
 @onready var status_label: Label = $Panel/Margin/Root/Right/Status
 @onready var close_button: Button = $Panel/Margin/Root/Right/TopRow/CloseButton
+@onready var queue_panel: PanelContainer = $Panel/Margin/Root/Right/QueuePanel
+@onready var queue_list: ItemList = $Panel/Margin/Root/Right/QueuePanel/QueueMargin/Queue/QueueList
+@onready var cancel_queued_button: Button = $Panel/Margin/Root/Right/QueuePanel/QueueMargin/Queue/CancelQueued
 
 const CATEGORY_NAMES: Array[String] = [
 	"Все",
@@ -70,6 +73,8 @@ func _ready() -> void:
 	_render_selected()
 	_bind_station()
 	Crafting.personal_craft_completed.connect(_on_personal_craft_completed)
+	Crafting.personal_queue_changed.connect(_on_personal_queue_changed)
+	_on_personal_queue_changed()
 
 
 func _process(_delta: float) -> void:
@@ -93,6 +98,39 @@ func _on_personal_craft_completed(_recipe: CraftRecipe) -> void:
 	progress.value = 0
 	status_label.text = "Готово!"
 	_render_selected()
+	_on_personal_queue_changed()
+
+
+func _on_personal_queue_changed() -> void:
+	if queue_panel == null or not is_instance_valid(queue_panel):
+		return
+	# Personal queue UI only (no station)
+	var is_personal := (station == null or not is_instance_valid(station))
+	queue_panel.visible = is_personal
+	if not is_personal:
+		return
+	if queue_list == null or not is_instance_valid(queue_list):
+		return
+	queue_list.clear()
+	var snap := Crafting.get_personal_queue_snapshot()
+	if snap.is_empty():
+		queue_list.add_item("Пусто")
+		queue_list.set_item_disabled(0, true)
+		cancel_queued_button.disabled = true
+		return
+	for i in snap.size():
+		var job: Dictionary = snap[i]
+		var r: CraftRecipe = job.get("recipe", null)
+		var label := ""
+		if i == 0 and Crafting.get_personal_active_recipe() != null:
+			var left := Crafting.get_personal_active_time_left()
+			label = "[В работе] %s (осталось: %.1f c)" % [r.get_label() if r != null else "?", left]
+		else:
+			label = "%s" % [r.get_label() if r != null else "?"]
+		var idx := queue_list.add_item(label)
+		if r != null and r.result != null and r.result.item != null and r.result.item.icon != null:
+			queue_list.set_item_icon(idx, r.result.item.icon)
+	cancel_queued_button.disabled = false
 
 
 func _wire_events() -> void:
@@ -103,6 +141,7 @@ func _wire_events() -> void:
 	craft10_button.pressed.connect(_on_craft_10)
 	fuel_list.item_selected.connect(_on_fuel_selected)
 	close_button.pressed.connect(_on_close_pressed)
+	cancel_queued_button.pressed.connect(_on_cancel_selected_queue)
 
 
 func _bind_station() -> void:
@@ -149,7 +188,34 @@ func _on_craft_5() -> void:
 
 
 func _on_craft_10() -> void:
-	_try_craft(10)
+	_try_craft(15)
+
+
+func _on_cancel_selected_queue() -> void:
+	if station != null and is_instance_valid(station):
+		return
+	if queue_list == null or not is_instance_valid(queue_list):
+		return
+	var selected := queue_list.get_selected_items()
+	if selected.is_empty():
+		return
+	var idx: int = int(selected[0])
+	# If list shows "Пусто" disabled item, ignore.
+	if queue_list.is_item_disabled(idx):
+		return
+	# Refund targets: prefer player's main inventory first, then extra inventories (hotbar).
+	var refund_targets: Array[Inventory] = []
+	if inventory != null:
+		refund_targets.append(inventory)
+	for inv2 in extra_inventories:
+		if inv2 != null:
+			refund_targets.append(inv2)
+	var ok := Crafting.cancel_personal_job(idx, refund_targets)
+	if ok:
+		status_label.text = "Отменено (ресурсы возвращены)"
+	else:
+		status_label.text = "Не удалось отменить"
+	_on_personal_queue_changed()
 
 
 func _on_close_pressed() -> void:
@@ -556,14 +622,10 @@ func _try_craft(times: int) -> void:
 		return
 	
 	# Без станции: ставим в личную очередь (таймер работает в фоне)
-	var queued := 0
-	for i in times:
-		var ok := Crafting.enqueue_personal_craft(_selected_recipe, sources, inventory)
-		if not ok:
-			break
-		queued += 1
+	var queued := Crafting.enqueue_personal_craft_many(_selected_recipe, sources, inventory, times)
 	status_label.text = ("В очереди: x%d" % queued) if queued > 0 else "Не удалось добавить в очередь"
 	_render_selected()
+	_on_personal_queue_changed()
 
 
 func _setup_fuel_list(sources: Array[Inventory], need_s: float, buffer_s: float) -> void:

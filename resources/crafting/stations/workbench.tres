@@ -2,11 +2,14 @@
 
 [ext_resource type="Script" uid="uid://dyg5vmeyajfof" path="res://scripts/crafting/crafting_station_type.gd" id="1_1d166"]
 [ext_resource type="Texture2D" uid="uid://dee8rk0pi470f" path="res://assets/icons/stylized_item/Adventure_Items/SODA_Icon_AdventureItems_Grave.png" id="1_2myh2"]
+[ext_resource type="Script" uid="uid://cq2nd6cjppoir" path="res://scripts/crafting/craft_fuel_entry.gd" id="1_w47y8"]
 
 [resource]
 script = ExtResource("1_1d166")
 id = &"workbench"
 display_name = "Верстак"
 icon = ExtResource("1_2myh2")
+supports_queue = true
 supports_parallel_crafts = true
+max_parallel_crafts = 5
 metadata/_custom_type_script = "uid://dyg5vmeyajfof"

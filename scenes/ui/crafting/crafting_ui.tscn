@@ -158,7 +158,7 @@ text = "Крафт x5"
 
 [node name="Craft10" type="Button" parent="Panel/Margin/Root/Right/Buttons" unique_id=1728289816]
 layout_mode = 2
-text = "Крафт x10"
+text = "Крафт x15"
 
 [node name="Progress" type="ProgressBar" parent="Panel/Margin/Root/Right" unique_id=1117604564]
 visible = false
@@ -167,3 +167,35 @@ max_value = 1.0
 
 [node name="Status" type="Label" parent="Panel/Margin/Root/Right" unique_id=1287696670]
 layout_mode = 2
+
+[node name="QueuePanel" type="PanelContainer" parent="Panel/Margin/Root/Right" unique_id=132913242]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="QueueMargin" type="MarginContainer" parent="Panel/Margin/Root/Right/QueuePanel" unique_id=132913243]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="Queue" type="VBoxContainer" parent="Panel/Margin/Root/Right/QueuePanel/QueueMargin" unique_id=132913244]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="QueueHeader" type="Label" parent="Panel/Margin/Root/Right/QueuePanel/QueueMargin/Queue" unique_id=132913245]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Очередь"
+
+[node name="QueueList" type="ItemList" parent="Panel/Margin/Root/Right/QueuePanel/QueueMargin/Queue" unique_id=132913246]
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+allow_reselect = true
+fixed_icon_size = Vector2i(20, 20)
+
+[node name="CancelQueued" type="Button" parent="Panel/Margin/Root/Right/QueuePanel/QueueMargin/Queue" unique_id=132913247]
+layout_mode = 2
+text = "Отменить выбранное (с возвратом ресурсов)"
