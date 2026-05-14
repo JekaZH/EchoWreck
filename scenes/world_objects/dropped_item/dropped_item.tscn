@@ -20,6 +20,7 @@ script = ExtResource("1_cdvnd")
 mesh = SubResource("SphereMesh_yk015")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1010392270]
+collision_layer = 0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1260932615]
 shape = SubResource("BoxShape3D_yk015")

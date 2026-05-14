@@ -13,6 +13,7 @@ var player_ui: Control = null
 @export var populate_only_if_empty: bool = true
 
 func _ready():
+	add_to_group("persist_chest")
 	interact_area.body_entered.connect(_on_body_entered)
 	interact_area.body_exited.connect(_on_body_exited)
 	if populate_on_ready:

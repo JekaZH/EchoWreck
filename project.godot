@@ -11,12 +11,14 @@ config_version=5
 [application]
 
 config/name="EchoWreck"
-run/main_scene="uid://ypmvgig6uicm"
+run/main_scene="res://scenes/ui/main_menu/main_menu.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
+WorldPersistence="*res://scripts/save/world_persistence.gd"
+SaveManager="*res://scripts/save/save_manager.gd"
 InventoryManager="*uid://bycce7w1rk8cm"
 DragPreview="*uid://caq2bte1idhpd"
 Crafting="*res://scripts/crafting/crafting_manager.gd"

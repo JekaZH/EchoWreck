@@ -12,6 +12,7 @@ func _ready():
 	if layer:
 		layer.layer = 128  # высокий слой, поверх всего UI
 	hide_preview()
+	SaveManager.before_screenshot_capture.connect(hide_preview)
 
 func show_preview(stack: ItemStack):
 	if not icon or not stack or not stack.item:

@@ -71,6 +71,7 @@ func try_harvest(player) -> bool:
 		# Полностью удаляем весь объект (включая mesh)
 		var root = get_parent()  # StaticBody3D или корень камня
 		if root and root != self:
+			_register_destroyed_harvestable(root)
 			root.queue_free()
 		else:
 			queue_free()
@@ -112,6 +113,15 @@ func _spawn_dropped_item(item: ItemData, count: int, spawn_pos: Vector3):
 func set_highlight(enabled: bool) -> void:
 	if outline_mesh:
 		outline_mesh.visible = enabled
+
+
+func _register_destroyed_harvestable(root: Node) -> void:
+	if root == null:
+		return
+	var main := get_tree().current_scene
+	if main == null or not main.is_ancestor_of(root):
+		return
+	WorldPersistence.register_removed(str(main.get_path_to(root)))
 
 
 func _on_highlight_area_body_entered(body: Node3D) -> void:

@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://cf6xk11stvqxl" path="res://scenes/world/world.tscn" id="1_o5qli"]
 [ext_resource type="Script" uid="uid://cksde01xcw06v" path="res://scripts/core/camera/isometric_camera.gd" id="2_0wfyh"]
 [ext_resource type="PackedScene" uid="uid://bavaadrgbiedk" path="res://scenes/player/Player.tscn" id="3_sugp2"]
+[ext_resource type="Script" path="res://scripts/main_game_bootstrap.gd" id="4_boot"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_0wfyh"]
 
@@ -14,6 +15,7 @@ background_mode = 2
 sky = SubResource("Sky_sugp2")
 
 [node name="Main" type="Node3D" unique_id=1502297984]
+script = ExtResource("4_boot")
 
 [node name="World" parent="." unique_id=532535475 instance=ExtResource("1_o5qli")]
 

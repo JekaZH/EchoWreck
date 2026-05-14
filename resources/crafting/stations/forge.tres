@@ -1,5 +1,6 @@
 [gd_resource type="Resource" script_class="CraftingStationType" format=3 uid="uid://k7ucbfelka0f"]
 
+[ext_resource type="Script" uid="uid://cq2nd6cjppoir" path="res://scripts/crafting/craft_fuel_entry.gd" id="1_4hc6s"]
 [ext_resource type="Script" uid="uid://dyg5vmeyajfof" path="res://scripts/crafting/crafting_station_type.gd" id="1_o5b6v"]
 [ext_resource type="Texture2D" uid="uid://cysuq8yahh7eb" path="res://assets/icons/stylized_item/All/SODA_Icon_Materials_Brick.png" id="1_rnfo6"]
 

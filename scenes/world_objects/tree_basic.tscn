@@ -40,7 +40,7 @@ mesh = SubResource("CylinderMesh_uqsbt")
 surface_material_override/0 = ExtResource("1_2qvkx")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1428753839 groups=["harvestable"]]
-collision_layer = 16
+collision_layer = 17
 collision_mask = 16
 script = ExtResource("1_7xii0")
 loot_table = SubResource("Resource_st1mx")
@@ -49,7 +49,6 @@ required_tool_type = "axe"
 required_harvest_type = "tree"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=160892960]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 shape = SubResource("CylinderShape3D_uqsbt")
 
 [node name="HighlightArea" type="Area3D" parent="." unique_id=2008016165]

@@ -1,0 +1,105 @@
+[gd_scene format=3 uid="uid://cmainmenuew01"]
+
+[ext_resource type="Script" uid="uid://6mook2y6fylq" path="res://scripts/ui/main_menu/main_menu_controller.gd" id="1_ctrl"]
+
+[node name="MainMenu" type="Control" unique_id=827529034]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ctrl")
+
+[node name="Background" type="ColorRect" parent="." unique_id=573668961]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.06, 0.09, 1)
+
+[node name="BackgroundAccent" type="ColorRect" parent="." unique_id=598672625]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 400.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12, 0.14, 0.2, 0.35)
+
+[node name="SafeArea" type="MarginContainer" parent="." unique_id=944935052]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 40
+
+[node name="MainPanel" type="PanelContainer" parent="SafeArea" unique_id=1676256348]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="Margin" type="MarginContainer" parent="SafeArea/MainPanel" unique_id=1558665205]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 28
+
+[node name="VBox" type="VBoxContainer" parent="SafeArea/MainPanel/Margin" unique_id=1562695497]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="SafeArea/MainPanel/Margin/VBox" unique_id=612604738]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "EchoWreck"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="SafeArea/MainPanel/Margin/VBox" unique_id=367344067]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.74, 0.82, 1)
+theme_override_font_sizes/font_size = 14
+text = "Главное меню"
+horizontal_alignment = 1
+
+[node name="Spacer1" type="Control" parent="SafeArea/MainPanel/Margin/VBox" unique_id=54101638]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+
+[node name="NewGameButton" type="Button" parent="SafeArea/MainPanel/Margin/VBox" unique_id=219665215]
+custom_minimum_size = Vector2(280, 40)
+layout_mode = 2
+text = "Новая игра"
+
+[node name="ContinueButton" type="Button" parent="SafeArea/MainPanel/Margin/VBox" unique_id=981226135]
+custom_minimum_size = Vector2(280, 40)
+layout_mode = 2
+text = "Продолжить"
+
+[node name="LoadButton" type="Button" parent="SafeArea/MainPanel/Margin/VBox" unique_id=1882312906]
+custom_minimum_size = Vector2(280, 40)
+layout_mode = 2
+text = "Загрузить"
+
+[node name="SettingsButton" type="Button" parent="SafeArea/MainPanel/Margin/VBox" unique_id=583372774]
+custom_minimum_size = Vector2(280, 40)
+layout_mode = 2
+text = "Настройки"
+
+[node name="QuitButton" type="Button" parent="SafeArea/MainPanel/Margin/VBox" unique_id=406651031]
+custom_minimum_size = Vector2(280, 40)
+layout_mode = 2
+text = "Выйти из игры"
+
+[node name="SubScreens" type="Control" parent="SafeArea" unique_id=1902833448]
+visible = false
+layout_mode = 2

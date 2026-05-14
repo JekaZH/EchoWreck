@@ -27,6 +27,7 @@ var _fuel_buffer_seconds: float = 0.0
 var _queue: Array[Dictionary] = []
 
 func _ready() -> void:
+	add_to_group("persist_crafting_station")
 	if interact_area:
 		interact_area.body_entered.connect(_on_body_entered)
 		interact_area.body_exited.connect(_on_body_exited)
@@ -148,6 +149,10 @@ func get_fuel_seconds_available() -> float:
 
 func get_fuel_buffer_seconds() -> float:
 	return _fuel_buffer_seconds
+
+
+func restore_persisted_fuel_buffer_seconds(seconds: float) -> void:
+	_fuel_buffer_seconds = maxf(0.0, seconds)
 
 
 func _count_fuel_seconds_in_sources(sources: Array[Inventory]) -> float:

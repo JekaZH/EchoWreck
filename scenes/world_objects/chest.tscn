@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://byoi2lf1t3wrk" path="res://scripts/world_objects/chest.gd" id="1_5dkos"]
 [ext_resource type="Script" uid="uid://darvx2nhweubn" path="res://scripts/inventory/inventory.gd" id="1_07bys"]
-[ext_resource type="Resource" path="res://resources/loot_tables/chest_admin_equipment.tres" id="2_admin_loot"]
+[ext_resource type="Resource" uid="uid://duw72hvg76j8y" path="res://resources/loot_tables/chest_admin_equipment.tres" id="2_admin_loot"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_mp3cv"]
 
@@ -17,8 +17,6 @@ radius = 1.5
 [node name="Chest" type="StaticBody3D" unique_id=2050241417]
 script = ExtResource("1_5dkos")
 populate_from_loot_table = ExtResource("2_admin_loot")
-populate_on_ready = true
-populate_only_if_empty = true
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=921282149]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)

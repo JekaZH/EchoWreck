@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://cqp2n4iarijnk"]
+
+[ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu"]
+
+[node name="MainMenu" type="Control" unique_id=833100438]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=847685910]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.08, 0.09, 0.12, 1)
+
+[node name="Center" type="CenterContainer" parent="." unique_id=1964805374]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Center" unique_id=1635255473]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Center/VBox" unique_id=368181360]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "EchoWreck"
+horizontal_alignment = 1
+
+[node name="ContinueButton" type="Button" parent="Center/VBox" unique_id=306682264]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+text = "Продолжить"
+
+[node name="NewGameButton" type="Button" parent="Center/VBox" unique_id=1747870286]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+text = "Новая игра"
+
+[node name="QuitButton" type="Button" parent="Center/VBox" unique_id=387279862]
+custom_minimum_size = Vector2(220, 0)
+layout_mode = 2
+text = "Выход"

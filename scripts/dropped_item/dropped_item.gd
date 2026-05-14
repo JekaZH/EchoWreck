@@ -9,6 +9,7 @@ extends Node3D
 @onready var label: Label3D = $Label3D  # добавим позже
 
 func _ready() -> void:
+	add_to_group("dropped_items")
 	if label:
 		label.text = "E to collect"
 		label.visible = false

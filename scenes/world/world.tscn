@@ -14,7 +14,7 @@
 [ext_resource type="Resource" uid="uid://c6xmkjqktt774" path="res://resources/items/chest_steel_plate.tres" id="8_umvgx"]
 [ext_resource type="PackedScene" uid="uid://d34mheimbafc3" path="res://scenes/world_objects/crafting/station_workbench.tscn" id="9_workbench"]
 [ext_resource type="PackedScene" path="res://scenes/world_objects/crafting/station_campfire.tscn" id="10_campfire"]
-[ext_resource type="PackedScene" path="res://scenes/world_objects/crafting/station_forge.tscn" id="11_forge"]
+[ext_resource type="PackedScene" uid="uid://dp6bfoiocjgh3" path="res://scenes/world_objects/crafting/station_forge.tscn" id="11_forge"]
 [ext_resource type="PackedScene" path="res://scenes/world_objects/crafting/station_loom.tscn" id="12_loom"]
 [ext_resource type="Resource" uid="uid://q6hw3cxy32pk" path="res://resources/items/wood_log.tres" id="13_wood_log"]
 [ext_resource type="Resource" uid="uid://pgvwrbnnk153" path="res://resources/items/wood_planks.tres" id="14_wood_planks"]

@@ -45,6 +45,10 @@ var current_stats_summary_panel = null
 
 @onready var stats_ui: PlayerStatsUI = null
 
+const PAUSE_MENU_SCENE := preload("res://scenes/ui/pause_menu/pause_menu.tscn")
+var _pause_menu: PauseMenuController
+var _ui_layer_visible_before_screenshot: bool = true
+
 var _nearby_interactables: Array[Node3D] = []
 var _active_interactable: Node3D = null
 var _interaction_prompt: InteractionPrompt = null
@@ -60,19 +64,17 @@ var is_tree_chopping_now: bool = false
 
 func _ready() -> void:
 	stats_component.stats = PlayerStats.new()  # или загружай сохранённые статы
-	
+
+	# До await: чтобы загрузка сейва из Main._ready не застала hotbar_inventory = null.
+	hotbar_inventory = $HotbarInventory
+	hotbar_inventory.slots_count = base_hotbar_slots
+	hotbar_inventory.item_dropped.connect(_on_item_dropped)
+
 	anim_tree.active = true
 	await get_tree().process_frame
 	await get_tree().process_frame
 	
 	inventory.item_dropped.connect(_on_item_dropped)
-	
-	# === Создаём отдельный инвентарь для Hotbar ===
-	hotbar_inventory = $HotbarInventory
-	hotbar_inventory.slots_count = base_hotbar_slots
-	hotbar_inventory.item_dropped.connect(_on_item_dropped)
-
-	# === Загружаем и настраиваем Hotbar UI ===
 	hotbar_ui = preload("res://scenes/ui/hotbar.tscn").instantiate()
 	ui_layer.add_child(hotbar_ui)
 	hotbar_ui.setup(self, hotbar_inventory)
@@ -85,6 +87,11 @@ func _ready() -> void:
 	_interaction_prompt = preload("res://scenes/ui/interaction/interaction_prompt.tscn").instantiate()
 	ui_layer.add_child(_interaction_prompt)
 	_interaction_prompt.set_visible_prompt(false)
+
+	_pause_menu = PAUSE_MENU_SCENE.instantiate() as PauseMenuController
+	add_child(_pause_menu)
+	SaveManager.before_screenshot_capture.connect(_on_before_save_screenshot_hide_ui)
+	SaveManager.after_screenshot_capture.connect(_on_after_save_screenshot_restore_ui)
 	
 	print("Hotbar успешно инициализирован с 5 слотами")
 	
@@ -95,6 +102,18 @@ func _ready() -> void:
 			if not h.harvested.is_connected(_on_harvested):
 				h.harvested.connect(_on_harvested)
 				print("Подключил harvested к ", h.name)
+
+
+func _on_before_save_screenshot_hide_ui() -> void:
+	if ui_layer:
+		_ui_layer_visible_before_screenshot = ui_layer.visible
+		ui_layer.visible = false
+
+
+func _on_after_save_screenshot_restore_ui() -> void:
+	if ui_layer:
+		ui_layer.visible = _ui_layer_visible_before_screenshot
+
 
 func handle_hotbar_shrink(target_slots_count: int) -> void:
 	if not hotbar_inventory:
@@ -236,10 +255,23 @@ func _input(event: InputEvent) -> void:
 		print("Крафт открыт (K)")
 			
 
-	# ====================== ESC ======================
+	# ====================== ESC / пауза ======================
 	elif event.is_action_pressed("ui_cancel"):
+		if _pause_menu and _pause_menu.is_menu_open():
+			_pause_menu.close_menu()
+			get_viewport().set_input_as_handled()
+			return
+		var inv_nodes := get_tree().get_nodes_in_group("inventory_ui")
+		if inv_nodes.size() > 0:
+			close_all_ui()
+			print("Esc — все окна закрыты")
+			get_viewport().set_input_as_handled()
+			return
 		close_all_ui()
-		print("Esc — все окна закрыты")
+		if _pause_menu:
+			_pause_menu.open_menu()
+			get_viewport().set_input_as_handled()
+			print("Esc — меню паузы")
 
 func _physics_process(delta: float) -> void:
 	if camera == null: return
