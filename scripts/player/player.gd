@@ -13,6 +13,7 @@ extends CharacterBody3D
 @export_range(0.1, 1.0, 0.05) var exhausted_walk_speed_multiplier: float = 0.55
 
 @onready var anim_tree: AnimationTree = $PlayerAnimTree
+@onready var anim_player: AnimationPlayer = $AnimationPlayer
 @onready var interact_ray: RayCast3D = $InteractRay
 
 @onready var stats_component: PlayerStatsComponent = $PlayerStatsComponent
@@ -49,6 +50,7 @@ var current_stats_summary_panel = null
 
 const PAUSE_MENU_SCENE := preload("res://scenes/ui/pause_menu/pause_menu.tscn")
 const DEATH_SCREEN_SCENE := preload("res://scenes/ui/death_screen/death_screen.tscn")
+const SWORD_SLASH_VFX_SCENE := preload("res://scenes/combat/sword_slash_vfx.tscn")
 var _pause_menu: PauseMenuController
 var _death_screen: DeathScreenController
 var _is_dead: bool = false
@@ -65,7 +67,9 @@ var nearby_dropped_items: Array[DroppedItem] = []
 var direction: Vector3 = Vector3.ZERO
 var last_moving: bool = false
 var last_running: bool = false
-var is_tree_chopping_now: bool = false
+var _action_animator: PlayerActionAnimator
+var _movement_locked: bool = false
+var _pending_pickup: bool = false
 
 func _ready() -> void:
 	stats_component.stats = PlayerStats.new()  # или загружай сохранённые статы
@@ -76,7 +80,13 @@ func _ready() -> void:
 	hotbar_inventory.item_dropped.connect(_on_item_dropped)
 
 	anim_tree.active = true
-	await get_tree().process_frame
+	_action_animator = PlayerActionAnimator.new()
+	_action_animator.name = "ActionAnimator"
+	add_child(_action_animator)
+	_action_animator.setup(self, anim_tree, anim_player)
+	_action_animator.action_hit_frame.connect(_on_action_hit_frame)
+	_action_animator.action_recovery.connect(_on_action_recovery)
+	_action_animator.action_finished.connect(_on_action_anim_finished)
 	await get_tree().process_frame
 	
 	inventory.item_dropped.connect(_on_item_dropped)
@@ -131,6 +141,9 @@ func _on_player_died() -> void:
 	if _is_dead:
 		return
 	_is_dead = true
+	_movement_locked = true
+	if _action_animator:
+		_action_animator.play_death()
 	close_all_ui()
 	if _pause_menu and _pause_menu.is_menu_open():
 		_pause_menu.close_menu()
@@ -303,10 +316,16 @@ func _input(event: InputEvent) -> void:
 			print("Esc — меню паузы")
 
 func _physics_process(delta: float) -> void:
-	if camera == null or _is_dead:
+	if camera == null:
+		return
+	if _is_dead:
+		velocity = velocity.move_toward(Vector3.ZERO, 12.0 * delta)
+		move_and_slide()
 		return
 
-	var input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+	var input_dir := Vector2.ZERO
+	if not _movement_locked:
+		input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var energy_ok := stats_component != null and stats_component.stats != null and stats_component.stats.energy > 0.0
 	var is_running := Input.is_action_pressed("run") and energy_ok
 	var wants_to_move := input_dir.length() > 0.05
@@ -386,54 +405,19 @@ func _physics_process(delta: float) -> void:
 	last_moving = is_moving_now
 	last_running = is_running_now
 	
-	is_tree_chopping_now = Input.is_action_just_pressed("attack")
-	
-	if is_tree_chopping_now:
-		# Поворот к курсору при рубке (мгновенный)
-		var mouse_pos = get_viewport().get_mouse_position()
-		var ray_origin = camera.project_ray_origin(mouse_pos)
-		var ray_dir = camera.project_ray_normal(mouse_pos)
-		var plane = Plane(Vector3.UP, global_position.y)
-		var intersection = plane.intersects_ray(ray_origin, ray_dir)
-		if intersection:
-			var look_dir = (intersection - global_position).normalized()
-			look_dir.y = 0
-			if look_dir.length() > 0.01:
-				var target_angle = atan2(look_dir.x, look_dir.z)
-				rotation.y = target_angle
-	
-	if anim_tree:
+	if anim_tree and anim_tree.active:
 		anim_tree.set("parameters/conditions/is_moving", is_moving_now)
 		anim_tree.set("parameters/conditions/is_running", is_running_now)
 		anim_tree.set("parameters/conditions/is_not_moving", not is_moving_now)
 		anim_tree.set("parameters/conditions/is_not_running", not is_running_now)
-		anim_tree.set("parameters/conditions/is_tree_chopping", is_tree_chopping_now)
+		anim_tree.set("parameters/conditions/is_tree_chopping", false)
 	
-	# Взаимодействие (без изменений)
-	if Input.is_action_just_pressed("attack"):
-		if interact_ray.is_colliding():
-			var collider = interact_ray.get_collider()
-			print("Попал в объект: ", collider.name, " | путь: ", collider.get_path())
-			if collider.has_method("try_harvest"):
-				var success = collider.try_harvest(self)
-				if success:
-					print("Успешно собрано!")
-			else:
-				print("Raycast ничего не видит!")
+	if Input.is_action_just_pressed("attack") and not _movement_locked:
+		_try_start_attack_action()
 	
-	if Input.is_action_just_pressed("interact"):
+	if Input.is_action_just_pressed("interact") and not _movement_locked:
 		if nearby_dropped_items.size() > 0:
-			var closest = nearby_dropped_items[0]
-			for item in nearby_dropped_items:
-				var dist = global_position.distance_to(item.global_position)
-				var closest_dist = global_position.distance_to(closest.global_position)
-				if dist < closest_dist:
-					closest = item
-			closest.pickup()
-			print("Подобрано ближайший предмет: ", closest.item_data.display_name)
-		else:
-			# Если рядом нет дропа — уже попытались через RayCast выше.
-			print("Нет предметов в зоне")
+			_try_start_pickup_action()
 
 func _on_harvested(drops: Array[Dictionary]) -> void:
 	print("Дерево срублено! Выпало предметов на землю: ", drops.size())
@@ -461,6 +445,186 @@ func _on_item_dropped(stack: ItemStack, total_drop: int, spawn_pos: Vector3, loo
 			rb.apply_central_impulse(look_dir * 4.0 + Vector3(0, 2.0, 0))
 		
 		print("Выброшен 1 предмет: ", stack.item.display_name, " на ", final_pos)
+
+func get_equipped_item_data() -> ItemData:
+	if tool_equipper == null or tool_equipper.current_tool == null:
+		return null
+	if tool_equipper.current_tool.has_meta("item_data"):
+		return tool_equipper.current_tool.get_meta("item_data") as ItemData
+	return null
+
+
+func _face_cursor_instant() -> void:
+	if camera == null:
+		return
+	var mouse_pos := get_viewport().get_mouse_position()
+	var ray_origin := camera.project_ray_origin(mouse_pos)
+	var ray_dir := camera.project_ray_normal(mouse_pos)
+	var plane := Plane(Vector3.UP, global_position.y)
+	var intersection: Variant = plane.intersects_ray(ray_origin, ray_dir)
+	if intersection == null:
+		return
+	var look_dir: Vector3 = (intersection as Vector3 - global_position).normalized()
+	look_dir.y = 0.0
+	if look_dir.length() > 0.01:
+		rotation.y = atan2(look_dir.x, look_dir.z)
+
+
+func _try_start_attack_action() -> void:
+	if _action_animator == null or _action_animator.is_busy():
+		return
+	var item := get_equipped_item_data()
+	if item == null or not item.can_primary_action():
+		return
+	_face_cursor_instant()
+	if _action_animator.play_item_action(item):
+		_movement_locked = true
+
+
+func _try_start_pickup_action() -> void:
+	if _action_animator == null or _action_animator.is_busy():
+		return
+	if nearby_dropped_items.is_empty():
+		return
+	_face_cursor_instant()
+	if _action_animator.try_play_pickup():
+		_pending_pickup = true
+		_movement_locked = true
+
+
+func _on_action_hit_frame() -> void:
+	_apply_primary_action_hit()
+	# После кадра удара можно уходить с линии атаки (остаток клипа доигрывается).
+	_movement_locked = false
+
+
+func _on_action_recovery() -> void:
+	_movement_locked = false
+
+
+func _on_action_anim_finished(kind: String) -> void:
+	if kind != "death":
+		_movement_locked = false
+	if kind == "pickup" and _pending_pickup:
+		_pending_pickup = false
+		_pickup_closest_dropped_item()
+
+
+func _apply_primary_action_hit() -> void:
+	var item := get_equipped_item_data()
+	if item == null:
+		return
+	if item.uses_melee_arc_hit():
+		_apply_sword_arc_hit(item)
+	else:
+		_apply_tool_ray_hit(item)
+
+
+func _apply_tool_ray_hit(item: ItemData) -> void:
+	if interact_ray == null:
+		return
+	interact_ray.force_raycast_update()
+	if not interact_ray.is_colliding():
+		return
+	var collider: Object = interact_ray.get_collider()
+	if collider == null:
+		return
+
+	var harvestable := _find_harvestable_from_collider(collider)
+	if harvestable != null:
+		harvestable.try_harvest(self)
+		return
+
+	var target := _resolve_damage_target(collider as Node)
+	if target == null or not target.has_method("take_damage"):
+		return
+	var dmg: float = item.entity_damage if item.entity_damage > 0.0 else 1.0
+	target.call("take_damage", dmg, self)
+
+
+func _apply_sword_arc_hit(item: ItemData) -> void:
+	var forward := _get_flat_forward()
+	var origin := global_position + Vector3(0.0, item.melee_arc_height, 0.0)
+	_spawn_sword_slash_vfx(origin, forward, item)
+	var targets := MeleeArcHit.collect_damage_targets(
+		self,
+		origin,
+		forward,
+		item.melee_arc_reach,
+		item.melee_arc_radius,
+		item.melee_arc_angle_deg
+	)
+	var dmg: float = item.entity_damage if item.entity_damage > 0.0 else 1.0
+	for target in targets:
+		if is_instance_valid(target):
+			target.call("take_damage", dmg, self)
+
+
+func _get_flat_forward() -> Vector3:
+	# Совпадает с поворотом к курсору (atan2 x,z → ось +Z персонажа).
+	var f := global_transform.basis.z
+	f.y = 0.0
+	if f.length_squared() < 0.0001:
+		return Vector3(sin(rotation.y), 0.0, cos(rotation.y)).normalized()
+	return f.normalized()
+
+
+func _spawn_sword_slash_vfx(origin: Vector3, forward: Vector3, item: ItemData) -> void:
+	var root := get_tree().current_scene
+	if root == null:
+		return
+	var vfx := SWORD_SLASH_VFX_SCENE.instantiate() as SwordSlashVfx
+	if vfx == null:
+		return
+	root.add_child(vfx)
+	vfx.play(origin, forward, item.melee_arc_reach, item.melee_arc_angle_deg)
+
+
+func take_damage(amount: float, source: Node = null) -> void:
+	take_damage_info(DamageInfo.from_amount(amount, source))
+
+
+func take_damage_info(info: DamageInfo) -> void:
+	if _is_dead or info == null or stats_component == null or stats_component.stats == null:
+		return
+	var dmg := maxf(info.amount, 0.0)
+	if dmg <= 0.0:
+		return
+	stats_component.stats.health = maxf(stats_component.stats.health - dmg, 0.0)
+
+
+func _find_harvestable_from_collider(collider: Object) -> Node:
+	var node := collider as Node
+	while node != null:
+		if node.has_method("try_harvest"):
+			return node
+		node = node.get_parent()
+	return null
+
+
+func _resolve_damage_target(collider: Node) -> Node:
+	if collider == null:
+		return null
+	if collider.has_method("take_damage"):
+		return collider
+	var parent := collider.get_parent()
+	if parent != null and parent.has_method("take_damage"):
+		return parent
+	return null
+
+
+func _pickup_closest_dropped_item() -> void:
+	if nearby_dropped_items.is_empty():
+		return
+	var closest: DroppedItem = nearby_dropped_items[0]
+	for item in nearby_dropped_items:
+		if not is_instance_valid(item):
+			continue
+		if global_position.distance_to(item.global_position) < global_position.distance_to(closest.global_position):
+			closest = item
+	if is_instance_valid(closest):
+		closest.pickup()
+
 
 func update_equipped_tool_from_hotbar():
 	if not hotbar_ui or hotbar_ui.active_slot_index < 0:
@@ -564,11 +728,11 @@ func _try_interact_raycast() -> void:
 		return
 	if not interact_ray.is_colliding():
 		return
-	
+
 	var collider := interact_ray.get_collider()
 	if collider == null:
 		return
-	
+
 	# collider может быть CollisionObject3D, а скрипт висит на родителе
 	var target: Node = collider
 	if not target.has_method("interact") and target.get_parent() != null and target.get_parent().has_method("interact"):

@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="EnemyDefinition" format=3 uid="uid://d0ehx8rmsbi10"]
+
+[ext_resource type="Script" uid="uid://cvb7agslybixh" path="res://scripts/enemies/enemy_definition.gd" id="1_def"]
+[ext_resource type="Script" uid="uid://cn6bx4dcnt1nk" path="res://scripts/inventory/loot_entry.gd" id="2_entry"]
+[ext_resource type="Script" uid="uid://fbnax6jp6py2" path="res://scripts/inventory/loot_table.gd" id="3_table"]
+[ext_resource type="Resource" uid="uid://1gq0ards1dq4" path="res://resources/items/stone.tres" id="4_stone"]
+
+[sub_resource type="Resource" id="LootEntry_stone"]
+script = ExtResource("2_entry")
+item = ExtResource("4_stone")
+chance = 0.35
+max_count = 2
+
+[sub_resource type="Resource" id="LootTable_grunt"]
+script = ExtResource("3_table")
+entries = Array[ExtResource("2_entry")]([SubResource("LootEntry_stone")])
+
+[resource]
+script = ExtResource("1_def")
+id = "capsule_grunt"
+display_name = "Cave Grunt"
+move_speed = 3.0
+aggro_range = 12.0
+attack_range = 1.7
+attack_damage = 9.0
+attack_windup = 0.65
+attack_cooldown = 1.3
+hit_stun_duration = 0.45
+loot_table = SubResource("LootTable_grunt")

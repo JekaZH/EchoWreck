@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://df1qd7sbrunkf"]
+
+[ext_resource type="Script" uid="uid://yfta2nah1gbb" path="res://scripts/enemies/enemy_body.gd" id="1_body"]
+[ext_resource type="Resource" uid="uid://d0ehx8rmsbi10" path="res://resources/enemies/capsule_grunt.tres" id="2_def"]
+[ext_resource type="Script" uid="uid://fv0057lbianw" path="res://scripts/combat/health_component.gd" id="3_health"]
+[ext_resource type="Script" uid="uid://dj56dirlr772r" path="res://scripts/enemies/enemy_debug_visual.gd" id="4_debug"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_visual"]
+radius = 0.35
+height = 1.1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_enemy"]
+albedo_color = Color(0.75, 0.18, 0.15, 1)
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.38
+height = 1.15
+
+[node name="EnemyCapsule" type="CharacterBody3D" unique_id=972527115 groups=["damageable", "enemy"]]
+collision_layer = 17
+script = ExtResource("1_body")
+definition = ExtResource("2_def")
+
+[node name="Visual" type="MeshInstance3D" parent="." unique_id=2123853375]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+mesh = SubResource("CapsuleMesh_visual")
+surface_material_override/0 = SubResource("StandardMaterial3D_enemy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=417726181]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.575, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Health" type="Node" parent="." unique_id=722135598]
+script = ExtResource("3_health")
+
+[node name="DebugVisual" type="Node3D" parent="." unique_id=1201447311]
+script = ExtResource("4_debug")

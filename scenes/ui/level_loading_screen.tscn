@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://cves3ykh5kpgm"]
+
+[ext_resource type="Script" path="res://scripts/ui/level_loading_screen.gd" id="1_script"]
+
+[node name="LevelLoadingScreen" type="CanvasLayer"]
+process_mode = 3
+layer = 120
+script = ExtResource("1_script")
+
+[node name="Root" type="Control" parent="."]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+
+[node name="Backdrop" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+color = Color(0.04, 0.05, 0.08, 1)
+
+[node name="Center" type="CenterContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Root/Center"]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Root/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="Root/Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="StatusLabel" type="Label" parent="Root/Center/Panel/Margin/VBox"]
+layout_mode = 2
+text = "Загрузка уровня..."
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="Root/Center/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(360, 28)
+layout_mode = 2
+max_value = 100.0
+show_percentage = true

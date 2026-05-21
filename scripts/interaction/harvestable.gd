@@ -1,11 +1,12 @@
 class_name Harvestable
-extends Node
+extends StaticBody3D
 
 @onready var outline_mesh: MeshInstance3D = $"../OutlineMesh"
 
 @export var loot_table: LootTable
 @export var max_health: float = 10.0
-var current_health: float = 0.0
+@export var show_health_bar: bool = true
+@export var health_bar_visibility: HealthBarVisibilityMode.Mode = HealthBarVisibilityMode.Mode.ON_DAMAGE
 
 @export var harvest_time: float = 1.5
 
@@ -18,8 +19,23 @@ var current_health: float = 0.0
 
 signal harvested(drops: Array[Dictionary])
 
-func _ready():
-	current_health = max_health
+const _HEALTH_BAR_SCENE := preload("res://scenes/ui/world_health_bar.tscn")
+const _HealthBarDisplay := preload("res://scripts/ui/world_health_bar_display.gd")
+
+var _health: HealthComponent
+var _health_bar: Node3D
+
+
+func _ready() -> void:
+	_health = get_node_or_null("Health") as HealthComponent
+	if _health == null:
+		_health = HealthComponent.new()
+		_health.name = "Health"
+		add_child(_health)
+	_health.max_health = max_health
+	_health.reset_health()
+	if show_health_bar:
+		call_deferred("_setup_health_bar")
 
 func try_harvest(player) -> bool:
 	if not player or not player.has_node("ToolEquipper"):
@@ -60,61 +76,110 @@ func try_harvest(player) -> bool:
 		return false
 
 	# === НАНОСИМ ДРОБНЫЙ УРОН ===
-	var damage = equipped_item.block_damage if equipped_item.block_damage > 0 else 1.0
-	current_health -= damage
+	var damage := equipped_item.block_damage if equipped_item.block_damage > 0 else 1.0
+	var destroyed := _health.apply_damage(damage, player)
 
-	print("Удар по блоку! Урон:", damage, " | Здоровье осталось:", current_health)
+	print("Удар по блоку! Урон:", damage, " | Здоровье осталось:", _health.current_health)
 
-	if current_health <= 0:
+	if destroyed:
 		print("Блок полностью уничтожен!")
-		var drops = generate_drops()
+		var harvest_root := _get_harvest_root()
+		var drops := generate_drops(harvest_root)
 		harvested.emit(drops)
-		
-		# Полностью удаляем весь объект (включая mesh)
-		var root = get_parent()  # StaticBody3D или корень камня
-		if root and root != self:
-			_register_destroyed_harvestable(root)
-			root.queue_free()
-		else:
-			queue_free()
+		_destroy_harvest_root(harvest_root)
 		return true
 
 	return false
 
 
-func generate_drops() -> Array[Dictionary]:
+func _get_harvest_root() -> Node3D:
+	var parent := get_parent()
+	if parent is Node3D:
+		return parent as Node3D
+	return self
+
+
+func _destroy_harvest_root(harvest_root: Node) -> void:
+	if harvest_root == null or not is_instance_valid(harvest_root):
+		queue_free()
+		return
+	if harvest_root != self:
+		_register_destroyed_harvestable(harvest_root)
+		harvest_root.queue_free()
+	else:
+		queue_free()
+
+
+func generate_drops(harvest_root: Node3D) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	
+	if loot_table == null or harvest_root == null:
+		return result
+
+	var center_pos := harvest_root.global_position
+	var host := _get_drop_spawn_host()
+
 	for entry in loot_table.entries:
-		if randf() < entry.chance:
-			var count = randi_range(entry.min_count, entry.max_count)
-			if count > 0:
-				var center_pos = get_parent().global_position
-				for i in range(count):
-					var offset = Vector3(
-						randf_range(-1.2, 1.2),
-						0.8,
-						randf_range(-1.2, 1.2)
-					)
-					var spawn_pos = center_pos + offset
-					call_deferred("_spawn_dropped_item", entry.item, 1, spawn_pos)
-					result.append({"item": entry.item, "count": 1})
+		if entry == null or entry.item == null:
+			continue
+		if randf() >= entry.chance:
+			continue
+		var drop_count := randi_range(entry.min_count, entry.max_count)
+		for _i in drop_count:
+			var offset := Vector3(
+				randf_range(-1.2, 1.2),
+				0.35,
+				randf_range(-1.2, 1.2)
+			)
+			var spawn_pos := center_pos + offset
+			if _spawn_dropped_item(host, entry.item, 1, spawn_pos):
+				result.append({"item": entry.item, "count": 1})
 	return result
 
 
-func _spawn_dropped_item(item: ItemData, count: int, spawn_pos: Vector3):
-	var dropped_scene = preload("res://scenes/world_objects/dropped_item/dropped_item.tscn")
-	var dropped = dropped_scene.instantiate() as DroppedItem
+func _get_drop_spawn_host() -> Node:
+	var scene := get_tree().current_scene
+	if scene == null:
+		return null
+	var ground := scene.find_child("GroundItems", true, false)
+	if ground != null:
+		return ground
+	return scene
+
+
+func _spawn_dropped_item(host: Node, item: ItemData, count: int, spawn_pos: Vector3) -> bool:
+	if host == null or item == null:
+		return false
+	var dropped_scene := preload("res://scenes/world_objects/dropped_item/dropped_item.tscn")
+	var dropped := dropped_scene.instantiate() as DroppedItem
+	if dropped == null:
+		return false
 	dropped.item_data = item
 	dropped.count = count
-	get_tree().current_scene.add_child(dropped)
+	host.add_child(dropped)
 	dropped.global_position = spawn_pos
 	dropped.add_to_group("dropped_items")
+	return true
 
 
 func set_highlight(enabled: bool) -> void:
 	if outline_mesh:
 		outline_mesh.visible = enabled
+	if _health_bar and _health_bar.has_method("set_highlighted"):
+		_health_bar.set_highlighted(enabled)
+
+
+func _setup_health_bar() -> void:
+	var harvest_root := _get_harvest_root()
+	if harvest_root == null:
+		return
+	_health_bar = _HEALTH_BAR_SCENE.instantiate()
+	if _health_bar == null:
+		return
+	_health_bar.visibility_mode = health_bar_visibility
+	harvest_root.add_child(_health_bar)
+	_health_bar.position = Vector3(0.0, _HealthBarDisplay.estimate_top_offset(harvest_root), 0.0)
+	if _health_bar.has_method("bind_to"):
+		_health_bar.bind_to(_health)
 
 
 func _register_destroyed_harvestable(root: Node) -> void:

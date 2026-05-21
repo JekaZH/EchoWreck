@@ -9,7 +9,7 @@
 script = ExtResource("1_2oqkr")
 hunger_restore = 25.0
 health_restore = 5.0
-energy_restore = -100.0
+energy_restore = 15.0
 metadata/_custom_type_script = "uid://dm6xxi7css0sq"
 
 [resource]
@@ -20,6 +20,9 @@ description = "Восстанавливает голод, здоровье и э
 icon = ExtResource("2_8nbq6")
 mesh_on_ground = ExtResource("3_pdbyo")
 category = "Food"
+primary_action_animation = null
+action_anim_speed_scale = null
+action_hit_time_ratio = null
 is_consumable = true
 effects = Array[ExtResource("1_2oqkr")]([SubResource("Resource_8nbq6")])
 metadata/_custom_type_script = "uid://p3b1q13fmee1"

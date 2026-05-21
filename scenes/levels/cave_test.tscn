@@ -6,28 +6,13 @@
 [ext_resource type="PackedScene" uid="uid://b3pysob8mmiuq" path="res://scenes/world/level_spawn_point.tscn" id="4_spawn"]
 [ext_resource type="PackedScene" uid="uid://b4twi8qhgiud7" path="res://scenes/world/level_transition_zone.tscn" id="5_zone"]
 [ext_resource type="PackedScene" uid="uid://ypmvgig6uicm" path="res://scenes/main.tscn" id="6_main"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_floor"]
-size = Vector3(24, 0.2, 24)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cave"]
-albedo_color = Color(0.25, 0.22, 0.28, 1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
-size = Vector3(24, 0.2, 24)
+[ext_resource type="PackedScene" uid="uid://bwhj4ak4e48so" path="res://scenes/world/cave_world.tscn" id="7_cave_world"]
 
 [node name="CaveTest" type="Node3D" unique_id=1220859776]
 script = ExtResource("1_boot")
+level_save_key = "res://scenes/levels/cave_test.tscn"
 
-[node name="Floor" type="StaticBody3D" parent="." unique_id=1175555183]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" unique_id=2056735380]
-mesh = SubResource("BoxMesh_floor")
-surface_material_override/0 = SubResource("StandardMaterial3D_cave")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=1741348802]
-shape = SubResource("BoxShape3D_floor")
+[node name="CaveWorld" parent="." unique_id=1394356656 instance=ExtResource("7_cave_world")]
 
 [node name="LevelPortals" type="Node3D" parent="." unique_id=712696896]
 

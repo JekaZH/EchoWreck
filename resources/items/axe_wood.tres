@@ -22,4 +22,6 @@ block_damage = 3.0
 tool_harvest_type = "tree"
 is_weapon = true
 entity_damage = 5.0
+primary_action_animation = 1
+action_hit_time_ratio = 0.32
 metadata/_custom_type_script = "uid://p3b1q13fmee1"

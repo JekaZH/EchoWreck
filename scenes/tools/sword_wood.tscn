@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://c8swordwood01"]
+
+[ext_resource type="PackedScene" uid="uid://dvkf8a5j4l0d1" path="res://assets/rpg_wearpons/Long_Sword/Long_Sword_01.glb" id="1_glb"]
+
+[node name="SwordWood" type="Node3D" unique_id=2036912388]
+
+[node name="Long_Sword_01" parent="." unique_id=206178863 instance=ExtResource("1_glb")]
+transform = Transform3D(-2.6226834e-08, 0.55, 0, -0.55, -2.6226834e-08, 0, 0, 0, 0.55, 0.02, 0.06, 0.05)

@@ -19,6 +19,8 @@
 - Корень `Node3D` + скрипт `main_game_bootstrap.gd`
 - `Player`, `Camera3D`, свет (как `cave_test.tscn`)
 - Папка `LevelPortals` — зоны и точки спавна
+- Контент мира — отдельная сцена, как `scenes/world/world.tscn` на поляне:
+  - **`scenes/world/cave_world.tscn`** для пещеры: `Harvestables` (камни/деревья), `Enemies`, `GroundItems`
 
 ### 2. Переходы
 - Инстанс `level_transition_zone.tscn` у входов → `target_level` = другая сцена

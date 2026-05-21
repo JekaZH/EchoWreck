@@ -18,6 +18,7 @@ sky = SubResource("Sky_sugp2")
 
 [node name="Main" type="Node3D" unique_id=1502297984]
 script = ExtResource("4_boot")
+level_save_key = "res://scenes/main.tscn"
 
 [node name="World" parent="." unique_id=532535475 instance=ExtResource("1_o5qli")]
 
@@ -49,14 +50,14 @@ editor_label = "Точка появления с боку"
 
 [node name="ZoneToCave" parent="LevelMarkers" unique_id=251216482 instance=ExtResource("6_zone")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 8)
-target_level_path = "uid://ccavetestlvl1"
+target_level_path = "res://scenes/levels/cave_test.tscn"
 arrival_portal_id = "cave_entrance"
 zone_display_name = "Тёмная пещера"
 gizmo_color = Color(2.695322e-06, 0.94865197, 0.437918, 0.4509804)
 
 [node name="ZoneToCaveSide" parent="LevelMarkers" unique_id=830271039 instance=ExtResource("6_zone")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.559998, 0, -1.031187)
-target_level_path = "uid://ccavetestlvl1"
+target_level_path = "res://scenes/levels/cave_test.tscn"
 arrival_portal_id = "cave_side"
 zone_display_name = "Тёмная пещера"
 gizmo_color = Color(2.695322e-06, 0.94865197, 0.437918, 0.4509804)

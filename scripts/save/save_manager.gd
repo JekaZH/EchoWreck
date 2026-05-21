@@ -107,10 +107,18 @@ func start_new_game() -> void:
 	LevelTravelManager.clear_travel_state()
 	_pending_data = null
 	_pending_new_game = true
-	get_tree().change_scene_to_file(MAIN_GAME_PATH)
+	_run_start_new_game()
+
+
+func _run_start_new_game() -> void:
+	await LevelTravelManager.transition_to_level(MAIN_GAME_PATH, "Новая игра...")
 
 
 func load_slot(slot: int) -> void:
+	_run_load_slot(slot)
+
+
+func _run_load_slot(slot: int) -> void:
 	var data := load_save_resource(slot)
 	if data == null:
 		push_warning("SaveManager: нет сохранения в слоте %d" % slot)
@@ -120,12 +128,7 @@ func load_slot(slot: int) -> void:
 	_pending_new_game = false
 	_pending_data = data
 	var level_path := LevelTravelManager.resolve_level_scene_path(data.level_scene_path)
-	var packed := load(level_path) as PackedScene
-	if packed == null:
-		push_warning("SaveManager.load_slot: не удалось загрузить %s, fallback main" % level_path)
-		get_tree().change_scene_to_file(MAIN_GAME_PATH)
-	else:
-		get_tree().change_scene_to_packed(packed)
+	await LevelTravelManager.transition_to_level(level_path, "Загрузка сохранения...")
 
 
 func load_latest() -> void:

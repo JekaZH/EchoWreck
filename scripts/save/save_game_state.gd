@@ -297,7 +297,24 @@ static func apply_destroyed_harvestables(main: Node, paths: Variant) -> void:
 		elif not key_str.is_empty():
 			WorldPersistKey.warn_missing(main, "добыча", key_str)
 	for n in to_kill:
-		n.queue_free()
+		n.free()
+
+
+static func apply_destroyed_enemies(main: Node, paths: Variant) -> void:
+	if main == null or not (paths is Array):
+		return
+	var to_kill: Array[Node] = []
+	for p in paths as Array:
+		if not (p is String):
+			continue
+		var key_str := str(p)
+		var node: Node = _find_enemy_for_key(main, key_str)
+		if node and is_instance_valid(node):
+			to_kill.append(node)
+		elif not key_str.is_empty():
+			WorldPersistKey.warn_missing(main, "враг", key_str)
+	for n in to_kill:
+		n.free()
 
 
 static func _find_harvest_root_for_key(main: Node, key: String) -> Node:
@@ -316,6 +333,19 @@ static func _find_harvest_root_for_key(main: Node, key: String) -> Node:
 			continue
 		if WorldPersistKey.make(main, root_node, harvest.persist_id) == key:
 			return root_node
+	return null
+
+
+static func _find_enemy_for_key(main: Node, key: String) -> Node:
+	if main == null or key.is_empty():
+		return null
+	if not WorldPersistKey.is_id_key(key):
+		return main.get_node_or_null(key)
+	for n in main.get_tree().get_nodes_in_group("enemy"):
+		if not main.is_ancestor_of(n):
+			continue
+		if n.get("persist_id") != null and WorldPersistKey.make(main, n, str(n.get("persist_id"))) == key:
+			return n
 	return null
 
 
@@ -359,9 +389,14 @@ static func apply_player_payload(player: Player, payload: Variant) -> void:
 		player.hotbar_inventory.changed.emit()
 
 
-static func build_world_payload(main: Node3D, removed_harvestables: Array = []) -> Dictionary:
+static func build_world_payload(
+	main: Node3D,
+	removed_harvestables: Array = [],
+	removed_enemies: Array = []
+) -> Dictionary:
 	return {
 		"removed_harvestables": removed_harvestables.duplicate(),
+		"removed_enemies": removed_enemies.duplicate(),
 		"dropped_items": collect_dropped_items(main),
 		"chests": serialize_chests(main),
 		"crafting_stations": serialize_crafting_stations(main),
@@ -373,6 +408,7 @@ static func apply_world_payload(main: Node3D, payload: Variant) -> void:
 		return
 	var ext := payload as Dictionary
 	apply_destroyed_harvestables(main, ext.get("removed_harvestables", []))
+	apply_destroyed_enemies(main, ext.get("removed_enemies", []))
 	clear_dropped_items(main)
 	spawn_dropped_items(main, ext.get("dropped_items", []))
 	apply_chests(main, ext.get("chests", {}))

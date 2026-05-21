@@ -44,6 +44,20 @@ extends Resource
 @export var entity_damage: float = 0.0          # урон по существам
 @export var attack_speed: float = 1.0
 @export var weapon_type: String = ""            # "melee", "ranged"
+## Дуга удара мечом (только SWORD_ATTACK). Топор/кирка — луч InteractRay.
+@export var melee_arc_reach: float = 2.0
+@export var melee_arc_radius: float = 1.15
+@export var melee_arc_angle_deg: float = 110.0
+@export var melee_arc_height: float = 1.0
+
+enum PrimaryActionAnim { NONE, HARVEST_CHOP, SWORD_ATTACK }
+
+## Какая анимация проигрывается по ЛКМ (удар / рубка). NONE — вывести из tool_type / is_weapon.
+@export var primary_action_animation: PrimaryActionAnim = PrimaryActionAnim.NONE
+## Множитель скорости клипа (< 1 — медленнее, удар ощутимее).
+@export_range(0.2, 2.0, 0.05) var action_anim_speed_scale: float = 1.0
+## Доля длительности клипа, на которой наносится урон / добыча (0.4 ≈ середина замаха).
+@export_range(0.0, 1.0, 0.01) var action_hit_time_ratio: float = 0.42
 
 # ==================== CONSUMABLE ====================
 @export_group("Consumable")
@@ -83,6 +97,34 @@ extends Resource
 # ==================== ОБЩИЕ ====================
 @export var weight: float = 1.0
 @export var custom_properties: Dictionary = {}
+
+func resolve_primary_action_animation() -> PrimaryActionAnim:
+	if primary_action_animation != PrimaryActionAnim.NONE:
+		return primary_action_animation
+	if is_weapon and (weapon_type == "melee" or tool_type == "sword"):
+		return PrimaryActionAnim.SWORD_ATTACK
+	if tool_type == "axe" or tool_type == "pickaxe":
+		return PrimaryActionAnim.HARVEST_CHOP
+	return PrimaryActionAnim.NONE
+
+
+func get_action_animation_name() -> String:
+	match resolve_primary_action_animation():
+		PrimaryActionAnim.HARVEST_CHOP:
+			return "TreeChopping"
+		PrimaryActionAnim.SWORD_ATTACK:
+			return "Sword_Attack"
+		_:
+			return ""
+
+
+func can_primary_action() -> bool:
+	return not get_action_animation_name().is_empty()
+
+
+func uses_melee_arc_hit() -> bool:
+	return resolve_primary_action_animation() == PrimaryActionAnim.SWORD_ATTACK
+
 
 # Вспомогательная функция
 func get_rarity_color() -> Color:

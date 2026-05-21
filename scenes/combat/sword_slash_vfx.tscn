@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://jlpd8vlvvbs7"]
+
+[ext_resource type="Script" uid="uid://73hqq3wh873j" path="res://scripts/combat/sword_slash_vfx.gd" id="1_vfx"]
+
+[node name="SwordSlashVfx" type="Node3D" unique_id=300481960]
+script = ExtResource("1_vfx")

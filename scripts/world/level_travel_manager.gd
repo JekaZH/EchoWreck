@@ -1,13 +1,16 @@
 extends Node
 
-## Autoload: переходы между сценами уровней и появление у `LevelSpawnPoint`.
+## Autoload: переходы между сценами уровней, экран загрузки, появление у `LevelSpawnPoint`.
 
 const CONFIRM_SCENE := preload("res://scenes/ui/level_travel_confirm.tscn")
+const LOADING_SCENE := preload("res://scenes/ui/level_loading_screen.tscn")
 const DEFAULT_LEVEL := "res://scenes/main.tscn"
 
 var _pending_arrival_portal_id: String = ""
 var _active_zone: LevelTransitionZone = null
 var _confirm_ui: LevelTravelConfirmController = null
+var _loading_ui: LevelLoadingScreen = null
+var _awaiting_bootstrap: bool = false
 ## Снимок игрока при переходе между уровнями (без записи на диск).
 var _travel_player_snapshot: Dictionary = {}
 
@@ -19,15 +22,22 @@ func _ready() -> void:
 	get_tree().root.call_deferred("add_child", _confirm_ui)
 	_confirm_ui.confirmed.connect(_on_confirm_yes)
 	_confirm_ui.cancelled.connect(_on_confirm_no)
+	call_deferred("_attach_loading_ui")
 
 
 func clear_travel_state() -> void:
 	_pending_arrival_portal_id = ""
 	_travel_player_snapshot.clear()
 	_active_zone = null
-	# Кэш миров уровней не сбрасываем — только при новой игре / меню.
+	_awaiting_bootstrap = false
 	if _confirm_ui:
 		_confirm_ui.hide_dialog()
+	if _loading_ui:
+		_loading_ui.hide_loading()
+
+
+func is_level_transition_active() -> bool:
+	return _awaiting_bootstrap
 
 
 func offer_travel(zone: LevelTransitionZone) -> void:
@@ -47,6 +57,10 @@ func cancel_offer(zone: LevelTransitionZone) -> void:
 
 
 func commit_travel(zone: LevelTransitionZone = null) -> void:
+	_run_commit_travel(zone)
+
+
+func _run_commit_travel(zone: LevelTransitionZone = null) -> void:
 	var z: LevelTransitionZone = zone if zone != null else _active_zone
 	if z == null:
 		return
@@ -68,22 +82,125 @@ func commit_travel(zone: LevelTransitionZone = null) -> void:
 		LevelWorldCache.capture_level(main_scene)
 
 	_capture_player_snapshot_before_travel()
+	await transition_to_level(path)
 
-	get_tree().paused = false
-	var packed := load(path) as PackedScene
-	if packed == null:
-		push_error("LevelTravelManager: не удалось загрузить %s" % path)
-		_pending_arrival_portal_id = ""
+
+func transition_to_level(path: String, status_message: String = "Загрузка уровня...") -> void:
+	var resolved := resolve_level_scene_path(path)
+	if not await _ensure_loading_ui_ready():
+		push_error("LevelTravelManager: экран загрузки недоступен")
 		return
-	get_tree().change_scene_to_packed(packed)
+	_awaiting_bootstrap = true
+	_loading_ui.show_loading(status_message)
+	_loading_ui.set_progress(0.05)
+
+	var tree := get_tree()
+	if tree == null:
+		_awaiting_bootstrap = false
+		_loading_ui.hide_loading()
+		return
+
+	tree.paused = false
+	await tree.process_frame
+
+	_loading_ui.set_progress(0.12)
+	var err := ResourceLoader.load_threaded_request(resolved)
+	if err != OK:
+		push_error("LevelTravelManager: load_threaded_request failed %d for %s" % [err, resolved])
+		_abort_transition()
+		return
+
+	while true:
+		var progress: Array = []
+		var status: ResourceLoader.ThreadLoadStatus = ResourceLoader.load_threaded_get_status(
+			resolved, progress
+		)
+		match status:
+			ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+				var ratio := 0.12
+				if progress.size() > 0:
+					ratio = 0.12 + float(progress[0]) * 0.55
+				_loading_ui.set_progress(ratio)
+				await tree.process_frame
+			ResourceLoader.THREAD_LOAD_LOADED:
+				break
+			_:
+				push_error("LevelTravelManager: не удалось загрузить %s (status %d)" % [resolved, status])
+				_abort_transition()
+				return
+
+	var packed := ResourceLoader.load_threaded_get(resolved) as PackedScene
+	if packed == null:
+		push_error("LevelTravelManager: packed scene null %s" % resolved)
+		_abort_transition()
+		return
+
+	_loading_ui.set_progress(0.72)
+	await tree.process_frame
+	tree.change_scene_to_packed(packed)
+
+	while _awaiting_bootstrap:
+		await tree.process_frame
+
+
+func finish_level_transition() -> void:
+	if not _awaiting_bootstrap:
+		return
+	if _loading_ui == null or not is_instance_valid(_loading_ui):
+		_awaiting_bootstrap = false
+		return
+	_loading_ui.set_progress(0.95)
+	var tree := get_tree()
+	if tree:
+		await tree.process_frame
+		await tree.process_frame
+	_loading_ui.set_progress(1.0)
+	await get_tree().create_timer(0.04).timeout
+	if _loading_ui:
+		_loading_ui.hide_loading()
+	_awaiting_bootstrap = false
+
+
+func _abort_transition() -> void:
+	_awaiting_bootstrap = false
+	if _loading_ui:
+		_loading_ui.hide_loading()
 
 
 func _on_confirm_yes() -> void:
-	commit_travel()
+	_run_commit_travel()
 
 
 func _on_confirm_no() -> void:
 	_active_zone = null
+
+
+func _attach_loading_ui() -> void:
+	await _ensure_loading_ui_ready()
+
+
+func _ensure_loading_ui_ready() -> bool:
+	if _loading_ui != null and is_instance_valid(_loading_ui):
+		if _loading_ui.is_inside_tree():
+			if not _loading_ui.is_node_ready():
+				await _loading_ui.ready
+			return true
+	var tree := get_tree()
+	if tree == null or tree.root == null:
+		return false
+	if _loading_ui == null or not is_instance_valid(_loading_ui):
+		_loading_ui = LOADING_SCENE.instantiate() as LevelLoadingScreen
+	if _loading_ui == null:
+		return false
+	if not _loading_ui.is_inside_tree():
+		tree.root.call_deferred("add_child", _loading_ui)
+		await tree.process_frame
+		if not _loading_ui.is_inside_tree():
+			await tree.process_frame
+	if not _loading_ui.is_node_ready():
+		await _loading_ui.ready
+	_loading_ui.hide_loading()
+	return true
 
 
 ## После загрузки сцены: поставить игрока у маркера (переход или сейв с portal в extension — позже).
@@ -146,7 +263,8 @@ static func _find_spawn(main_root: Node, portal_id: String) -> LevelSpawnPoint:
 func resolve_level_scene_path(path: String) -> String:
 	if path.is_empty():
 		return DEFAULT_LEVEL
-	if ResourceLoader.exists(path):
-		return path
+	var normalized := LevelWorldCache.normalize_level_key(path)
+	if ResourceLoader.exists(normalized):
+		return normalized
 	push_warning("LevelTravelManager: сцена не найдена %s, fallback main" % path)
 	return DEFAULT_LEVEL

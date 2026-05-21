@@ -1,0 +1,86 @@
+[gd_scene load_steps=2 format=3 uid="uid://b64h3dwb5tejg"]
+
+[ext_resource type="Script" path="res://scripts/ui/world_health_bar_display.gd" id="1_display"]
+
+[node name="WorldHealthBar" type="Node3D"]
+script = ExtResource("1_display")
+
+[node name="SubViewport" type="SubViewport" parent="."]
+transparent_bg = true
+size = Vector2i(152, 52)
+disable_3d = true
+
+[node name="BarRoot" type="Control" parent="SubViewport"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Shadow" type="ColorRect" parent="SubViewport/BarRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.45)
+
+[node name="Border" type="ColorRect" parent="SubViewport/BarRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = -2.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.18, 0.18, 0.2, 1)
+
+[node name="Background" type="ColorRect" parent="SubViewport/BarRoot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = -5.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.06, 0.06, 0.08, 0.96)
+
+[node name="Fill" type="ColorRect" parent="SubViewport/BarRoot"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 7.0
+offset_top = 7.0
+offset_right = -7.0
+offset_bottom = -7.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.82, 0.14, 0.12, 1)
+
+[node name="BarSprite" type="Sprite3D" parent="."]
+billboard = 1
+pixel_size = 0.006
+texture_filter = 0
+
+[node name="HealthLabel3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.46, 0)
+billboard = 1
+text = "0/0"
+font_size = 48
+outline_size = 12
+outline_modulate = Color(0, 0, 0, 1)
+modulate = Color(1, 0.98, 0.95, 1)
+horizontal_alignment = 1
