@@ -118,7 +118,7 @@ static func apply_stats(stats: PlayerStats, d: Variant) -> void:
 
 
 static func serialize_equipment(eq: PlayerEquipment) -> Dictionary:
-	var out := {}
+	var out: Dictionary = {}
 	if eq == null:
 		return out
 	for slot in EQUIPMENT_SLOTS:
@@ -158,7 +158,7 @@ static func serialize_chests(main: Node) -> Dictionary:
 		var chest := n as Chest
 		if chest.inventory == null:
 			continue
-		var rel := str(main.get_path_to(chest))
+		var rel := WorldPersistKey.make(main, chest, chest.persist_id)
 		out[rel] = serialize_inventory(chest.inventory)
 	return out
 
@@ -168,9 +168,10 @@ static func apply_chests(main: Node, data: Variant) -> void:
 		return
 	var dict := data as Dictionary
 	for rel in dict.keys():
-		var path_str := str(rel)
-		var node := main.get_node_or_null(path_str)
-		if node == null or not (node is Chest):
+		var key_str := str(rel)
+		var node := WorldPersistKey.find_in_level(main, key_str, "persist_chest")
+		if node == null:
+			WorldPersistKey.warn_missing(main, "сундук", key_str)
 			continue
 		var chest := node as Chest
 		if chest.inventory:
@@ -187,15 +188,12 @@ static func serialize_crafting_stations(main: Node) -> Dictionary:
 		if not main.is_ancestor_of(n):
 			continue
 		var st := n as CraftingStation
-		if st.output_inventory == null and st.fuel_inventory == null:
-			continue
-		var entry := {}
-		entry["fuel_buffer_seconds"] = st.get_fuel_buffer_seconds()
+		var entry: Dictionary = st.export_persist_state()
 		if st.fuel_inventory:
 			entry["fuel"] = serialize_inventory(st.fuel_inventory)
 		if st.output_inventory:
 			entry["output"] = serialize_inventory(st.output_inventory)
-		out[str(main.get_path_to(st))] = entry
+		out[WorldPersistKey.make(main, st, st.persist_id)] = entry
 	return out
 
 
@@ -204,9 +202,10 @@ static func apply_crafting_stations(main: Node, data: Variant) -> void:
 		return
 	var dict := data as Dictionary
 	for rel in dict.keys():
-		var path_str := str(rel)
-		var node := main.get_node_or_null(path_str)
-		if node == null or not (node is CraftingStation):
+		var key_str := str(rel)
+		var node := WorldPersistKey.find_in_level(main, key_str, "persist_crafting_station")
+		if node == null:
+			WorldPersistKey.warn_missing(main, "станция крафта", key_str)
 			continue
 		var st := node as CraftingStation
 		var entry_v: Variant = dict[rel]
@@ -217,7 +216,7 @@ static func apply_crafting_stations(main: Node, data: Variant) -> void:
 			apply_inventory(st.fuel_inventory, entry["fuel"])
 		if st.output_inventory and entry.has("output"):
 			apply_inventory(st.output_inventory, entry["output"])
-		st.restore_persisted_fuel_buffer_seconds(float(entry.get("fuel_buffer_seconds", 0.0)))
+		st.import_persist_state(entry)
 
 
 static func collect_dropped_items(main: Node) -> Array:
@@ -291,25 +290,103 @@ static func apply_destroyed_harvestables(main: Node, paths: Variant) -> void:
 	for p in paths as Array:
 		if not (p is String):
 			continue
-		var node := main.get_node_or_null(str(p))
+		var key_str := str(p)
+		var node: Node = _find_harvest_root_for_key(main, key_str)
 		if node and is_instance_valid(node):
 			to_kill.append(node)
+		elif not key_str.is_empty():
+			WorldPersistKey.warn_missing(main, "добыча", key_str)
 	for n in to_kill:
 		n.queue_free()
 
 
+static func _find_harvest_root_for_key(main: Node, key: String) -> Node:
+	if main == null or key.is_empty():
+		return null
+	if not WorldPersistKey.is_id_key(key):
+		return main.get_node_or_null(key)
+	for h in main.get_tree().get_nodes_in_group("harvestable"):
+		if not main.is_ancestor_of(h):
+			continue
+		if not (h is Harvestable):
+			continue
+		var harvest := h as Harvestable
+		var root_node := h.get_parent()
+		if root_node == null:
+			continue
+		if WorldPersistKey.make(main, root_node, harvest.persist_id) == key:
+			return root_node
+	return null
+
+
+static func build_player_payload(player: Player) -> Dictionary:
+	return {
+		"player_inventory": serialize_inventory(player.inventory),
+		"hotbar_inventory": serialize_inventory(player.hotbar_inventory) if player.hotbar_inventory else [],
+		"hotbar_slots": player.hotbar_inventory.slots_count if player.hotbar_inventory else player.base_hotbar_slots,
+		"player_stats": serialize_stats(player.stats_component.stats),
+		"player_equipment": serialize_equipment(player.player_equipment),
+	}
+
+
+static func apply_player_payload(player: Player, payload: Variant) -> void:
+	if player == null or not (payload is Dictionary):
+		return
+	var ext: Dictionary = payload as Dictionary
+	apply_stats(player.stats_component.stats, ext.get("player_stats", {}))
+	for slot in EQUIPMENT_SLOTS:
+		player.player_equipment.unequip_slot(slot)
+	apply_inventory(player.inventory, ext.get("player_inventory", []))
+	apply_equipment(player.player_equipment, ext.get("player_equipment", {}))
+	if player.hotbar_inventory:
+		var hb_slots: int = int(ext.get("hotbar_slots", player.hotbar_inventory.slots_count))
+		hb_slots = maxi(hb_slots, player.hotbar_inventory.slots_count)
+		player.hotbar_inventory.set_slots_count(hb_slots)
+		apply_inventory(player.hotbar_inventory, ext.get("hotbar_inventory", []))
+	if player.stats_ui:
+		player.stats_ui.setup(player.stats_component.stats)
+	if player.hotbar_ui and player.hotbar_inventory:
+		player.hotbar_ui.slot_count = player.hotbar_inventory.slots_count
+		player.hotbar_ui.refresh_slots()
+		var max_idx := player.hotbar_inventory.slots_count - 1
+		if player.hotbar_ui.active_slot_index >= 0 and max_idx >= 0:
+			player.hotbar_ui.select_slot(mini(player.hotbar_ui.active_slot_index, max_idx))
+		else:
+			player.update_equipped_tool_from_hotbar()
+	player.player_equipment._recompute_player_stats()
+	player.inventory.changed.emit()
+	if player.hotbar_inventory:
+		player.hotbar_inventory.changed.emit()
+
+
+static func build_world_payload(main: Node3D, removed_harvestables: Array = []) -> Dictionary:
+	return {
+		"removed_harvestables": removed_harvestables.duplicate(),
+		"dropped_items": collect_dropped_items(main),
+		"chests": serialize_chests(main),
+		"crafting_stations": serialize_crafting_stations(main),
+	}
+
+
+static func apply_world_payload(main: Node3D, payload: Variant) -> void:
+	if main == null or not (payload is Dictionary):
+		return
+	var ext := payload as Dictionary
+	apply_destroyed_harvestables(main, ext.get("removed_harvestables", []))
+	clear_dropped_items(main)
+	spawn_dropped_items(main, ext.get("dropped_items", []))
+	apply_chests(main, ext.get("chests", {}))
+	apply_crafting_stations(main, ext.get("crafting_stations", {}))
+
+
 static func build_extension_data(main: Node3D, player: Player) -> Dictionary:
-	var ext := {}
-	ext["format_payload"] = 2
-	ext["removed_harvestables"] = WorldPersistence.get_removed()
-	ext["dropped_items"] = collect_dropped_items(main)
-	ext["player_inventory"] = serialize_inventory(player.inventory)
-	ext["hotbar_inventory"] = serialize_inventory(player.hotbar_inventory) if player.hotbar_inventory else []
-	ext["hotbar_slots"] = player.hotbar_inventory.slots_count if player.hotbar_inventory else player.base_hotbar_slots
-	ext["player_stats"] = serialize_stats(player.stats_component.stats)
-	ext["player_equipment"] = serialize_equipment(player.player_equipment)
-	ext["chests"] = serialize_chests(main)
-	ext["crafting_stations"] = serialize_crafting_stations(main)
+	LevelWorldCache.capture_level(main)
+	var ext: Dictionary = {}
+	ext["format_payload"] = 3
+	ext["levels"] = LevelWorldCache.get_all_levels()
+	var player_part: Dictionary = build_player_payload(player)
+	for k in player_part.keys():
+		ext[k] = player_part[k]
 	return ext
 
 
@@ -320,50 +397,21 @@ static func apply_to_game(main: Node3D, data: SaveGameData) -> void:
 	var player := main.get_node_or_null("Player") as Player
 	if player == null:
 		return
-	# Старые сейвы без полного payload — не трогаем мир и инвентарь.
-	if int(ext.get("format_payload", 0)) < 2:
+	var payload_ver: int = int(ext.get("format_payload", 0))
+	if payload_ver < 2:
 		return
 
-	WorldPersistence.set_from_save(ext.get("removed_harvestables", []))
-	apply_destroyed_harvestables(main, ext.get("removed_harvestables", []))
-
-	clear_dropped_items(main)
-	spawn_dropped_items(main, ext.get("dropped_items", []))
-
-	apply_stats(player.stats_component.stats, ext.get("player_stats", {}))
-
-	for slot in EQUIPMENT_SLOTS:
-		player.player_equipment.unequip_slot(slot)
-
-	apply_inventory(player.inventory, ext.get("player_inventory", []))
-
-	apply_equipment(player.player_equipment, ext.get("player_equipment", {}))
-
-	if player.hotbar_inventory == null:
-		push_warning("SaveGameState.apply_to_game: hotbar_inventory отсутствует, пропуск восстановления хотбара")
+	if payload_ver >= 3 and ext.has("levels"):
+		LevelWorldCache.set_all_levels(ext["levels"])
+		apply_world_payload(main, LevelWorldCache.get_level_payload(LevelWorldCache.get_level_key(main)))
 	else:
-		var hb_slots: int = int(ext.get("hotbar_slots", player.hotbar_inventory.slots_count))
-		hb_slots = maxi(hb_slots, player.hotbar_inventory.slots_count)
-		player.hotbar_inventory.set_slots_count(hb_slots)
-		apply_inventory(player.hotbar_inventory, ext.get("hotbar_inventory", []))
+		# Сейвы format_payload 2 — только текущий уровень в файле.
+		WorldPersistence.set_from_save(ext.get("removed_harvestables", []))
+		apply_world_payload(main, {
+			"removed_harvestables": ext.get("removed_harvestables", []),
+			"dropped_items": ext.get("dropped_items", []),
+			"chests": ext.get("chests", {}),
+			"crafting_stations": ext.get("crafting_stations", {}),
+		})
 
-	apply_chests(main, ext.get("chests", {}))
-	apply_crafting_stations(main, ext.get("crafting_stations", {}))
-
-	if player.stats_ui:
-		player.stats_ui.setup(player.stats_component.stats)
-
-	if player.hotbar_ui and player.hotbar_inventory:
-		player.hotbar_ui.slot_count = player.hotbar_inventory.slots_count
-		player.hotbar_ui.refresh_slots()
-		var max_idx := player.hotbar_inventory.slots_count - 1
-		if player.hotbar_ui.active_slot_index >= 0 and max_idx >= 0:
-			player.hotbar_ui.select_slot(mini(player.hotbar_ui.active_slot_index, max_idx))
-		else:
-			player.update_equipped_tool_from_hotbar()
-
-	player.player_equipment._recompute_player_stats()
-
-	player.inventory.changed.emit()
-	if player.hotbar_inventory:
-		player.hotbar_inventory.changed.emit()
+	apply_player_payload(player, ext)

@@ -9,13 +9,14 @@
 script = ExtResource("1_2oqkr")
 hunger_restore = 25.0
 health_restore = 5.0
+energy_restore = -100.0
 metadata/_custom_type_script = "uid://dm6xxi7css0sq"
 
 [resource]
 script = ExtResource("2_yw5el")
 id = "apple"
 display_name = "Яблоко"
-description = "Будет + давать"
+description = "Восстанавливает голод, здоровье и энергию"
 icon = ExtResource("2_8nbq6")
 mesh_on_ground = ExtResource("3_pdbyo")
 category = "Food"

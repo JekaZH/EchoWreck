@@ -4,17 +4,22 @@ extends Resource
 
 @export_enum("Instant", "OverTime") var effect_type: String = "Instant"
 
-# Мгновенные эффекты
+@export_group("Мгновенно")
 @export var hunger_restore: float = 0.0
 @export var thirst_restore: float = 0.0
 @export var health_restore: float = 0.0
+@export var energy_restore: float = 0.0
 
-# Эффекты со временем (бафы / дебафы)
-@export var duration: float = 0.0          # 0 = мгновенный
+@export_group("Со временем (OverTime)")
+@export var duration: float = 0.0
+@export var hunger_restore_per_second: float = 0.0
+@export var thirst_restore_per_second: float = 0.0
+@export var health_restore_per_second: float = 0.0
+@export var energy_restore_per_second: float = 0.0
 @export var speed_multiplier: float = 1.0
 @export var damage_multiplier: float = 1.0
-@export var hunger_decrease_multiplier: float = 1.0   # например 0.5 = голод уменьшается в 2 раза медленнее
+@export var hunger_decrease_multiplier: float = 1.0
 
-# Для будущего (можно расширять)
+@export_group("Прочее")
 @export var custom_effect_name: String = ""
 @export var custom_value: float = 0.0

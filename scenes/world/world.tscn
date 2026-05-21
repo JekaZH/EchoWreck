@@ -10,6 +10,7 @@
 [ext_resource type="Resource" uid="uid://b6efp0tkhclpi" path="res://resources/items/apple.tres" id="5_t5ptc"]
 [ext_resource type="Resource" uid="uid://bdic6aqkjko7e" path="res://resources/items/heal_potion.tres" id="6_bq33v"]
 [ext_resource type="Resource" uid="uid://djpurve614gpi" path="res://resources/items/belt_leather_small.tres" id="6_dlabj"]
+[ext_resource type="Resource" uid="uid://dcbnr7i77k1pw" path="res://resources/items/toxic_potion.tres" id="6_t634p"]
 [ext_resource type="Resource" uid="uid://dcmwpoq0tbrla" path="res://resources/items/chest_leather_tunic.tres" id="7_srmg5"]
 [ext_resource type="Resource" uid="uid://c6xmkjqktt774" path="res://resources/items/chest_steel_plate.tres" id="8_umvgx"]
 [ext_resource type="PackedScene" uid="uid://d34mheimbafc3" path="res://scenes/world_objects/crafting/station_workbench.tscn" id="9_workbench"]
@@ -94,6 +95,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.174623, 0, 1.076848)
 [node name="DroppedItem" parent="GroundItems" unique_id=203633381 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.820032, 0.49465227, -0.69523716)
 item_data = ExtResource("4_t5ptc")
+
+[node name="DroppedItem9" parent="GroundItems" unique_id=876771697 instance=ExtResource("3_v5dby")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3303056, 0.49465227, -3.4193783)
+item_data = ExtResource("5_t5ptc")
+
+[node name="DroppedItem10" parent="GroundItems" unique_id=1368562428 instance=ExtResource("3_v5dby")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5156093, 0.49465227, -4.965596)
+item_data = ExtResource("6_t634p")
 
 [node name="DroppedItem5" parent="GroundItems" unique_id=246006209 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.89987, 0.49465227, -0.69523716)

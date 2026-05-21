@@ -1,0 +1,46 @@
+[gd_scene load_steps=5 format=3 uid="uid://b4twi8qhgiud7"]
+
+[ext_resource type="Script" path="res://scripts/world/level_transition_zone.gd" id="1_zn"]
+
+[sub_resource type="StandardMaterial3D" id="Mat_zone"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.15, 0.95, 0.35, 0.45)
+cull_mode = 2
+
+[sub_resource type="BoxMesh" id="BoxMesh_zone"]
+size = Vector3(3, 2.5, 3)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_zone"]
+size = Vector3(3, 2.5, 3)
+
+[node name="LevelTransitionZone" type="Node3D"]
+script = ExtResource("1_zn")
+zone_display_name = "Переход (настройте меня)"
+arrival_portal_id = "default"
+zone_size = Vector3(3, 2.5, 3)
+
+[node name="EditorZoneMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+cast_shadow = 0
+gi_mode = 0
+mesh = SubResource("BoxMesh_zone")
+surface_material_override/0 = SubResource("Mat_zone")
+
+[node name="EditorLabel" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+pixel_size = 0.002
+font_size = 32
+outline_size = 8
+text = "ЗОНА ПЕРЕХОДА
+(настройте в инспекторе)"
+modulate = Color(0.7, 1, 0.75, 1)
+
+[node name="TriggerArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 1
+monitoring = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TriggerArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+shape = SubResource("BoxShape3D_zone")

@@ -1,0 +1,87 @@
+[gd_scene load_steps=2 format=3 uid="uid://cdeathscreen01"]
+
+[ext_resource type="Script" path="res://scripts/ui/death_screen_controller.gd" id="1_ds"]
+
+[node name="DeathScreen" type="CanvasLayer"]
+process_mode = 3
+layer = 130
+script = ExtResource("1_ds")
+
+[node name="Root" type="Control" parent="."]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dimmer" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0, 0, 0.72)
+
+[node name="MainPanel" type="PanelContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -180.0
+offset_right = 220.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="Root/MainPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+
+[node name="VBox" type="VBoxContainer" parent="Root/MainPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Root/MainPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Вы погибли"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Root/MainPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Здоровье упало до нуля"
+horizontal_alignment = 1
+
+[node name="LatestSaveButton" type="Button" parent="Root/MainPanel/Margin/VBox"]
+custom_minimum_size = Vector2(280, 40)
+layout_mode = 2
+text = "Загрузить последнее сохранение"
+
+[node name="LoadButton" type="Button" parent="Root/MainPanel/Margin/VBox"]
+custom_minimum_size = Vector2(280, 40)
+layout_mode = 2
+text = "Выбрать сохранение"
+
+[node name="MainMenuButton" type="Button" parent="Root/MainPanel/Margin/VBox"]
+custom_minimum_size = Vector2(280, 40)
+layout_mode = 2
+text = "Выйти в главное меню"
+
+[node name="SubScreens" type="Control" parent="Root"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

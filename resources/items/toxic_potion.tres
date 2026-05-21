@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dcbnr7i77k1pw"]
+
+[ext_resource type="Script" uid="uid://dm6xxi7css0sq" path="res://scripts/inventory/item_effect.gd" id="1_1lr7s"]
+[ext_resource type="Texture2D" uid="uid://bll0l0r65v48u" path="res://assets/icons/stylized_item/Potions_Herbs/SODA_Icon_PortionsHerbs_Potion_LightGreen.png" id="2_1lr7s"]
+[ext_resource type="PackedScene" uid="uid://bbequu47ef4nc" path="res://scenes/world_objects/dropped_item/dropped_item.tscn" id="3_uq4cl"]
+[ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="4_xcmx2"]
+
+[sub_resource type="Resource" id="Resource_t2ees"]
+script = ExtResource("1_1lr7s")
+health_restore = -100.0
+energy_restore = null
+hunger_restore_per_second = null
+thirst_restore_per_second = null
+health_restore_per_second = null
+energy_restore_per_second = null
+metadata/_custom_type_script = "uid://dm6xxi7css0sq"
+
+[resource]
+script = ExtResource("4_xcmx2")
+id = "toxic_potion"
+display_name = "Яд"
+description = "Умереть"
+icon = ExtResource("2_1lr7s")
+max_stack = 5
+mesh_on_ground = ExtResource("3_uq4cl")
+category = "Consumable"
+rarity = "Uncommon"
+is_consumable = true
+use_time = 3.0
+effects = Array[ExtResource("1_1lr7s")]([SubResource("Resource_t2ees")])
+metadata/_custom_type_script = "uid://p3b1q13fmee1"

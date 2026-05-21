@@ -9,6 +9,8 @@ extends CharacterBody3D
 @export var run_deceleration_multiplier: float = 2.0
 @export var mouse_look_speed: float = 10.0          # скорость поворота к курсору (когда НЕ бежим)
 @export var interact_distance: float = 3.0
+## Множитель скорости ходьбы при energy <= 0 (бег отключён).
+@export_range(0.1, 1.0, 0.05) var exhausted_walk_speed_multiplier: float = 0.55
 
 @onready var anim_tree: AnimationTree = $PlayerAnimTree
 @onready var interact_ray: RayCast3D = $InteractRay
@@ -46,7 +48,10 @@ var current_stats_summary_panel = null
 @onready var stats_ui: PlayerStatsUI = null
 
 const PAUSE_MENU_SCENE := preload("res://scenes/ui/pause_menu/pause_menu.tscn")
+const DEATH_SCREEN_SCENE := preload("res://scenes/ui/death_screen/death_screen.tscn")
 var _pause_menu: PauseMenuController
+var _death_screen: DeathScreenController
+var _is_dead: bool = false
 var _ui_layer_visible_before_screenshot: bool = true
 
 var _nearby_interactables: Array[Node3D] = []
@@ -90,6 +95,13 @@ func _ready() -> void:
 
 	_pause_menu = PAUSE_MENU_SCENE.instantiate() as PauseMenuController
 	add_child(_pause_menu)
+
+	_death_screen = DEATH_SCREEN_SCENE.instantiate() as DeathScreenController
+	add_child(_death_screen)
+
+	if stats_component:
+		stats_component.died.connect(_on_player_died)
+
 	SaveManager.before_screenshot_capture.connect(_on_before_save_screenshot_hide_ui)
 	SaveManager.after_screenshot_capture.connect(_on_after_save_screenshot_restore_ui)
 	
@@ -113,6 +125,21 @@ func _on_before_save_screenshot_hide_ui() -> void:
 func _on_after_save_screenshot_restore_ui() -> void:
 	if ui_layer:
 		ui_layer.visible = _ui_layer_visible_before_screenshot
+
+
+func _on_player_died() -> void:
+	if _is_dead:
+		return
+	_is_dead = true
+	close_all_ui()
+	if _pause_menu and _pause_menu.is_menu_open():
+		_pause_menu.close_menu()
+	if _death_screen:
+		_death_screen.open_screen()
+
+
+func is_dead() -> bool:
+	return _is_dead
 
 
 func handle_hotbar_shrink(target_slots_count: int) -> void:
@@ -147,6 +174,8 @@ func handle_hotbar_shrink(target_slots_count: int) -> void:
 			hotbar_inventory.clear_slot(idx)
 
 func _input(event: InputEvent) -> void:
+	if _is_dead:
+		return
 	if Input.is_action_just_pressed("ui_accept"): # клавиша Enter для теста
 		var test_item = preload("res://resources/items/axe_wood.tres")
 		if test_item:
@@ -256,7 +285,7 @@ func _input(event: InputEvent) -> void:
 			
 
 	# ====================== ESC / пауза ======================
-	elif event.is_action_pressed("ui_cancel"):
+	elif event.is_action_pressed("ui_cancel") and not _is_dead:
 		if _pause_menu and _pause_menu.is_menu_open():
 			_pause_menu.close_menu()
 			get_viewport().set_input_as_handled()
@@ -274,11 +303,16 @@ func _input(event: InputEvent) -> void:
 			print("Esc — меню паузы")
 
 func _physics_process(delta: float) -> void:
-	if camera == null: return
-	
+	if camera == null or _is_dead:
+		return
+
 	var input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
-	var is_running = Input.is_action_pressed("run")
-	var wants_to_move = input_dir.length() > 0.05
+	var energy_ok := stats_component != null and stats_component.stats != null and stats_component.stats.energy > 0.0
+	var is_running := Input.is_action_pressed("run") and energy_ok
+	var wants_to_move := input_dir.length() > 0.05
+	var walk_speed_scale := 1.0
+	if not energy_ok:
+		walk_speed_scale = exhausted_walk_speed_multiplier
 	
 	# ────────────────────────────────────────────────
 	# 1. Поворот к курсору — ТОЛЬКО когда НЕ бежим
@@ -313,8 +347,12 @@ func _physics_process(delta: float) -> void:
 	
 	direction = (cam_right * input_dir.x + cam_forward * input_dir.y).normalized()
 	
-	var preset = run_preset if is_running and wants_to_move else walk_preset
-	var target_vel = direction * preset.max_speed
+	var using_run_preset := is_running and wants_to_move
+	var preset: MovementPreset = run_preset if using_run_preset else walk_preset
+	var speed_cap: float = preset.max_speed
+	if not using_run_preset:
+		speed_cap *= walk_speed_scale
+	var target_vel := direction * speed_cap
 	
 	if wants_to_move:
 		var forward_component = velocity.dot(direction.normalized())
@@ -322,10 +360,10 @@ func _physics_process(delta: float) -> void:
 		var perp = velocity - direction.normalized() * forward_component
 		perp = perp.move_toward(Vector3.ZERO, 60.0 * delta)
 		
-		velocity = direction * forward_component + direction * (preset.max_speed / preset.acceleration_time) * delta
-		
-		if velocity.length() > preset.max_speed:
-			velocity = velocity.normalized() * preset.max_speed
+		velocity = direction * forward_component + direction * (speed_cap / preset.acceleration_time) * delta
+
+		if velocity.length() > speed_cap:
+			velocity = velocity.normalized() * speed_cap
 		
 		# ←←← ИСПРАВЛЕНИЕ: поворот по направлению движения ТОЛЬКО при беге
 		if is_running and direction.length() > 0.01:
@@ -333,7 +371,7 @@ func _physics_process(delta: float) -> void:
 			rotation.y = lerp_angle(rotation.y, move_angle, 12.0 * delta)
 	
 	else:
-		var decel = preset.max_speed / preset.deceleration_time
+		var decel = speed_cap / preset.deceleration_time
 		if last_running:
 			decel *= run_deceleration_multiplier
 		velocity = velocity.move_toward(Vector3.ZERO, decel * delta)
@@ -449,16 +487,7 @@ func apply_consumable_from_hotbar(slot_index: int):
 	if not stats_comp:
 		return
 
-	# Применяем эффекты
-	for effect in stack.item.effects:
-		stats_comp.stats.hunger += effect.hunger_restore
-		stats_comp.stats.thirst += effect.thirst_restore
-		stats_comp.stats.health += effect.health_restore
-
-	# Ограничиваем
-	stats_comp.stats.hunger = clamp(stats_comp.stats.hunger, 0, stats_comp.stats.max_hunger)
-	stats_comp.stats.thirst = clamp(stats_comp.stats.thirst, 0, stats_comp.stats.max_thirst)
-	stats_comp.stats.health = clamp(stats_comp.stats.health, 0, stats_comp.stats.max_health)
+	stats_comp.apply_item_effects(stack.item)
 
 	# Уменьшаем стак
 	if stack.count > 1:

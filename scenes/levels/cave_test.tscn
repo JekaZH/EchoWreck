@@ -1,0 +1,73 @@
+[gd_scene format=3 uid="uid://ccavetestlvl1"]
+
+[ext_resource type="Script" uid="uid://350e0wp7qbx3" path="res://scripts/main_game_bootstrap.gd" id="1_boot"]
+[ext_resource type="PackedScene" uid="uid://bavaadrgbiedk" path="res://scenes/player/Player.tscn" id="2_player"]
+[ext_resource type="Script" uid="uid://cksde01xcw06v" path="res://scripts/core/camera/isometric_camera.gd" id="3_cam"]
+[ext_resource type="PackedScene" uid="uid://b3pysob8mmiuq" path="res://scenes/world/level_spawn_point.tscn" id="4_spawn"]
+[ext_resource type="PackedScene" uid="uid://b4twi8qhgiud7" path="res://scenes/world/level_transition_zone.tscn" id="5_zone"]
+[ext_resource type="PackedScene" uid="uid://ypmvgig6uicm" path="res://scenes/main.tscn" id="6_main"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+size = Vector3(24, 0.2, 24)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cave"]
+albedo_color = Color(0.25, 0.22, 0.28, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(24, 0.2, 24)
+
+[node name="CaveTest" type="Node3D" unique_id=1220859776]
+script = ExtResource("1_boot")
+
+[node name="Floor" type="StaticBody3D" parent="." unique_id=1175555183]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor" unique_id=2056735380]
+mesh = SubResource("BoxMesh_floor")
+surface_material_override/0 = SubResource("StandardMaterial3D_cave")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor" unique_id=1741348802]
+shape = SubResource("BoxShape3D_floor")
+
+[node name="LevelPortals" type="Node3D" parent="." unique_id=712696896]
+
+[node name="SpawnFromMain" parent="LevelPortals" unique_id=1525540001 instance=ExtResource("4_spawn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.204105)
+portal_id = "cave_entrance"
+editor_label = "Вход с поляны"
+
+[node name="SpawnSide" parent="LevelPortals" unique_id=386685635 instance=ExtResource("4_spawn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.172062, 0, -2)
+portal_id = "cave_side"
+editor_label = "Боковой вход (пример второй точки)"
+gizmo_color = Color(0.55, 0.45, 1, 0.55)
+
+[node name="ReturnToMain" parent="LevelPortals" unique_id=1523273318 instance=ExtResource("5_zone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+target_level = ExtResource("6_main")
+target_level_path = "res://scenes/main.tscn"
+arrival_portal_id = "main_from_cave"
+zone_display_name = "Выход на поляну"
+zone_size = Vector3(3, 2.5, 2.5)
+
+[node name="ReturnToMainSide" parent="LevelPortals" unique_id=582435878 instance=ExtResource("5_zone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3816867, 0, -1.0439281)
+target_level = ExtResource("6_main")
+target_level_path = "res://scenes/main.tscn"
+arrival_portal_id = "main_from_cave_side"
+zone_display_name = "Выход на поляну"
+zone_size = Vector3(3, 2.5, 2.5)
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1451040057 node_paths=PackedStringArray("target")]
+transform = Transform3D(0.70710677, -0.61237246, 0.35355335, 0, 0.49999997, 0.86602545, -0.70710677, -0.61237246, 0.35355335, 10, 15, 10)
+script = ExtResource("3_cam")
+target = NodePath("../Player")
+offset = Vector3(5, 10, 5)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1656489942]
+transform = Transform3D(0.70710677, 0.49999997, -0.49999997, 0, 0.70710677, 0.70710677, 0.70710677, -0.49999997, 0.49999997, 0, 8, 0)
+light_energy = 0.65
+
+[node name="Player" parent="." unique_id=2087062081 node_paths=PackedStringArray("camera") instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+camera = NodePath("../Camera3D")

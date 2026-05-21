@@ -1,32 +1,26 @@
 extends Node
 
-## Пути узлов добычи (относительно `current_scene`), которые уже уничтожены в этой сессии / в загруженном сейве.
-
-var removed_harvest_paths: Array[String] = []
-
+## Обёртка для совместимости: состояние мира хранится в `LevelWorldCache` по сценам уровней.
 
 func clear() -> void:
-	removed_harvest_paths.clear()
+	LevelWorldCache.clear_all()
 
 
 func set_from_save(arr: Variant) -> void:
-	removed_harvest_paths.clear()
-	if arr is Array:
-		for p in arr:
-			if p is String and (p as String).length() > 0:
-				if not removed_harvest_paths.has(p):
-					removed_harvest_paths.append(p)
+	LevelWorldCache.set_removed_for_current_level(arr)
 
 
 func register_removed(path_from_main: String) -> void:
-	if path_from_main.is_empty():
-		return
-	if not removed_harvest_paths.has(path_from_main):
-		removed_harvest_paths.append(path_from_main)
+	LevelWorldCache.register_removed_harvestable(path_from_main)
 
 
 func get_removed() -> Array[String]:
+	var tree := get_tree()
+	if tree == null or tree.current_scene == null:
+		return []
+	var arr: Array = LevelWorldCache.get_removed_paths(tree.current_scene)
 	var out: Array[String] = []
-	for p in removed_harvest_paths:
-		out.append(p)
+	for p in arr:
+		if p is String:
+			out.append(p)
 	return out

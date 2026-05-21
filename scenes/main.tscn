@@ -3,7 +3,9 @@
 [ext_resource type="PackedScene" uid="uid://cf6xk11stvqxl" path="res://scenes/world/world.tscn" id="1_o5qli"]
 [ext_resource type="Script" uid="uid://cksde01xcw06v" path="res://scripts/core/camera/isometric_camera.gd" id="2_0wfyh"]
 [ext_resource type="PackedScene" uid="uid://bavaadrgbiedk" path="res://scenes/player/Player.tscn" id="3_sugp2"]
-[ext_resource type="Script" path="res://scripts/main_game_bootstrap.gd" id="4_boot"]
+[ext_resource type="Script" uid="uid://350e0wp7qbx3" path="res://scripts/main_game_bootstrap.gd" id="4_boot"]
+[ext_resource type="PackedScene" uid="uid://b3pysob8mmiuq" path="res://scenes/world/level_spawn_point.tscn" id="5_spawn"]
+[ext_resource type="PackedScene" uid="uid://b4twi8qhgiud7" path="res://scenes/world/level_transition_zone.tscn" id="6_zone"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_0wfyh"]
 
@@ -30,6 +32,34 @@ transform = Transform3D(0.70710677, 0.49999997, -0.49999997, 0, 0.70710677, 0.70
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=749349398]
 environment = SubResource("Environment_jyhfs")
+
+[node name="LevelMarkers" type="Node3D" parent="." unique_id=1825372527]
+
+[node name="SpawnDefault" parent="LevelMarkers" unique_id=494165467 instance=ExtResource("5_spawn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.11, 0, -0.14)
+
+[node name="SpawnFromCave" parent="LevelMarkers" unique_id=1467602182 instance=ExtResource("5_spawn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 6)
+portal_id = "main_from_cave"
+
+[node name="SpawnFromCaveSide" parent="LevelMarkers" unique_id=1669650950 instance=ExtResource("5_spawn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.708715, 0, -1.1097775)
+portal_id = "main_from_cave_side"
+editor_label = "Точка появления с боку"
+
+[node name="ZoneToCave" parent="LevelMarkers" unique_id=251216482 instance=ExtResource("6_zone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 8)
+target_level_path = "uid://ccavetestlvl1"
+arrival_portal_id = "cave_entrance"
+zone_display_name = "Тёмная пещера"
+gizmo_color = Color(2.695322e-06, 0.94865197, 0.437918, 0.4509804)
+
+[node name="ZoneToCaveSide" parent="LevelMarkers" unique_id=830271039 instance=ExtResource("6_zone")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.559998, 0, -1.031187)
+target_level_path = "uid://ccavetestlvl1"
+arrival_portal_id = "cave_side"
+zone_display_name = "Тёмная пещера"
+gizmo_color = Color(2.695322e-06, 0.94865197, 0.437918, 0.4509804)
 
 [node name="Player" parent="." unique_id=1875923307 node_paths=PackedStringArray("camera") instance=ExtResource("3_sugp2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.109371066, 0, -0.13994193)

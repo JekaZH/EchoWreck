@@ -11,6 +11,8 @@ signal craft_failed(recipe: CraftRecipe, reason: String)
 # Опционально: можно поставить outline/иконку/текст подсказки позже (Этап 8).
 @export var interaction_label: String = "Крафт"
 @export var prompt_offset: Vector3 = Vector3(0.0, 1.6, 0.0)
+## Стабильный id для сохранений (уникален внутри сцены уровня). Пусто = путь узла.
+@export var persist_id: String = ""
 
 @onready var interact_area: Area3D = get_node_or_null("InteractArea")
 @onready var fuel_inventory: Inventory = get_node_or_null("FuelInventory")
@@ -149,6 +151,80 @@ func get_fuel_seconds_available() -> float:
 
 func get_fuel_buffer_seconds() -> float:
 	return _fuel_buffer_seconds
+
+
+func export_persist_state() -> Dictionary:
+	var jobs: Array = []
+	if _is_crafting and _active_recipe != null:
+		jobs.append(_persist_job_dict(_active_recipe, _time_left, _time_total))
+	for job in _queue:
+		if job is Dictionary:
+			var recipe: CraftRecipe = job.get("recipe")
+			if recipe != null:
+				jobs.append(_persist_job_dict(recipe, float(job.get("time_left", 0.0)), float(job.get("time_total", 0.0))))
+	return {
+		"craft_jobs": jobs,
+		"fuel_buffer_seconds": _fuel_buffer_seconds,
+	}
+
+
+func _persist_job_dict(recipe: CraftRecipe, time_left: float, time_total: float) -> Dictionary:
+	var path := ""
+	if recipe != null and not recipe.resource_path.is_empty():
+		path = recipe.resource_path
+	elif recipe != null and not String(recipe.id).is_empty():
+		path = "id:%s" % String(recipe.id)
+	return {
+		"recipe_path": path,
+		"time_left": time_left,
+		"time_total": time_total,
+	}
+
+
+func import_persist_state(data: Variant) -> void:
+	_cancel_active("persist_reset")
+	_queue.clear()
+	_fuel_buffer_seconds = 0.0
+	if not (data is Dictionary):
+		return
+	var dict := data as Dictionary
+	_fuel_buffer_seconds = float(dict.get("fuel_buffer_seconds", 0.0))
+	var jobs_v: Variant = dict.get("craft_jobs", [])
+	if not (jobs_v is Array):
+		return
+	for entry in jobs_v as Array:
+		if not (entry is Dictionary):
+			continue
+		var e := entry as Dictionary
+		var recipe := _resolve_recipe_for_persist(str(e.get("recipe_path", "")))
+		if recipe == null:
+			continue
+		_queue.append({
+			"recipe": recipe,
+			"time_total": float(e.get("time_total", recipe.craft_time_seconds)),
+			"time_left": float(e.get("time_left", 0.0)),
+		})
+	if not _is_crafting and not _queue.is_empty():
+		_start_next_job()
+
+
+func _resolve_recipe_for_persist(path_or_id: String) -> CraftRecipe:
+	if path_or_id.is_empty():
+		return null
+	if path_or_id.begins_with("id:"):
+		var rid := path_or_id.substr(3)
+		var dir := DirAccess.open("res://resources/crafting/recipes/")
+		if dir:
+			for f in dir.get_files():
+				if not f.ends_with(".tres"):
+					continue
+				var r := load("res://resources/crafting/recipes/%s" % f) as CraftRecipe
+				if r and String(r.id) == rid:
+					return r
+		return null
+	if ResourceLoader.exists(path_or_id):
+		return load(path_or_id) as CraftRecipe
+	return null
 
 
 func restore_persisted_fuel_buffer_seconds(seconds: float) -> void:
@@ -294,76 +370,128 @@ func preview_fuel_consumption(seconds_needed: float) -> Dictionary:
 	return {}
 
 
-func can_start_craft(recipe: CraftRecipe, sources: Array[Inventory], output_inventory: Inventory) -> bool:
-	if recipe == null or not recipe.is_valid():
-		return false
-	if station_type == null or recipe.required_station != station_type:
-		return false
+func get_max_job_slots() -> int:
+	if station_type != null and station_type.supports_queue:
+		return maxi(1, station_type.max_parallel_crafts)
+	return 1
+
+
+func get_pending_job_count() -> int:
+	var n := _queue.size()
 	if _is_crafting:
-		return false
-	
-	# We take ingredients/fuel immediately, and result goes to station output.
-	if not Crafting.has_requirements_multi(sources, Crafting.get_requirements(recipe)):
-		return false
-	if self.output_inventory == null:
-		return false
-	if recipe.result == null or recipe.result.item == null:
-		return false
-	if not _simulate_output_can_fit_after_queue(recipe.result.item, recipe.result.amount):
-		return false
-	
+		n += 1
+	return n
+
+
+func get_available_job_slots() -> int:
+	return maxi(0, get_max_job_slots() - get_pending_job_count())
+
+
+func can_start_craft(recipe: CraftRecipe, sources: Array[Inventory], _output_inventory: Inventory) -> bool:
+	return compute_max_crafts(recipe, sources, true) > 0
+
+
+func compute_max_crafts(recipe: CraftRecipe, sources: Array[Inventory], respect_queue_slots: bool = true) -> int:
+	if recipe == null or not recipe.is_valid():
+		return 0
+	if station_type == null or recipe.required_station != station_type:
+		return 0
+	if output_inventory == null or recipe.result == null or recipe.result.item == null or recipe.result.amount <= 0:
+		return 0
+
+	var req := Crafting.get_requirements(recipe)
+	var max_by_ing := 999999
+	for item in req.keys():
+		var need := int(req[item])
+		if need <= 0:
+			continue
+		var have := Crafting.count_item_multi(sources, item)
+		max_by_ing = mini(max_by_ing, int(floor(float(have) / float(need))))
+	if max_by_ing == 999999:
+		max_by_ing = 0
+
+	var max_by_fuel := 999999
 	if recipe.requires_fuel:
 		if station_type == null or not station_type.supports_fuel:
-			return false
-		var need := get_fuel_seconds_needed_for_recipe(recipe)
-		var total_available := _fuel_buffer_seconds + _count_fuel_seconds_in_sources(sources)
-		return total_available >= need
-	
-	return true
+			return 0
+		var need_s := get_fuel_seconds_needed_for_recipe(recipe)
+		var total_s := get_total_fuel_seconds_available(sources)
+		max_by_fuel = int(floor(total_s / need_s)) if need_s > 0.0 else 0
+
+	var upper := mini(max_by_ing, max_by_fuel)
+	if upper <= 0:
+		return 0
+
+	var lo := 0
+	var hi := upper
+	while lo < hi:
+		var mid := int(ceil((lo + hi) / 2.0))
+		if _simulate_output_can_fit_after_queue(recipe.result.item, recipe.result.amount * mid):
+			lo = mid
+		else:
+			hi = mid - 1
+
+	if respect_queue_slots:
+		return mini(lo, get_available_job_slots())
+	return lo
 
 
 func start_craft(recipe: CraftRecipe, sources: Array[Inventory], output_inventory: Inventory, preferred_fuel_item: ItemData = null) -> bool:
-	if not can_start_craft(recipe, sources, output_inventory):
-		craft_failed.emit(recipe, "cannot_start")
-		return false
+	return start_craft_many(recipe, sources, output_inventory, preferred_fuel_item, 1) == 1
 
-	# 1) Immediately consume ingredients (so crafting can continue in background).
-	var req := Crafting.get_requirements(recipe)
-	if not Crafting.remove_items_multi(sources, req):
+
+func start_craft_many(
+	recipe: CraftRecipe,
+	sources: Array[Inventory],
+	_output_inventory: Inventory,
+	preferred_fuel_item: ItemData = null,
+	times: int = 1
+) -> int:
+	if times <= 0 or recipe == null or not recipe.is_valid():
+		return 0
+
+	var craftable := mini(times, compute_max_crafts(recipe, sources, true))
+	if craftable <= 0:
+		craft_failed.emit(recipe, "cannot_start")
+		return 0
+
+	var per_req := Crafting.get_requirements(recipe)
+	var total_req: Dictionary = {}
+	for item in per_req.keys():
+		total_req[item] = int(per_req[item]) * craftable
+	if not Crafting.remove_items_multi(sources, total_req):
 		craft_failed.emit(recipe, "no_ingredients")
-		return false
-	
+		return 0
+
+	if recipe.requires_fuel:
+		var need_one := get_fuel_seconds_needed_for_recipe(recipe)
+		var need_total := need_one * float(craftable)
+		var plan := preview_auto_fuel_take(need_total, sources)
+		if preferred_fuel_item != null:
+			plan = preview_fuel_take_for_specific_item(need_total, sources, preferred_fuel_item)
+		if not _apply_auto_fuel_take(plan, sources):
+			craft_failed.emit(recipe, "no_fuel_items")
+			return 0
+		if not _consume_from_buffer(need_total):
+			craft_failed.emit(recipe, "no_fuel")
+			return 0
+
 	if recipe.start_sound and sfx_player:
 		sfx_player.stream = recipe.start_sound
 		sfx_player.play()
-	
-	# 2) Fuel: consume upfront into buffer then seconds from buffer.
-	if recipe.requires_fuel:
-		var need := get_fuel_seconds_needed_for_recipe(recipe)
-		var plan := preview_auto_fuel_take(need, sources)
-		if preferred_fuel_item != null:
-			plan = preview_fuel_take_for_specific_item(need, sources, preferred_fuel_item)
-		if not _apply_auto_fuel_take(plan, sources):
-			_cancel_active("no_fuel_items")
-			return false
-		if not _consume_from_buffer(need):
-			_cancel_active("no_fuel")
-			return false
 
-	# 3) Enqueue job
-	var job := {
-		"recipe": recipe,
-		"time_total": maxf(0.0, recipe.craft_time_seconds),
-		"time_left": maxf(0.0, recipe.craft_time_seconds),
-	}
-	_queue.append(job)
-	
-	# If nothing active, start next immediately
+	for _i in craftable:
+		_queue.append({
+			"recipe": recipe,
+			"time_total": maxf(0.0, recipe.craft_time_seconds),
+			"time_left": maxf(0.0, recipe.craft_time_seconds),
+		})
+
 	if not _is_crafting:
 		_start_next_job()
-	
+
 	craft_state_changed.emit()
-	return true
+	return craftable
 
 
 func _start_next_job() -> void:

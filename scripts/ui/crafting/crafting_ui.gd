@@ -97,6 +97,7 @@ func _on_personal_craft_completed(_recipe: CraftRecipe) -> void:
 	progress.visible = false
 	progress.value = 0
 	status_label.text = "Готово!"
+	_refresh_recipe_list_labels()
 	_render_selected()
 	_on_personal_queue_changed()
 
@@ -232,16 +233,19 @@ func _on_station_progress_changed(p: float) -> void:
 
 
 func _on_station_state_changed() -> void:
+	_refresh_recipe_list_labels()
 	_render_selected()
 
 
 func _on_station_completed(_r: CraftRecipe) -> void:
 	status_label.text = "Готово"
+	_refresh_recipe_list_labels()
 	_render_selected()
 
 
 func _on_station_failed(_r: CraftRecipe, reason: String) -> void:
 	status_label.text = "Ошибка: " + reason
+	_refresh_recipe_list_labels()
 	_render_selected()
 
 
@@ -290,7 +294,7 @@ func _apply_filters() -> void:
 		if _selected_category != "Все" and r.recipe_category != _selected_category:
 			continue
 		_visible_recipes.append(r)
-		var idx := recipe_list.add_item(r.get_label())
+		var idx := recipe_list.add_item(_recipe_list_label(r))
 		var icon := _get_recipe_icon(r)
 		if icon != null:
 			recipe_list.set_item_icon(idx, icon)
@@ -348,6 +352,7 @@ func _render_selected() -> void:
 	_build_ingredients_rows(_selected_recipe)
 	_build_fuel_rows(_selected_recipe)
 	_build_max_crafts_row(_selected_recipe)
+	_refresh_recipe_list_labels()
 	
 	var can := false
 	if inventory != null:
@@ -357,22 +362,23 @@ func _render_selected() -> void:
 				sources.append(inv2)
 		
 		if station != null and is_instance_valid(station):
-			can = station.can_start_craft(_selected_recipe, sources, inventory)
+			can = station.compute_max_crafts(_selected_recipe, sources, true) > 0
 		else:
-			can = Crafting.can_craft_multi(sources, _selected_recipe, inventory)
+			can = _compute_max_crafts_now(_selected_recipe, sources, inventory) > 0
 	_set_buttons_enabled(can)
 	if not can:
-		if station != null and is_instance_valid(station) and station.is_busy():
-			status_label.text = "Крафт выполняется..."
+		if station != null and is_instance_valid(station) \
+				and _compute_max_crafts_for_recipe(_selected_recipe) > 0 \
+				and station.get_available_job_slots() <= 0:
+			status_label.text = "Очередь заполнена (макс. %d)" % station.get_max_job_slots()
 		else:
 			status_label.text = "Не хватает ингредиентов / нет места / нет топлива"
 
 
 func _set_buttons_enabled(v: bool) -> void:
-	var busy := station != null and is_instance_valid(station) and station.is_busy()
-	craft_button.disabled = busy or (not v)
-	craft5_button.disabled = busy or (not v)
-	craft10_button.disabled = busy or (not v)
+	craft_button.disabled = not v
+	craft5_button.disabled = not v
+	craft10_button.disabled = not v
 
 
 func _clear_ingredients() -> void:
@@ -480,13 +486,7 @@ func _build_max_crafts_row(r: CraftRecipe) -> void:
 		return
 	if inventory == null:
 		return
-	
-	var sources: Array[Inventory] = [inventory]
-	for inv2 in extra_inventories:
-		if inv2 != null:
-			sources.append(inv2)
-	
-	var max_count := _compute_max_crafts_now(r, sources, inventory)
+	var max_count := _compute_max_crafts_for_recipe(r)
 	
 	var lbl := Label.new()
 	lbl.text = "Максимум можно скрафтить сейчас: %d" % max_count
@@ -495,6 +495,37 @@ func _build_max_crafts_row(r: CraftRecipe) -> void:
 		fuel_details.add_child(lbl)
 	else:
 		ingredients_box.add_child(lbl)
+
+
+func _recipe_list_label(r: CraftRecipe) -> String:
+	var label := r.get_label()
+	if inventory == null:
+		return label
+	return "%s (%d)" % [label, _compute_max_crafts_for_recipe(r)]
+
+
+func _get_craft_sources() -> Array[Inventory]:
+	var sources: Array[Inventory] = []
+	if inventory != null:
+		sources.append(inventory)
+	for inv2 in extra_inventories:
+		if inv2 != null:
+			sources.append(inv2)
+	return sources
+
+
+func _compute_max_crafts_for_recipe(r: CraftRecipe) -> int:
+	if inventory == null or r == null:
+		return 0
+	var sources := _get_craft_sources()
+	if station != null and is_instance_valid(station):
+		return station.compute_max_crafts(r, sources, false)
+	return _compute_max_crafts_now(r, sources, inventory)
+
+
+func _refresh_recipe_list_labels() -> void:
+	for i in _visible_recipes.size():
+		recipe_list.set_item_text(i, _recipe_list_label(_visible_recipes[i]))
 
 
 func _compute_max_crafts_now(r: CraftRecipe, sources: Array[Inventory], output_inv: Inventory) -> int:
@@ -613,17 +644,17 @@ func _try_craft(times: int) -> void:
 		if inv2 != null:
 			sources.append(inv2)
 
-	# If station is present, we start ONE craft job (queue system будет позже).
 	if station != null and is_instance_valid(station):
-		var ok_station := station.start_craft(_selected_recipe, sources, inventory, _preferred_fuel_item)
-		if not ok_station:
-			status_label.text = "Крафт не запущен"
+		var started := station.start_craft_many(_selected_recipe, sources, inventory, _preferred_fuel_item, times)
+		status_label.text = ("В очереди: x%d" % started) if started > 0 else "Крафт не запущен"
+		_refresh_recipe_list_labels()
 		_render_selected()
 		return
 	
 	# Без станции: ставим в личную очередь (таймер работает в фоне)
 	var queued := Crafting.enqueue_personal_craft_many(_selected_recipe, sources, inventory, times)
 	status_label.text = ("В очереди: x%d" % queued) if queued > 0 else "Не удалось добавить в очередь"
+	_refresh_recipe_list_labels()
 	_render_selected()
 	_on_personal_queue_changed()
 

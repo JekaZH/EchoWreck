@@ -403,16 +403,7 @@ func apply_item(stack: ItemStack):
 		print("Ошибка: PlayerStatsComponent не найден")
 		return
 	
-	# Применяем все эффекты
-	for effect in stack.item.effects:
-		stats_comp.stats.hunger += effect.hunger_restore
-		stats_comp.stats.thirst += effect.thirst_restore
-		stats_comp.stats.health += effect.health_restore
-		# Можно добавить другие эффекты позже
-	
-	stats_comp.stats.hunger = clamp(stats_comp.stats.hunger, 0, stats_comp.stats.max_hunger)
-	stats_comp.stats.thirst = clamp(stats_comp.stats.thirst, 0, stats_comp.stats.max_thirst)
-	stats_comp.stats.health = clamp(stats_comp.stats.health, 0, stats_comp.stats.max_health)
+	stats_comp.apply_item_effects(stack.item)
 	
 	# Убираем 1 предмет из стака
 	if stack.count > 1:

@@ -8,6 +8,7 @@
 [sub_resource type="Resource" id="Resource_t2ees"]
 script = ExtResource("1_h42t0")
 health_restore = 50.0
+energy_restore = 10.0
 metadata/_custom_type_script = "uid://dm6xxi7css0sq"
 
 [resource]

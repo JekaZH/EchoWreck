@@ -17,8 +17,10 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+LevelWorldCache="*res://scripts/save/level_world_cache.gd"
 WorldPersistence="*res://scripts/save/world_persistence.gd"
 SaveManager="*res://scripts/save/save_manager.gd"
+LevelTravelManager="*res://scripts/world/level_travel_manager.gd"
 InventoryManager="*uid://bycce7w1rk8cm"
 DragPreview="*uid://caq2bte1idhpd"
 Crafting="*res://scripts/crafting/crafting_manager.gd"

@@ -11,6 +11,8 @@ var player_ui: Control = null
 @export var populate_from_loot_table: LootTable
 @export var populate_on_ready: bool = true
 @export var populate_only_if_empty: bool = true
+## Стабильный id для сохранений (уникален внутри сцены уровня). Пусто = путь узла.
+@export var persist_id: String = ""
 
 func _ready():
 	add_to_group("persist_chest")

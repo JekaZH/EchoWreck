@@ -2,8 +2,8 @@ extends Node
 
 ## Корневая папка слотов в user://
 const SAVE_DIR := "user://saves"
-const MAIN_GAME := preload("res://scenes/main.tscn")
-const MAIN_MENU := preload("res://scenes/ui/main_menu/main_menu.tscn")
+const MAIN_GAME_PATH := "res://scenes/main.tscn"
+const MAIN_MENU_PATH := "res://scenes/ui/main_menu/main_menu.tscn"
 
 ## Сколько слотов показывать в UI (0 … MAX−1).
 const MAX_SAVE_SLOTS: int = 30
@@ -102,10 +102,12 @@ func get_latest_slot() -> int:
 
 
 func start_new_game() -> void:
+	LevelWorldCache.clear_all()
 	WorldPersistence.clear()
+	LevelTravelManager.clear_travel_state()
 	_pending_data = null
 	_pending_new_game = true
-	get_tree().change_scene_to_packed(MAIN_GAME)
+	get_tree().change_scene_to_file(MAIN_GAME_PATH)
 
 
 func load_slot(slot: int) -> void:
@@ -114,9 +116,16 @@ func load_slot(slot: int) -> void:
 		push_warning("SaveManager: нет сохранения в слоте %d" % slot)
 		return
 	get_tree().paused = false
+	LevelTravelManager.clear_travel_state()
 	_pending_new_game = false
 	_pending_data = data
-	get_tree().change_scene_to_packed(MAIN_GAME)
+	var level_path := LevelTravelManager.resolve_level_scene_path(data.level_scene_path)
+	var packed := load(level_path) as PackedScene
+	if packed == null:
+		push_warning("SaveManager.load_slot: не удалось загрузить %s, fallback main" % level_path)
+		get_tree().change_scene_to_file(MAIN_GAME_PATH)
+	else:
+		get_tree().change_scene_to_packed(packed)
 
 
 func load_latest() -> void:
@@ -130,8 +139,10 @@ func go_to_main_menu() -> void:
 	get_tree().paused = false
 	_pending_data = null
 	_pending_new_game = false
+	LevelWorldCache.clear_all()
 	WorldPersistence.clear()
-	get_tree().change_scene_to_packed(MAIN_MENU)
+	LevelTravelManager.clear_travel_state()
+	get_tree().change_scene_to_file(MAIN_MENU_PATH)
 
 
 ## Вызывать с корня игровой сцены (например `Main`) после появления игрока в дереве.
@@ -146,6 +157,10 @@ func apply_pending_to_game(main_root: Node) -> void:
 		(player as Node3D).global_transform = _pending_data.player_transform
 	SaveGameState.apply_to_game(main_root as Node3D, _pending_data)
 	_pending_data = null
+
+
+func has_pending_save_data() -> bool:
+	return _pending_data != null and not _pending_new_game
 
 
 func save_slot(slot: int) -> bool:
@@ -163,7 +178,7 @@ func save_slot(slot: int) -> bool:
 		return false
 	var p := player as Player
 	var data := SaveGameData.new()
-	data.format_version = 2
+	data.format_version = 3
 	data.unix_time = Time.get_unix_time_from_system()
 	if String(main.scene_file_path).length() > 0:
 		data.level_scene_path = main.scene_file_path

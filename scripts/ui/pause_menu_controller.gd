@@ -3,8 +3,8 @@ class_name PauseMenuController
 
 ## Игровое меню (пауза): дочерний узел игрока или мира, `layer` выше обычного UI.
 
-const SAVE_BROWSER_SCENE := preload("res://scenes/ui/save_slots_browser.tscn")
-const SETTINGS_SCENE := preload("res://scenes/ui/settings_placeholder_menu.tscn")
+const SAVE_BROWSER_PATH := "res://scenes/ui/save_slots_browser.tscn"
+const SETTINGS_PATH := "res://scenes/ui/settings_placeholder_menu.tscn"
 
 @onready var _dimmer: ColorRect = $Root/Dimmer
 @onready var _main_panel: PanelContainer = $Root/MainPanel
@@ -48,22 +48,42 @@ func _on_after_save_screenshot() -> void:
 
 
 func _build_subscreens() -> void:
-	_load_browser = SAVE_BROWSER_SCENE.instantiate() as SaveSlotsBrowser
+	var load_node := _instantiate_subscreen(SAVE_BROWSER_PATH)
+	if load_node == null:
+		return
+	_load_browser = load_node as SaveSlotsBrowser
 	_load_browser.hide()
 	_load_browser.load_committed.connect(_on_load_slot)
 	_load_browser.back_pressed.connect(_hide_subscreens)
 	_subscreens.add_child(_load_browser)
 
-	_save_browser = SAVE_BROWSER_SCENE.instantiate() as SaveSlotsBrowser
+	var save_node := _instantiate_subscreen(SAVE_BROWSER_PATH)
+	if save_node == null:
+		return
+	_save_browser = save_node as SaveSlotsBrowser
 	_save_browser.hide()
 	_save_browser.save_committed.connect(_on_save_slot)
 	_save_browser.back_pressed.connect(_hide_subscreens)
 	_subscreens.add_child(_save_browser)
 
-	_settings_root = SETTINGS_SCENE.instantiate() as Control
+	var settings := _instantiate_subscreen(SETTINGS_PATH)
+	if settings == null:
+		return
+	_settings_root = settings as Control
 	_settings_root.hide()
 	_settings_root.connect("back_pressed", Callable(self, "_hide_subscreens"))
 	_subscreens.add_child(_settings_root)
+
+
+func _instantiate_subscreen(path: String) -> Node:
+	var packed := load(path) as PackedScene
+	if packed == null:
+		push_error("pause_menu: cannot load scene %s" % path)
+		return null
+	var node := packed.instantiate()
+	if node == null:
+		push_error("pause_menu: cannot instantiate %s" % path)
+	return node
 
 
 func is_menu_open() -> bool:

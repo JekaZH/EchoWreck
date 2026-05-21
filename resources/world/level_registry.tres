@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="LevelRegistry" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/level_registry.gd" id="1_reg"]
+[ext_resource type="Script" path="res://scripts/world/level_entry.gd" id="2_ent"]
+[ext_resource type="PackedScene" uid="uid://ypmvgig6uicm" path="res://scenes/main.tscn" id="3_main"]
+[ext_resource type="PackedScene" path="res://scenes/levels/cave_test.tscn" id="4_cave"]
+
+[sub_resource type="Resource" id="Entry_main"]
+script = ExtResource("2_ent")
+level_id = "main"
+display_name = "Поляна (основной мир)"
+scene = ExtResource("3_main")
+
+[sub_resource type="Resource" id="Entry_cave"]
+script = ExtResource("2_ent")
+level_id = "cave_test"
+display_name = "Тёмная пещера"
+scene = ExtResource("4_cave")
+
+[resource]
+script = ExtResource("1_reg")
+entries = Array[ExtResource("2_ent")]([SubResource("Entry_main"), SubResource("Entry_cave")])

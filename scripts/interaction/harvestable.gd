@@ -13,6 +13,8 @@ var current_health: float = 0.0
 @export var required_tool_type: String = ""      # "pickaxe", "axe", "shovel"
 @export var required_tier: int = 0
 @export var required_harvest_type: String = ""
+## Стабильный id узла добычи (уникален внутри сцены). Пусто = путь корня дерева/камня.
+@export var persist_id: String = ""
 
 signal harvested(drops: Array[Dictionary])
 
@@ -121,7 +123,9 @@ func _register_destroyed_harvestable(root: Node) -> void:
 	var main := get_tree().current_scene
 	if main == null or not main.is_ancestor_of(root):
 		return
-	WorldPersistence.register_removed(str(main.get_path_to(root)))
+	LevelWorldCache.register_removed_harvestable(
+		WorldPersistKey.make(main, root, persist_id)
+	)
 
 
 func _on_highlight_area_body_entered(body: Node3D) -> void:

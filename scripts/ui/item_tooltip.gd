@@ -213,7 +213,22 @@ func add_effect_line(effect: ItemEffect):
 
 	if effect.health_restore != 0:
 		text += "Здоровье: " + ( "+" if effect.health_restore > 0 else "" ) + str(effect.health_restore) + " "
-		color = Color.RED if effect.health_restore > 0 else Color.RED  # здоровье всегда красный
+		color = Color.RED if effect.health_restore > 0 else Color.RED
+
+	if effect.energy_restore != 0:
+		text += "Энергия: " + ( "+" if effect.energy_restore > 0 else "" ) + str(effect.energy_restore) + " "
+		color = Color(1.0, 0.85, 0.2) if effect.energy_restore > 0 else Color.RED
+
+	if effect.effect_type == "OverTime" and effect.duration > 0.0:
+		if effect.hunger_restore_per_second != 0.0:
+			text += "Голод/с: " + str(effect.hunger_restore_per_second) + " "
+		if effect.thirst_restore_per_second != 0.0:
+			text += "Жажда/с: " + str(effect.thirst_restore_per_second) + " "
+		if effect.health_restore_per_second != 0.0:
+			text += "Здоровье/с: " + str(effect.health_restore_per_second) + " "
+		if effect.energy_restore_per_second != 0.0:
+			text += "Энергия/с: " + str(effect.energy_restore_per_second) + " "
+		text += "Длит.: " + str(effect.duration) + "с "
 
 	if effect.speed_multiplier != 1.0:
 		var sign = "+" if effect.speed_multiplier > 1.0 else ""
