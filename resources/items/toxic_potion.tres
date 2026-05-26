@@ -8,11 +8,6 @@
 [sub_resource type="Resource" id="Resource_t2ees"]
 script = ExtResource("1_1lr7s")
 health_restore = -100.0
-energy_restore = null
-hunger_restore_per_second = null
-thirst_restore_per_second = null
-health_restore_per_second = null
-energy_restore_per_second = null
 metadata/_custom_type_script = "uid://dm6xxi7css0sq"
 
 [resource]

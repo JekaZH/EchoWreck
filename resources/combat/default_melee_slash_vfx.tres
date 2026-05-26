@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="MeleeSlashVfxSettings" format=3 uid="uid://bxc3sotf548ii"]
+
+[ext_resource type="Script" uid="uid://c3oimsdrdci3x" path="res://scripts/combat/melee_slash_vfx_settings.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")

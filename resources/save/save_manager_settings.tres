@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="SaveManagerSettings" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/save/save_manager_settings.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+autosave_enabled = true
+autosave_on_level_transition = true
+autosave_interval_seconds = 300.0
+warn_unsaved_on_exit_to_menu = true

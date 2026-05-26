@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="MeleeSlashVfxSettings" format=3 uid="uid://dgfmgcoud0k4e"]
+
+[ext_resource type="Script" uid="uid://c3oimsdrdci3x" path="res://scripts/combat/melee_slash_vfx_settings.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+arc_inner_reach_ratio = 0.12
+arc_outer_reach_ratio = 0.92
+sweep_duration = 0.3
+progress_end = 1.05
+fade_duration = 0.16
+slash_color = Color(0.55, 0.88, 1, 0.9)
+band_width = 0.15
+wave_freq = 18.0
+wave_amp = 0.09
+edge_soft = 0.1
+emission_strength = 2.4
+wave_phase_speed = 20.0
+ripple_phase_speed = 24.0

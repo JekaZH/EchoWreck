@@ -14,3 +14,8 @@ func _process(delta: float) -> void:
 	if target:
 		var desired_pos = target.global_position + offset
 		global_position = global_position.lerp(desired_pos, follow_speed * delta)
+
+
+func is_world_point_behind_camera(world_pos: Vector3) -> bool:
+	var local_pos := global_transform.affine_inverse() * world_pos
+	return local_pos.z > 0.0

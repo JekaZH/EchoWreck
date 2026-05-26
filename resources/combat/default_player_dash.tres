@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="PlayerDashSettings" format=3 uid="uid://bk1qsdsy3xxev"]
+
+[ext_resource type="Script" uid="uid://d1e0yn85h0jl2" path="res://scripts/combat/player_dash_settings.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")

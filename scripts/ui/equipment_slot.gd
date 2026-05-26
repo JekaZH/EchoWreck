@@ -35,37 +35,52 @@ func _ready():
 func _gui_input(event: InputEvent) -> void:
 	if not (event is InputEventMouseButton and event.pressed):
 		return
+	if not player_equipment:
+		return
+	var item := player_equipment.get_item_in_slot(slot_type)
+	if not item:
+		return
+	var player := get_tree().get_first_node_in_group("player")
+	if player == null:
+		return
+
+	if event.button_index == MOUSE_BUTTON_RIGHT:
+		if manager and manager.held_item:
+			return
+		_drop_equipped_to_world(player, item)
+		return
+
 	if event.button_index != MOUSE_BUTTON_LEFT:
 		return
 	if not Input.is_key_pressed(KEY_SHIFT):
 		return
-	if not player_equipment:
-		return
-	
-	var item := player_equipment.get_item_in_slot(slot_type)
-	if not item:
-		return
-	
-	var player = get_tree().get_first_node_in_group("player")
-	if not player:
-		return
-	
-	# Unequip and return to player inventory if possible, otherwise drop.
+
 	var old_item: ItemData = player_equipment.unequip_slot(slot_type)
 	if not old_item:
 		return
-	
 	var inv: Inventory = player.get_node_or_null("Inventory")
 	if inv and inv.can_fit_item(old_item, 1):
 		inv.add_item(old_item, 1)
 	else:
-		var angle: float = player.rotation.y
-		var look_dir: Vector3 = Vector3(sin(angle), 0.0, cos(angle)).normalized()
-		var spawn_pos: Vector3 = player.global_position + look_dir * 2.5 + Vector3(0.0, 0.8, 0.0)
-		if player.has_method("_on_item_dropped"):
-			player._on_item_dropped(ItemStack.new(old_item, 1), 1, spawn_pos, look_dir)
-	
+		_spawn_equipment_drop(player, old_item)
 	update_display()
+
+
+func _drop_equipped_to_world(player: Node, _item: ItemData) -> void:
+	var old_item: ItemData = player_equipment.unequip_slot(slot_type)
+	if old_item:
+		_spawn_equipment_drop(player, old_item)
+	update_display()
+
+
+func _spawn_equipment_drop(player: Node, item: ItemData) -> void:
+	if item == null:
+		return
+	var angle: float = player.rotation.y
+	var look_dir: Vector3 = Vector3(sin(angle), 0.0, cos(angle)).normalized()
+	var spawn_pos: Vector3 = player.global_position + look_dir * 2.5 + Vector3(0.0, 0.8, 0.0)
+	if player.has_method("_on_item_dropped"):
+		player._on_item_dropped(ItemStack.new(item, 1), 1, spawn_pos, look_dir)
 
 func setup(equipment: PlayerEquipment):
 	player_equipment = equipment

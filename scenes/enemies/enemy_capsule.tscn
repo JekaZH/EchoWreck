@@ -35,3 +35,4 @@ script = ExtResource("3_health")
 
 [node name="DebugVisual" type="Node3D" parent="." unique_id=1201447311]
 script = ExtResource("4_debug")
+enabled = false

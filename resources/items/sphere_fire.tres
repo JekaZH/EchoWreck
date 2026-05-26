@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://budstx7l123uq"]
+
+[ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="1_item"]
+[ext_resource type="Script" uid="uid://dm6xxi7css0sq" path="res://scripts/inventory/item_effect.gd" id="1_jyond"]
+[ext_resource type="Texture2D" uid="uid://bohv5sbixrgny" path="res://assets/icons/stylized_item/All/SODA_Icon_Orbs_CrystalBall2.png" id="2_icon"]
+[ext_resource type="Resource" uid="uid://dj8qfndpjp5jq" path="res://resources/combat/fireball_projectile.tres" id="3_proj"]
+
+[resource]
+script = ExtResource("1_item")
+id = "sphere_fire"
+display_name = "Сфера огня"
+description = "Магическая сфера: ЛКМ — фаербол, урон по области. Урон по врагам — в характеристиках предмета."
+icon = ExtResource("2_icon")
+max_stack = 1
+category = "Weapon"
+is_weapon = true
+entity_damage = 150.0
+attack_speed = 1.6
+weapon_type = "ranged"
+primary_action_animation = 3
+action_anim_speed_scale = 1.15
+action_hit_time_ratio = 0.22
+magic_sphere_type = 1
+magic_projectile = ExtResource("3_proj")
+spell_cast_speed_scale = 1.4

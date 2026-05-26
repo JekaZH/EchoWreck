@@ -15,7 +15,7 @@ func _ready():
 	is_ready = true
 	hide()
 
-func show_tooltip(item: ItemData, compare_item: ItemData = null):
+func show_tooltip(item: ItemData, compare_item: ItemData = null, durability_current: int = -1) -> void:
 	if not item:
 		hide()
 		return
@@ -36,6 +36,12 @@ func show_tooltip(item: ItemData, compare_item: ItemData = null):
 	if item.tool_type != "":
 		add_stat_line("Инструмент", item.tool_type.capitalize(), Color.LIGHT_BLUE)
 
+	if item.uses_durability():
+		var max_d := item.tool_durability
+		var cur := durability_current if durability_current >= 0 else max_d
+		var col := Color(0.35, 1.0, 0.55) if float(cur) / float(max_d) > 0.35 else Color(1.0, 0.45, 0.35)
+		add_stat_line("Прочность", "%d / %d" % [cur, max_d], col)
+
 	# Урон по блокам (для инструментов)
 	if item.block_damage > 0:
 		add_stat_line("Урон по блокам", "+" + str(item.block_damage), Color.ORANGE)
@@ -43,6 +49,10 @@ func show_tooltip(item: ItemData, compare_item: ItemData = null):
 	# Урон по существам (для оружия)
 	if item.entity_damage > 0:
 		add_stat_line("Урон по врагам", "+" + str(item.entity_damage), Color.ORANGE)
+
+	if item.is_weapon and item.attack_speed > 0.0:
+		var aps := item.attack_speed
+		add_stat_line("Скорость атаки", "%.2f / сек" % aps, Color(0.75, 0.85, 1.0))
 
 	# Эффекты из массива
 	for effect in item.effects:
@@ -199,43 +209,61 @@ func _fit_background() -> void:
 	background.offset_right = 0.0
 	background.offset_bottom = 0.0
 
-func add_effect_line(effect: ItemEffect):
-	var text = ""
-	var color = Color.WHITE
-
-	if effect.hunger_restore != 0:
-		text += "Голод: " + ( "+" if effect.hunger_restore > 0 else "" ) + str(effect.hunger_restore) + " "
-		color = Color.LIGHT_GREEN if effect.hunger_restore > 0 else Color.RED
-
-	if effect.thirst_restore != 0:
-		text += "Жажда: " + ( "+" if effect.thirst_restore > 0 else "" ) + str(effect.thirst_restore) + " "
-		color = Color.DODGER_BLUE if effect.thirst_restore > 0 else Color.RED
-
-	if effect.health_restore != 0:
-		text += "Здоровье: " + ( "+" if effect.health_restore > 0 else "" ) + str(effect.health_restore) + " "
-		color = Color.RED if effect.health_restore > 0 else Color.RED
-
-	if effect.energy_restore != 0:
-		text += "Энергия: " + ( "+" if effect.energy_restore > 0 else "" ) + str(effect.energy_restore) + " "
-		color = Color(1.0, 0.85, 0.2) if effect.energy_restore > 0 else Color.RED
-
+func add_effect_line(effect: ItemEffect) -> void:
+	if effect == null:
+		return
 	if effect.effect_type == "OverTime" and effect.duration > 0.0:
-		if effect.hunger_restore_per_second != 0.0:
-			text += "Голод/с: " + str(effect.hunger_restore_per_second) + " "
-		if effect.thirst_restore_per_second != 0.0:
-			text += "Жажда/с: " + str(effect.thirst_restore_per_second) + " "
-		if effect.health_restore_per_second != 0.0:
-			text += "Здоровье/с: " + str(effect.health_restore_per_second) + " "
-		if effect.energy_restore_per_second != 0.0:
-			text += "Энергия/с: " + str(effect.energy_restore_per_second) + " "
-		text += "Длит.: " + str(effect.duration) + "с "
+		add_stat_line("Длительность", "%.1f с" % effect.duration, Color(0.85, 0.85, 0.9))
+		_add_effect_value("Голод", effect.hunger_restore_per_second, true, true)
+		_add_effect_value("Жажда", effect.thirst_restore_per_second, true, true)
+		_add_effect_value("Здоровье", effect.health_restore_per_second, true, true)
+		_add_effect_value("Энергия", effect.energy_restore_per_second, true, true)
+	else:
+		_add_effect_value("Голод", effect.hunger_restore)
+		_add_effect_value("Жажда", effect.thirst_restore)
+		_add_effect_value("Здоровье", effect.health_restore)
+		_add_effect_value("Энергия", effect.energy_restore)
+	if abs(effect.speed_multiplier - 1.0) > 0.001:
+		var pct := (effect.speed_multiplier - 1.0) * 100.0
+		_add_effect_value("Скорость", pct, false, false, true)
+	if abs(effect.damage_multiplier - 1.0) > 0.001:
+		var pct_dmg := (effect.damage_multiplier - 1.0) * 100.0
+		_add_effect_value("Урон", pct_dmg, false, false, true)
+	if abs(effect.hunger_decrease_multiplier - 1.0) > 0.001:
+		var pct_h := (effect.hunger_decrease_multiplier - 1.0) * 100.0
+		_add_effect_value("Расход голода", pct_h, true, false, true)
+	if not effect.custom_effect_name.is_empty() and abs(effect.custom_value) > 0.0001:
+		_add_effect_value(effect.custom_effect_name, effect.custom_value)
 
-	if effect.speed_multiplier != 1.0:
-		var sign = "+" if effect.speed_multiplier > 1.0 else ""
-		text += "Скорость: " + sign + str((effect.speed_multiplier - 1.0) * 100) + "% "
 
-	if text != "":
-		add_stat_line("Эффект", text.strip_edges(), color)
+func _add_effect_value(
+	label: String,
+	value: float,
+	lower_is_better: bool = false,
+	per_second: bool = false,
+	as_percent: bool = false
+) -> void:
+	if abs(value) < 0.0001:
+		return
+	var suffix := "/с" if per_second else ""
+	var value_text: String
+	if as_percent:
+		value_text = "%+.0f%%%s" % [value, suffix]
+	else:
+		value_text = "%+.0f%s" % [value, suffix] if value > 0 else "%0.0f%s" % [value, suffix]
+	var color := _effect_value_color(value, lower_is_better, as_percent)
+	add_stat_line(label, value_text, color)
+
+
+func _effect_value_color(value: float, lower_is_better: bool, as_percent: bool) -> Color:
+	if abs(value) < 0.0001:
+		return Color(1, 1, 1, 0.65)
+	var positive := value > 0.0
+	if lower_is_better:
+		positive = value < 0.0
+	elif as_percent:
+		positive = value > 0.0
+	return Color(0.35, 1.0, 0.55, 1.0) if positive else Color(1.0, 0.35, 0.35, 1.0)
 
 func add_stat_line(label_text: String, value_text: String, color: Color = Color.WHITE):
 	var hbox = HBoxContainer.new()

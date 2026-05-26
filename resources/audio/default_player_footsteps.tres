@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PlayerFootstepSettings" format=3 uid="uid://dy2og1lfo1cm6"]
+
+[ext_resource type="Script" uid="uid://blij0h1t8mxiu" path="res://scripts/player/player_footstep_settings.gd" id="1_script"]
+[ext_resource type="Resource" uid="uid://boyeroy230mnq" path="res://resources/audio/clips/walk_dust_step_clip.tres" id="2_step_clip"]
+[ext_resource type="Resource" uid="uid://bggoqmaaa3w78" path="res://resources/audio/clips/pickup_clip.tres" id="3_pickup_clip"]
+
+[resource]
+script = ExtResource("1_script")
+step_clip = ExtResource("2_step_clip")
+step_volume_db = -0.5
+step_distance_m = 1.35
+run_step_distance_multiplier = 0.58
+pickup_clip = ExtResource("3_pickup_clip")

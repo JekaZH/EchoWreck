@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://dedym22hq3cf4" path="res://scenes/tools/axe_wood.tscn" id="2_1dxvt"]
 [ext_resource type="Texture2D" uid="uid://bby4tei3sl1wg" path="res://assets/icons/stylized_item/All/SODA_Icon_Weapons_Axe.png" id="2_nby3a"]
 [ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="2_rq8rl"]
+[ext_resource type="AudioStream" uid="uid://cbxgi3u5hhx0j" path="res://assets/audio/tools_axe.ogg" id="5_1dxvt"]
+[ext_resource type="AudioStream" uid="uid://dido0el45o6k0" path="res://assets/audio/weapon_hit.wav" id="6_y81nj"]
 
 [resource]
 script = ExtResource("2_rq8rl")
@@ -18,10 +20,19 @@ is_equippable = true
 equipped_scene = ExtResource("2_1dxvt")
 hand_offset = Vector3(0, 0.08, 0.04)
 tool_type = "axe"
+tool_durability = 70
 block_damage = 3.0
 tool_harvest_type = "tree"
 is_weapon = true
 entity_damage = 5.0
+attack_speed = 0.95
 primary_action_animation = 1
 action_hit_time_ratio = 0.32
+magic_sphere_type = null
+magic_hide_hand_model = null
+spell_cast_speed_scale = null
+tool_hit_sound = ExtResource("5_1dxvt")
+tool_hit_volume_db = null
+weapon_hit_sound = ExtResource("6_y81nj")
+weapon_hit_volume_db = null
 metadata/_custom_type_script = "uid://p3b1q13fmee1"

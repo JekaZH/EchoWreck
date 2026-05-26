@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://cc3xch787bmp4" path="res://scenes/world_objects/stone_basic.tscn" id="1_stone"]
 [ext_resource type="PackedScene" uid="uid://df1qd7sbrunkf" path="res://scenes/enemies/enemy_capsule.tscn" id="2_enemy"]
+[ext_resource type="Script" path="res://scripts/world/world_ground_mesh.gd" id="3_ground"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_floor"]
 size = Vector3(22, 0, 22)
@@ -12,8 +13,10 @@ albedo_color = Color(0.22, 0.2, 0.26, 1)
 [node name="CaveWorld" type="Node3D" unique_id=778416085]
 
 [node name="Ground" type="MeshInstance3D" parent="." unique_id=1975942634]
+script = ExtResource("3_ground")
 mesh = SubResource("BoxMesh_floor")
 surface_material_override/0 = SubResource("StandardMaterial3D_floor")
+collision_size_override = Vector3(22, 1.2, 22)
 
 [node name="Harvestables" type="Node3D" parent="." unique_id=94313172]
 

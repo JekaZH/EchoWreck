@@ -1,6 +1,8 @@
 [gd_scene format=3 uid="uid://jlpd8vlvvbs7"]
 
 [ext_resource type="Script" uid="uid://73hqq3wh873j" path="res://scripts/combat/sword_slash_vfx.gd" id="1_vfx"]
+[ext_resource type="Resource" uid="uid://bxc3sotf548ii" path="res://resources/combat/default_melee_slash_vfx.tres" id="2_settings"]
 
 [node name="SwordSlashVfx" type="Node3D" unique_id=300481960]
 script = ExtResource("1_vfx")
+editor_settings = ExtResource("2_settings")

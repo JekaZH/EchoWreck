@@ -11,6 +11,7 @@ const SAVE_BROWSER_PATH := "res://scenes/ui/save_slots_browser.tscn"
 @onready var _subscreens: Control = $Root/SubScreens
 
 var _load_browser: SaveSlotsBrowser
+var _exit_unsaved_confirm: ConfirmationDialog
 
 
 func _ready() -> void:
@@ -18,6 +19,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	hide()
 	_build_subscreens()
+	_setup_exit_confirm()
 	_latest_btn.pressed.connect(_on_load_latest)
 	_load_btn.pressed.connect(_show_load_browser)
 	_menu_btn.pressed.connect(_on_main_menu)
@@ -94,6 +96,25 @@ func _on_load_slot(slot: int) -> void:
 	SaveManager.load_slot(slot)
 
 
+func _setup_exit_confirm() -> void:
+	_exit_unsaved_confirm = ConfirmationDialog.new()
+	_exit_unsaved_confirm.title = "Несохранённые изменения"
+	_exit_unsaved_confirm.dialog_text = (
+		"Есть несохранённые изменения.\nВыйти в главное меню без сохранения?"
+	)
+	_exit_unsaved_confirm.ok_button_text = "Выйти"
+	_exit_unsaved_confirm.cancel_button_text = "Остаться"
+	_exit_unsaved_confirm.confirmed.connect(_do_exit_to_main_menu)
+	add_child(_exit_unsaved_confirm)
+
+
 func _on_main_menu() -> void:
+	if SaveManager.should_warn_unsaved_on_exit():
+		_exit_unsaved_confirm.popup_centered()
+		return
+	_do_exit_to_main_menu()
+
+
+func _do_exit_to_main_menu() -> void:
 	get_tree().paused = false
 	SaveManager.go_to_main_menu()

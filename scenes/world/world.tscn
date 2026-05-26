@@ -1,71 +1,180 @@
 [gd_scene format=3 uid="uid://cf6xk11stvqxl"]
 
 [ext_resource type="PackedScene" uid="uid://c8mj0quninl67" path="res://scenes/world_objects/tree_basic.tscn" id="1_dphjl"]
+[ext_resource type="PackedScene" uid="uid://00h55kb6cxue" path="res://scenes/world/terrain/world_terrain.tscn" id="1_terrain"]
 [ext_resource type="PackedScene" uid="uid://cc3xch787bmp4" path="res://scenes/world_objects/stone_basic.tscn" id="2_1fp7r"]
+[ext_resource type="PackedScene" uid="uid://dyry3g1pk3ku5" path="res://assets/stylized_nature_kit_standard/glTF/Flower_3_Single.gltf" id="2_sh7a8"]
 [ext_resource type="PackedScene" uid="uid://cluc3fjss7afb" path="res://scenes/world_objects/chest.tscn" id="2_sl2e5"]
+[ext_resource type="Script" uid="uid://cf1ufeky6ahc8" path="res://scripts/world/terrain/terrain_snap_children.gd" id="2_snap"]
+[ext_resource type="PackedScene" uid="uid://bt15rmcibqnvm" path="res://assets/stylized_nature_kit_standard/glTF/Flower_3_Group.gltf" id="3_7mx70"]
+[ext_resource type="Script" uid="uid://bw01wwo88ndg" path="res://scripts/world/terrain/world_play_bounds.gd" id="3_bounds"]
 [ext_resource type="PackedScene" uid="uid://bbequu47ef4nc" path="res://scenes/world_objects/dropped_item/dropped_item.tscn" id="3_v5dby"]
+[ext_resource type="PackedScene" uid="uid://bo2p0d73ftulr" path="res://assets/stylized_nature_kit_standard/glTF/Flower_4_Group.gltf" id="4_1cxds"]
 [ext_resource type="Resource" uid="uid://bdgotffirhnbm" path="res://resources/items/pickaxe_wood.tres" id="4_t5ptc"]
+[ext_resource type="Script" uid="uid://bkddn1otleen1" path="res://scripts/world/terrain/world_scene_setup.gd" id="4_world_setup"]
 [ext_resource type="Resource" uid="uid://bp62llw710gr3" path="res://resources/items/belt_leather.tres" id="5_1yooq"]
+[ext_resource type="PackedScene" uid="uid://bkn0ac1tmseop" path="res://assets/stylized_nature_kit_standard/glTF/Flower_4_Single.gltf" id="5_2m0ga"]
 [ext_resource type="Resource" uid="uid://7o7hu281wogl" path="res://resources/items/axe_wood.tres" id="5_j2gmx"]
-[ext_resource type="Resource" path="res://resources/items/sword_wood.tres" id="17_sword"]
 [ext_resource type="Resource" uid="uid://b6efp0tkhclpi" path="res://resources/items/apple.tres" id="5_t5ptc"]
 [ext_resource type="Resource" uid="uid://bdic6aqkjko7e" path="res://resources/items/heal_potion.tres" id="6_bq33v"]
 [ext_resource type="Resource" uid="uid://djpurve614gpi" path="res://resources/items/belt_leather_small.tres" id="6_dlabj"]
+[ext_resource type="PackedScene" uid="uid://u6e1aj000e2h" path="res://assets/stylized_nature_kit_standard/glTF/Grass_Common_Short.gltf" id="6_ovomx"]
 [ext_resource type="Resource" uid="uid://dcbnr7i77k1pw" path="res://resources/items/toxic_potion.tres" id="6_t634p"]
+[ext_resource type="PackedScene" uid="uid://c8s8gxmvn4he3" path="res://assets/stylized_nature_kit_standard/glTF/Grass_Common_Tall.gltf" id="7_kx0xk"]
 [ext_resource type="Resource" uid="uid://dcmwpoq0tbrla" path="res://resources/items/chest_leather_tunic.tres" id="7_srmg5"]
+[ext_resource type="PackedScene" uid="uid://c8ucn0rntwdoj" path="res://assets/stylized_nature_kit_standard/glTF/Mushroom_Common.gltf" id="8_5fxch"]
 [ext_resource type="Resource" uid="uid://c6xmkjqktt774" path="res://resources/items/chest_steel_plate.tres" id="8_umvgx"]
+[ext_resource type="PackedScene" uid="uid://b6plifnq18bwk" path="res://assets/stylized_nature_kit_standard/glTF/Mushroom_Laetiporus.gltf" id="9_4v0p3"]
 [ext_resource type="PackedScene" uid="uid://d34mheimbafc3" path="res://scenes/world_objects/crafting/station_workbench.tscn" id="9_workbench"]
-[ext_resource type="PackedScene" path="res://scenes/world_objects/crafting/station_campfire.tscn" id="10_campfire"]
+[ext_resource type="PackedScene" uid="uid://cdlfxsol0g06g" path="res://scenes/world_objects/crafting/station_campfire.tscn" id="10_campfire"]
+[ext_resource type="Texture2D" uid="uid://c88j3oj0lf6om" path="res://resources/world/terrain/textures/rock023_alb_ht.png" id="10_fqf7g"]
 [ext_resource type="PackedScene" uid="uid://dp6bfoiocjgh3" path="res://scenes/world_objects/crafting/station_forge.tscn" id="11_forge"]
+[ext_resource type="Texture2D" uid="uid://c307hdmos4gtm" path="res://resources/world/terrain/textures/rock023_nrm_rgh.png" id="11_jum6b"]
+[ext_resource type="Texture2D" uid="uid://ddprscrpsofah" path="res://resources/world/terrain/textures/ground037_alb_ht.png" id="12_l4ul6"]
 [ext_resource type="PackedScene" path="res://scenes/world_objects/crafting/station_loom.tscn" id="12_loom"]
+[ext_resource type="Texture2D" uid="uid://c1ots7w6i0i1q" path="res://resources/world/terrain/textures/ground037_nrm_rgh.png" id="13_q3hpu"]
 [ext_resource type="Resource" uid="uid://q6hw3cxy32pk" path="res://resources/items/wood_log.tres" id="13_wood_log"]
 [ext_resource type="Resource" uid="uid://pgvwrbnnk153" path="res://resources/items/wood_planks.tres" id="14_wood_planks"]
 [ext_resource type="Resource" uid="uid://yha7c2ubsuv6" path="res://resources/items/coal.tres" id="15_coal"]
 [ext_resource type="Resource" uid="uid://1gq0ards1dq4" path="res://resources/items/stone.tres" id="16_stone"]
+[ext_resource type="Resource" uid="uid://bwswordwood01" path="res://resources/items/sword_wood.tres" id="17_sword"]
+[ext_resource type="Resource" uid="uid://budstx7l123uq" path="res://resources/items/sphere_fire.tres" id="20_j0rhc"]
+[ext_resource type="Resource" path="res://resources/items/sphere_ice.tres" id="21_4jq4u"]
+[ext_resource type="PackedScene" uid="uid://by7143n8xmv3q" path="res://scenes/combat/training_dummy.tscn" id="41_7mx70"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4rhad"]
-albedo_color = Color(0.39572972, 0.32123318, 0.25094575, 1)
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_7mx70"]
+name = "Flower_3_Single"
+scene_file = ExtResource("2_sh7a8")
+density = 6.0774775
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_4rhad"]
-material = SubResource("StandardMaterial3D_4rhad")
-size = Vector2(200, 200)
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_1cxds"]
+name = "Flower_3_Group"
+id = 1
+scene_file = ExtResource("3_7mx70")
+density = 2.0548313
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_4rhad"]
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_2m0ga"]
+name = "Flower_4_Group"
+id = 2
+scene_file = ExtResource("4_1cxds")
+density = 1.6515054
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_ovomx"]
+name = "Flower_4_Single"
+id = 3
+scene_file = ExtResource("5_2m0ga")
+density = 4.9879313
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_kx0xk"]
+name = "Grass_Common_Short"
+id = 4
+scene_file = ExtResource("6_ovomx")
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_5fxch"]
+name = "Grass_Common_Tall"
+id = 5
+scene_file = ExtResource("7_kx0xk")
+density = 6.0071483
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_4v0p3"]
+name = "Mushroom_Common"
+id = 6
+scene_file = ExtResource("8_5fxch")
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_fqf7g"]
+name = "Mushroom_Laetiporus"
+id = 7
+scene_file = ExtResource("9_4v0p3")
+density = 8.652064
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_rock"]
+name = "Rock"
+albedo_texture = ExtResource("10_fqf7g")
+normal_texture = ExtResource("11_jum6b")
+normal_depth = 1.0
+ao_strength = 2.0
+roughness = -0.05
+uv_scale = 0.12
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_grass"]
+name = "Grass"
+id = 1
+albedo_color = Color(0.67451, 0.74902, 0.686275, 1)
+albedo_texture = ExtResource("12_l4ul6")
+normal_texture = ExtResource("13_q3hpu")
+normal_depth = 1.0
+ao_strength = 2.0
+uv_scale = 0.18
+detiling_rotation = 0.12
+
+[sub_resource type="Terrain3DAssets" id="Terrain3DAssets_jum6b"]
+mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_7mx70"), SubResource("Terrain3DMeshAsset_1cxds"), SubResource("Terrain3DMeshAsset_2m0ga"), SubResource("Terrain3DMeshAsset_ovomx"), SubResource("Terrain3DMeshAsset_kx0xk"), SubResource("Terrain3DMeshAsset_5fxch"), SubResource("Terrain3DMeshAsset_4v0p3"), SubResource("Terrain3DMeshAsset_fqf7g")])
+texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_rock"), SubResource("Terrain3DTextureAsset_grass")])
 
 [node name="World" type="Node3D" unique_id=532535475]
 
-[node name="Ground" type="MeshInstance3D" parent="." unique_id=372198166]
-mesh = SubResource("PlaneMesh_4rhad")
+[node name="WorldTerrain" parent="." unique_id=554911866 instance=ExtResource("1_terrain")]
+assets = SubResource("Terrain3DAssets_jum6b")
+metadata/ew_terrain_layout_ready = true
+
+[node name="PathPortals" type="Node3D" parent="WorldTerrain" unique_id=243122037]
+
+[node name="@Marker3D@19170" type="Marker3D" parent="WorldTerrain/PathPortals" unique_id=634896416]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 86, 0.08, 0)
+
+[node name="@Marker3D@19171" type="Marker3D" parent="WorldTerrain/PathPortals" unique_id=143959781]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -86, 0.08, 0)
+
+[node name="@Marker3D@19172" type="Marker3D" parent="WorldTerrain/PathPortals" unique_id=355960704]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, -86)
+
+[node name="@Marker3D@19173" type="Marker3D" parent="WorldTerrain/PathPortals" unique_id=617600720]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.08, 86)
+
+[node name="WorldSceneSetup" type="Node3D" parent="." unique_id=811538865]
+script = ExtResource("4_world_setup")
+
+[node name="WorldPlayBounds" type="Node3D" parent="." unique_id=1155321045]
+script = ExtResource("3_bounds")
+show_debug_wall = true
 
 [node name="TerrainDetails" type="Node3D" parent="." unique_id=1536069428]
 
-[node name="Tree1" type="MeshInstance3D" parent="TerrainDetails" unique_id=1913250187]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 10)
-mesh = SubResource("CylinderMesh_4rhad")
-
-[node name="Tree2" type="MeshInstance3D" parent="TerrainDetails" unique_id=638764945]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.130127, 0.5, 4.213187)
-mesh = SubResource("CylinderMesh_4rhad")
-
-[node name="Tree3" type="MeshInstance3D" parent="TerrainDetails" unique_id=1257369686]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.5, 0.5542207)
-mesh = SubResource("CylinderMesh_4rhad")
-
-[node name="Tree4" type="MeshInstance3D" parent="TerrainDetails" unique_id=638181041]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.4387074, 0.5, -1.916543)
-mesh = SubResource("CylinderMesh_4rhad")
-
 [node name="Tree" parent="TerrainDetails" unique_id=968043563 instance=ExtResource("1_dphjl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.92474747, 0, 8.123716)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.92474747, 0, 10.81517)
 
 [node name="Tree8" parent="TerrainDetails" unique_id=633895497 instance=ExtResource("1_dphjl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.31979132, 0, 8.123716)
 
 [node name="Tree9" parent="TerrainDetails" unique_id=838919566 instance=ExtResource("1_dphjl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5557227, 0, 8.123716)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8234954, 0, 8.123716)
 
 [node name="Tree10" parent="TerrainDetails" unique_id=2030502708 instance=ExtResource("1_dphjl")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.0292106, 0, 8.123716)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.495409, 0, 8.123716)
 
 [node name="Tree5" parent="TerrainDetails" unique_id=372294775 instance=ExtResource("1_dphjl")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.659622, 0, 4.9785004)
@@ -89,77 +198,120 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.564988, 0, 8.603111)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.990689, 0, 8.603111)
 
 [node name="Stone2" parent="TerrainDetails" unique_id=1086062938 instance=ExtResource("2_1fp7r")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.174623, 0, 1.076848)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.957905, 0, 7.210206)
 
 [node name="GroundItems" type="Node3D" parent="." unique_id=622216375]
 
 [node name="DroppedItem" parent="GroundItems" unique_id=203633381 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.820032, 0.49465227, -0.69523716)
+linear_damp = 1.2
+angular_damp = 2.0
 item_data = ExtResource("4_t5ptc")
+
+[node name="DroppedItem11" parent="GroundItems" unique_id=1122039263 instance=ExtResource("3_v5dby")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.605155, 0.49465227, -0.69523716)
+linear_damp = 1.2
+angular_damp = 2.0
+item_data = ExtResource("20_j0rhc")
+
+[node name="DroppedItem12" parent="GroundItems" unique_id=954475969 instance=ExtResource("3_v5dby")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.3968725, 0.49465227, -0.69523716)
+linear_damp = 1.2
+angular_damp = 2.0
+item_data = ExtResource("21_4jq4u")
 
 [node name="DroppedItem9" parent="GroundItems" unique_id=876771697 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3303056, 0.49465227, -3.4193783)
+linear_damp = 1.2
+angular_damp = 2.0
 item_data = ExtResource("5_t5ptc")
 
 [node name="DroppedItem10" parent="GroundItems" unique_id=1368562428 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5156093, 0.49465227, -4.965596)
+linear_damp = 1.2
+angular_damp = 2.0
 item_data = ExtResource("6_t634p")
 
 [node name="DroppedItem5" parent="GroundItems" unique_id=246006209 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.89987, 0.49465227, -0.69523716)
+linear_damp = 1.2
+angular_damp = 2.0
 item_data = ExtResource("5_1yooq")
 
 [node name="DroppedItem6" parent="GroundItems" unique_id=2057328067 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6691685, 0.49465227, -0.69523716)
+linear_damp = 1.2
+angular_damp = 2.0
 item_data = ExtResource("6_dlabj")
 
 [node name="DroppedItem7" parent="GroundItems" unique_id=536290274 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.846925, 0.49465227, -0.69523716)
+linear_damp = 1.2
+angular_damp = 2.0
 item_data = ExtResource("7_srmg5")
 
 [node name="DroppedItem8" parent="GroundItems" unique_id=783468938 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.9293404, 0.49465227, -0.69523716)
+linear_damp = 1.2
+angular_damp = 2.0
 item_data = ExtResource("8_umvgx")
 
 [node name="DroppedItem4" parent="GroundItems" unique_id=1363238185 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.092499, 0.49465227, -0.69523716)
+linear_damp = 1.2
+angular_damp = 2.0
 item_data = ExtResource("5_j2gmx")
 
-[node name="DroppedItemSword" parent="GroundItems" instance=ExtResource("3_v5dby")]
+[node name="DroppedItemSword" parent="GroundItems" unique_id=1307591679 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 0.49465227, -2.2)
+linear_damp = 1.2
+angular_damp = 2.0
 item_data = ExtResource("17_sword")
 
 [node name="DroppedItem2" parent="GroundItems" unique_id=1343817600 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.1425085, 0, -2.6471825)
+linear_damp = 1.2
+angular_damp = 2.0
 item_data = ExtResource("5_t5ptc")
 
 [node name="DroppedItem3" parent="GroundItems" unique_id=90887012 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.154822, 0, -5.178507)
+linear_damp = 1.2
+angular_damp = 2.0
 item_data = ExtResource("6_bq33v")
 
 [node name="DroppedWoodLogFuel" parent="GroundItems" unique_id=747217232 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8, 0, 1)
+linear_damp = 1.2
+angular_damp = 2.0
 item_data = ExtResource("13_wood_log")
 count = 8
 
 [node name="DroppedWoodPlanksFuel" parent="GroundItems" unique_id=1407074244 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 0, 1)
+linear_damp = 1.2
+angular_damp = 2.0
 item_data = ExtResource("14_wood_planks")
 count = 12
 
 [node name="DroppedCoalFuel" parent="GroundItems" unique_id=986748510 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 1)
+linear_damp = 1.2
+angular_damp = 2.0
 item_data = ExtResource("15_coal")
 count = 6
 
 [node name="DroppedStoneForTest" parent="GroundItems" unique_id=1728119172 instance=ExtResource("3_v5dby")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 0, 1)
+linear_damp = 1.2
+angular_damp = 2.0
 item_data = ExtResource("16_stone")
 count = 10
 
 [node name="WaterAreas" type="Node3D" parent="." unique_id=223744742]
 
 [node name="StaticProps" type="Node3D" parent="." unique_id=960840098]
+script = ExtResource("2_snap")
 
 [node name="CraftingStations" type="Node3D" parent="StaticProps" unique_id=175147556]
 
@@ -167,10 +319,10 @@ count = 10
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8, 0, 2.2)
 
 [node name="Campfire" parent="StaticProps/CraftingStations" unique_id=791278923 instance=ExtResource("10_campfire")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 2.1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0.040095687, 2.1)
 
 [node name="Forge" parent="StaticProps/CraftingStations" unique_id=1267860215 instance=ExtResource("11_forge")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 2.2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0.3834951, 2.2)
 
 [node name="Loom" parent="StaticProps/CraftingStations" unique_id=604548457 instance=ExtResource("12_loom")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.4, 0, 2)
@@ -179,3 +331,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.4, 0, 2)
 
 [node name="Chest" parent="." unique_id=2050241417 instance=ExtResource("2_sl2e5")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.471974, -4.7683716e-07, 1.3949251)
+
+[node name="TrainingDummy" parent="." unique_id=803974630 instance=ExtResource("41_7mx70")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.082965, 2.9375553, -12.534007)

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="AudioStreamClipSettings" format=3 uid="uid://bggoqmaaa3w78"]
+
+[ext_resource type="Script" uid="uid://cnqyk2b4qxxec" path="res://scripts/audio/audio_stream_clip_settings.gd" id="1_script"]
+[ext_resource type="AudioStream" uid="uid://dws5hv3610w5d" path="res://assets/audio/pickup.wav" id="2_stream"]
+
+[resource]
+script = ExtResource("1_script")
+stream = ExtResource("2_stream")
+trim_end_sec = 0.05

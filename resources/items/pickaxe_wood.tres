@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://ddo8lydsdip34" path="res://scenes/tools/pickaxe_wood.tscn" id="2_glwc8"]
 [ext_resource type="Texture2D" uid="uid://clvpwdudpucr3" path="res://assets/icons/stylized_item/Adventure_Items/SODA_Icon_AdventureItems_Pick.png" id="3_iklbe"]
 [ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="4_ambge"]
+[ext_resource type="AudioStream" uid="uid://ocv43so5063w" path="res://assets/audio/tools_pickaxe.wav" id="5_glwc8"]
+[ext_resource type="AudioStream" uid="uid://dido0el45o6k0" path="res://assets/audio/weapon_hit.wav" id="6_iklbe"]
 
 [resource]
 script = ExtResource("4_ambge")
@@ -18,10 +20,18 @@ is_equippable = true
 equipped_scene = ExtResource("2_glwc8")
 hand_offset = Vector3(0, 0.08, 0.04)
 tool_type = "pickaxe"
+tool_durability = 80
 block_damage = 2.5
 tool_harvest_type = "stone"
 is_weapon = true
 entity_damage = 4.0
 primary_action_animation = 1
 action_hit_time_ratio = 0.34
+magic_sphere_type = null
+magic_hide_hand_model = null
+spell_cast_speed_scale = null
+tool_hit_sound = ExtResource("5_glwc8")
+tool_hit_volume_db = null
+weapon_hit_sound = ExtResource("6_iklbe")
+weapon_hit_volume_db = null
 metadata/_custom_type_script = "uid://p3b1q13fmee1"

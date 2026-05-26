@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://c7ocq368ggogc"
+path="res://.godot/imported/WeaponStand.obj-d07065f0f90cd0b25ad85a2d168e91ec.mesh"
+
+[deps]
+
+files=["res://.godot/imported/WeaponStand.obj-d07065f0f90cd0b25ad85a2d168e91ec.mesh"]
+
+source_file="res://assets/fantasy_props_kit_standard/Exports/OBJ/WeaponStand.obj"
+dest_files=["res://.godot/imported/WeaponStand.obj-d07065f0f90cd0b25ad85a2d168e91ec.mesh", "res://.godot/imported/WeaponStand.obj-d07065f0f90cd0b25ad85a2d168e91ec.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

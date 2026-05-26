@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://cnxfk85gp0mtv"
+path="res://.godot/imported/Corner_Exterior_TopDown.obj-f876e2d949d6aed7d3e1b71936a2dfde.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Corner_Exterior_TopDown.obj-f876e2d949d6aed7d3e1b71936a2dfde.mesh"]
+
+source_file="res://assets/medieval_village_kit_standard/OBJ/Corner_Exterior_TopDown.obj"
+dest_files=["res://.godot/imported/Corner_Exterior_TopDown.obj-f876e2d949d6aed7d3e1b71936a2dfde.mesh", "res://.godot/imported/Corner_Exterior_TopDown.obj-f876e2d949d6aed7d3e1b71936a2dfde.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

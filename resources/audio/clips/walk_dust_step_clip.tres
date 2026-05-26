@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="AudioStreamClipSettings" format=3 uid="uid://boyeroy230mnq"]
+
+[ext_resource type="Script" uid="uid://cnqyk2b4qxxec" path="res://scripts/audio/audio_stream_clip_settings.gd" id="1_script"]
+[ext_resource type="AudioStream" uid="uid://355fr6fsig2l" path="res://assets/audio/walk_dust.wav" id="2_stream"]
+
+[resource]
+script = ExtResource("1_script")
+stream = ExtResource("2_stream")

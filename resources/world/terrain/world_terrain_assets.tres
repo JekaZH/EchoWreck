@@ -1,0 +1,126 @@
+[gd_resource type="Terrain3DAssets" format=3 uid="uid://d2nusnshemtlk"]
+
+[ext_resource type="PackedScene" uid="uid://dyry3g1pk3ku5" path="res://assets/stylized_nature_kit_standard/glTF/Flower_3_Single.gltf" id="1_2gbvi"]
+[ext_resource type="PackedScene" uid="uid://bt15rmcibqnvm" path="res://assets/stylized_nature_kit_standard/glTF/Flower_3_Group.gltf" id="2_f5x8f"]
+[ext_resource type="Texture2D" uid="uid://c88j3oj0lf6om" path="res://resources/world/terrain/textures/rock023_alb_ht.png" id="2_rock_alb"]
+[ext_resource type="PackedScene" uid="uid://bo2p0d73ftulr" path="res://assets/stylized_nature_kit_standard/glTF/Flower_4_Group.gltf" id="3_3c6o1"]
+[ext_resource type="Texture2D" uid="uid://c307hdmos4gtm" path="res://resources/world/terrain/textures/rock023_nrm_rgh.png" id="3_rock_nrm"]
+[ext_resource type="Texture2D" uid="uid://ddprscrpsofah" path="res://resources/world/terrain/textures/ground037_alb_ht.png" id="4_grass_alb"]
+[ext_resource type="PackedScene" uid="uid://bkn0ac1tmseop" path="res://assets/stylized_nature_kit_standard/glTF/Flower_4_Single.gltf" id="4_uysko"]
+[ext_resource type="Texture2D" uid="uid://c1ots7w6i0i1q" path="res://resources/world/terrain/textures/ground037_nrm_rgh.png" id="5_grass_nrm"]
+[ext_resource type="PackedScene" uid="uid://u6e1aj000e2h" path="res://assets/stylized_nature_kit_standard/glTF/Grass_Common_Short.gltf" id="5_i3xa5"]
+[ext_resource type="PackedScene" uid="uid://c8s8gxmvn4he3" path="res://assets/stylized_nature_kit_standard/glTF/Grass_Common_Tall.gltf" id="6_arxb7"]
+[ext_resource type="PackedScene" uid="uid://c8ucn0rntwdoj" path="res://assets/stylized_nature_kit_standard/glTF/Mushroom_Common.gltf" id="7_lptp0"]
+[ext_resource type="PackedScene" uid="uid://b6plifnq18bwk" path="res://assets/stylized_nature_kit_standard/glTF/Mushroom_Laetiporus.gltf" id="8_xam33"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4tp4s"]
+transparency = 4
+cull_mode = 2
+vertex_color_use_as_albedo = true
+backlight_enabled = true
+backlight = Color(0.5, 0.5, 0.5, 1)
+distance_fade_mode = 1
+distance_fade_min_distance = 128.0
+distance_fade_max_distance = 96.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_lapn0"]
+generated_type = 1
+height_offset = 0.5
+material_override = SubResource("StandardMaterial3D_4tp4s")
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_kqiwh"]
+name = "Flower_3_Single"
+id = 1
+scene_file = ExtResource("1_2gbvi")
+density = 6.0774775
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_qtdlw"]
+name = "Flower_3_Group"
+id = 2
+scene_file = ExtResource("2_f5x8f")
+density = 2.0548313
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_hydmd"]
+name = "Flower_4_Group"
+id = 3
+scene_file = ExtResource("3_3c6o1")
+density = 1.6515054
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_qcs3e"]
+name = "Flower_4_Single"
+id = 4
+scene_file = ExtResource("4_uysko")
+density = 4.9879313
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_xwehw"]
+name = "Grass_Common_Short"
+id = 5
+scene_file = ExtResource("5_i3xa5")
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_qbt8r"]
+name = "Grass_Common_Tall"
+id = 6
+scene_file = ExtResource("6_arxb7")
+density = 6.0071483
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_tr7sx"]
+name = "Mushroom_Common"
+id = 7
+scene_file = ExtResource("7_lptp0")
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_nmi2j"]
+name = "Mushroom_Laetiporus"
+id = 8
+scene_file = ExtResource("8_xam33")
+density = 8.652064
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_rock"]
+name = "Rock"
+albedo_texture = ExtResource("2_rock_alb")
+normal_texture = ExtResource("3_rock_nrm")
+normal_depth = 1.0
+ao_strength = 2.0
+roughness = -0.05
+uv_scale = 0.12
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_grass"]
+name = "Grass"
+id = 1
+albedo_color = Color(0.67451, 0.74902, 0.686275, 1)
+albedo_texture = ExtResource("4_grass_alb")
+normal_texture = ExtResource("5_grass_nrm")
+normal_depth = 1.0
+ao_strength = 2.0
+uv_scale = 0.18
+detiling_rotation = 0.12
+
+[resource]
+mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_lapn0"), SubResource("Terrain3DMeshAsset_kqiwh"), SubResource("Terrain3DMeshAsset_qtdlw"), SubResource("Terrain3DMeshAsset_hydmd"), SubResource("Terrain3DMeshAsset_qcs3e"), SubResource("Terrain3DMeshAsset_xwehw"), SubResource("Terrain3DMeshAsset_qbt8r"), SubResource("Terrain3DMeshAsset_tr7sx"), SubResource("Terrain3DMeshAsset_nmi2j")])
+texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_rock"), SubResource("Terrain3DTextureAsset_grass")])

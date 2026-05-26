@@ -37,6 +37,12 @@ func _ready() -> void:
 	if show_health_bar:
 		call_deferred("_setup_health_bar")
 
+func _play_tool_hit_sound(item: ItemData) -> void:
+	if item == null or item.tool_hit_sound == null:
+		return
+	GameAudio.play_3d(item.tool_hit_sound, global_position, item.tool_hit_volume_db)
+
+
 func try_harvest(player) -> bool:
 	if not player or not player.has_node("ToolEquipper"):
 		print("Harvestable: Player или ToolEquipper не найден")
@@ -80,6 +86,7 @@ func try_harvest(player) -> bool:
 	var destroyed := _health.apply_damage(damage, player)
 
 	print("Удар по блоку! Урон:", damage, " | Здоровье осталось:", _health.current_health)
+	_play_tool_hit_sound(equipped_item)
 
 	if destroyed:
 		print("Блок полностью уничтожен!")
@@ -87,9 +94,7 @@ func try_harvest(player) -> bool:
 		var drops := generate_drops(harvest_root)
 		harvested.emit(drops)
 		_destroy_harvest_root(harvest_root)
-		return true
-
-	return false
+	return true
 
 
 func _get_harvest_root() -> Node3D:
@@ -158,11 +163,15 @@ func _spawn_dropped_item(host: Node, item: ItemData, count: int, spawn_pos: Vect
 	host.add_child(dropped)
 	dropped.global_position = spawn_pos
 	dropped.add_to_group("dropped_items")
+	dropped.call_deferred("apply_spawn_pop")
 	return true
 
 
 func set_highlight(enabled: bool) -> void:
-	if outline_mesh:
+	var root := get_parent()
+	if root != null and root.has_method("set_harvest_highlight"):
+		root.call("set_harvest_highlight", enabled)
+	elif outline_mesh:
 		outline_mesh.visible = enabled
 	if _health_bar and _health_bar.has_method("set_highlighted"):
 		_health_bar.set_highlighted(enabled)
@@ -177,7 +186,12 @@ func _setup_health_bar() -> void:
 		return
 	_health_bar.visibility_mode = health_bar_visibility
 	harvest_root.add_child(_health_bar)
-	_health_bar.position = Vector3(0.0, _HealthBarDisplay.estimate_top_offset(harvest_root), 0.0)
+	var bar_y := 0.0
+	if harvest_root.has_method("get_health_bar_height"):
+		bar_y = float(harvest_root.call("get_health_bar_height"))
+	else:
+		bar_y = _HealthBarDisplay.estimate_top_offset(harvest_root)
+	_health_bar.position = Vector3(0.0, bar_y, 0.0)
 	if _health_bar.has_method("bind_to"):
 		_health_bar.bind_to(_health)
 

@@ -33,6 +33,12 @@ func _ready() -> void:
 	_delete_btn.pressed.connect(_on_delete_pressed)
 	_item_list.item_activated.connect(_on_item_activated)
 	_item_list.item_selected.connect(_on_item_selected)
+	SaveManager.autosave_finished.connect(_on_autosave_finished)
+
+
+func _on_autosave_finished(_success: bool) -> void:
+	if visible and _mode == Mode.LOAD:
+		_rebuild_list()
 
 
 func set_mode(m: Mode, custom_title: String = "") -> void:
@@ -43,7 +49,7 @@ func set_mode(m: Mode, custom_title: String = "") -> void:
 		_title.text = "Загрузить игру" if m == Mode.LOAD else "Сохранить игру"
 	_action_btn.text = "Загрузить" if m == Mode.LOAD else "Сохранить в слот"
 	_hint.text = (
-		"Сверху — самые новые сохранения, ниже — пустые слоты. Двойной клик — быстро загрузить."
+		"Сверху — самые новые (включая автосохранение). Двойной клик — быстро загрузить."
 		if m == Mode.LOAD
 		else "Сверху — занятые слоты (новые выше). Пустой слот сохраняется сразу; занятый — с подтверждением."
 	)
@@ -54,6 +60,38 @@ func set_mode(m: Mode, custom_title: String = "") -> void:
 func _rebuild_list() -> void:
 	_item_list.clear()
 	_slot_by_item_index.clear()
+	if _mode == Mode.LOAD:
+		_rebuild_load_list()
+	else:
+		_rebuild_save_list()
+	_update_delete_enabled()
+
+
+func _rebuild_load_list() -> void:
+	var used: Dictionary = {}
+	var rows: Array[Dictionary] = []
+	if SaveManager.autosave_has_data():
+		var auto_data := SaveManager.load_autosave()
+		if auto_data:
+			rows.append({"slot": SaveManager.AUTOSAVE_SLOT, "time": auto_data.unix_time})
+	for entry in SaveManager.list_saves_sorted():
+		var slot: int = int(entry["slot"])
+		var data: SaveGameData = entry["data"]
+		rows.append({"slot": slot, "time": data.unix_time})
+		used[slot] = true
+	rows.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a["time"]) > float(b["time"])
+	)
+	for row in rows:
+		_append_row(int(row["slot"]))
+		used[int(row["slot"])] = true
+	for s in range(SaveManager.MAX_SAVE_SLOTS):
+		if used.has(s):
+			continue
+		_append_row(s)
+
+
+func _rebuild_save_list() -> void:
 	var used: Dictionary = {}
 	for entry in SaveManager.list_saves_sorted():
 		var slot: int = int(entry["slot"])
@@ -63,7 +101,6 @@ func _rebuild_list() -> void:
 		if used.has(s):
 			continue
 		_append_row(s)
-	_update_delete_enabled()
 
 
 func _append_row(slot: int) -> void:
@@ -77,6 +114,13 @@ func _append_row(slot: int) -> void:
 
 
 func _format_slot_line(slot: int) -> String:
+	if SaveManager.is_autosave_slot(slot):
+		if not SaveManager.autosave_has_data():
+			return "Автосохранение — пусто"
+		var auto_d := SaveManager.load_autosave()
+		if auto_d == null:
+			return "Автосохранение — ошибка чтения"
+		return "Автосохранение — " + Time.get_datetime_string_from_unix_time(int(auto_d.unix_time))
 	var prefix := "Слот %02d — " % (slot + 1)
 	if not SaveManager.slot_has_save(slot):
 		return prefix + "пусто"
@@ -87,7 +131,11 @@ func _format_slot_line(slot: int) -> String:
 
 
 func _load_thumb_texture(slot: int) -> Texture2D:
-	var thumb := SaveManager.get_slot_thumb_path(slot)
+	var thumb := (
+		SaveManager.get_autosave_thumb_path()
+		if SaveManager.is_autosave_slot(slot)
+		else SaveManager.get_slot_thumb_path(slot)
+	)
 	if not FileAccess.file_exists(thumb):
 		return null
 	var abs_path := ProjectSettings.globalize_path(thumb)
@@ -113,7 +161,15 @@ func _on_item_selected(_index: int) -> void:
 
 func _update_delete_enabled() -> void:
 	var s := _selected_slot()
-	_delete_btn.disabled = s < 0 or not SaveManager.slot_has_save(s)
+	_delete_btn.disabled = (
+		s < 0
+		or SaveManager.is_autosave_slot(s)
+		or not SaveManager.slot_has_save(s)
+	)
+
+
+func _can_load_slot(slot: int) -> bool:
+	return SaveManager.slot_has_save(slot)
 
 
 func _on_action_pressed() -> void:
@@ -121,15 +177,17 @@ func _on_action_pressed() -> void:
 	if slot < 0:
 		return
 	if _mode == Mode.LOAD:
-		if SaveManager.slot_has_save(slot):
+		if _can_load_slot(slot):
 			load_committed.emit(slot)
 	elif _mode == Mode.SAVE:
+		if SaveManager.is_autosave_slot(slot):
+			return
 		_try_commit_save(slot)
 
 
 func _on_delete_pressed() -> void:
 	var slot := _selected_slot()
-	if slot < 0 or not SaveManager.slot_has_save(slot):
+	if slot < 0 or SaveManager.is_autosave_slot(slot) or not SaveManager.slot_has_save(slot):
 		return
 	_pending_delete_slot = slot
 	_delete_confirm.dialog_text = "Удалить сохранение в слоте %d?\nФайл будет удалён безвозвратно." % (slot + 1)
@@ -149,10 +207,11 @@ func _on_item_activated(index: int) -> void:
 		return
 	var slot: int = _slot_by_item_index[index]
 	if _mode == Mode.LOAD:
-		if SaveManager.slot_has_save(slot):
+		if _can_load_slot(slot):
 			load_committed.emit(slot)
 	elif _mode == Mode.SAVE:
-		_try_commit_save(slot)
+		if not SaveManager.is_autosave_slot(slot):
+			_try_commit_save(slot)
 
 
 func _try_commit_save(slot: int) -> void:

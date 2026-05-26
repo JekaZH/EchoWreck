@@ -37,7 +37,10 @@ func _notification(what: int) -> void:
 func _refresh_continue_visibility() -> void:
 	if not is_node_ready() or _continue_btn == null:
 		return
-	var has_saves := SaveManager.get_latest_slot() >= 0
+	var has_saves := (
+		SaveManager.autosave_has_data()
+		or SaveManager.get_latest_slot() >= 0
+	)
 	_continue_btn.visible = has_saves
 
 

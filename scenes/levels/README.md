@@ -17,13 +17,14 @@
 
 ### 1. Сцена уровня
 - Корень `Node3D` + скрипт `main_game_bootstrap.gd`
+- На корне **`level_save_key`** = путь этой сцены, напр. `res://scenes/levels/my_level.tscn`
 - `Player`, `Camera3D`, свет (как `cave_test.tscn`)
 - Папка `LevelPortals` — зоны и точки спавна
 - Контент мира — отдельная сцена, как `scenes/world/world.tscn` на поляне:
   - **`scenes/world/cave_world.tscn`** для пещеры: `Harvestables` (камни/деревья), `Enemies`, `GroundItems`
 
 ### 2. Переходы
-- Инстанс `level_transition_zone.tscn` у входов → `target_level` = другая сцена
+- Инстанс `level_transition_zone.tscn` у входов → `target_level` / `target_level_path` = **`res://…`**, не `uid://`
 - `arrival_portal_id` = `portal_id` маркера **на целевой** сцене
 - Обратные зоны на других сценах ссылаются на **ваш** `portal_id`
 
@@ -31,7 +32,8 @@
 
 | Объект | Условие |
 |--------|---------|
-| Деревья, камни | Сцена `tree_basic` / `stone_basic` + скрипт `Harvestable` (уже есть) |
+| Деревья, камни | `tree_basic` / `stone_basic` + `Harvestable`, **`persist_id`** на инстансе. Вариант модели: **`prop_variant`** (деревья CommonTree 1–5, камни Rock_Medium 1–3). В редакторе — полупрозрачный цилиндр-гизмо (`EditorPlacementGizmo`), в игре скрыт |
+| Убитые враги | `enemy_capsule.tscn` / `EnemyBody`, уникальный **`persist_id`** |
 | Дроп на земле | Группа `dropped_items` (у `DroppedItem` уже есть) |
 | Сундук | Сцена/скрипт `Chest` → группа `persist_chest` |
 | Станция крафта | `CraftingStation` → группа `persist_crafting_station` |
@@ -39,7 +41,7 @@
 **Новый тип объекта** (например жилой рудник) — нужен скрипт, который при изменении состояния попадает в `SaveGameState.build_world_payload` / группу (расширение системы).
 
 ### 4. Стабильные id (рекомендуется)
-На сундуке, станции, `Harvestable` в инспекторе:
+На сундуке, станции, `Harvestable`, **`EnemyBody`** в инспекторе:
 
 - **`persist_id`** — уникальный в **этой** сцене (`chest_mine_a`, `campfire_01`, `tree_grove_3`)
 
@@ -61,7 +63,7 @@ extension_data.levels = {
 }
 ```
 
-При переходе без записи на диск — то же в **LevelWorldCache** (память сессии).
+При переходе без записи на диск — то же в **LevelWorldCache** (память сессии). Пока грузится сцена и применяется кэш, показывается **`level_loading_screen.tscn`** (autoload `LevelTravelManager`).
 
 ---
 

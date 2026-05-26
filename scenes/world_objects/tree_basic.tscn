@@ -1,60 +1,58 @@
 [gd_scene format=3 uid="uid://c8mj0quninl67"]
 
-[ext_resource type="Material" uid="uid://b5c70hsp2mq8a" path="res://shaders/outline_material.tres" id="1_2qvkx"]
-[ext_resource type="Script" uid="uid://lqwyemd20jd" path="res://scripts/interaction/harvestable.gd" id="1_7xii0"]
-[ext_resource type="Script" uid="uid://cn6bx4dcnt1nk" path="res://scripts/inventory/loot_entry.gd" id="2_i4fol"]
-[ext_resource type="Resource" uid="uid://q6hw3cxy32pk" path="res://resources/items/wood_log.tres" id="3_2qvkx"]
-[ext_resource type="Script" uid="uid://fbnax6jp6py2" path="res://scripts/inventory/loot_table.gd" id="4_i4fol"]
+[ext_resource type="Script" uid="uid://dcyqiqkq2vb5y" path="res://scripts/world_objects/harvestable_prop_root.gd" id="2_prop_root"]
+[ext_resource type="Script" uid="uid://uuop3unqu46g" path="res://scripts/world_objects/harvestable_editor_gizmo.gd" id="3_gizmo"]
+[ext_resource type="Script" uid="uid://lqwyemd20jd" path="res://scripts/interaction/harvestable.gd" id="4_harvestable"]
+[ext_resource type="Script" uid="uid://cn6bx4dcnt1nk" path="res://scripts/inventory/loot_entry.gd" id="5_loot_entry"]
+[ext_resource type="Resource" uid="uid://q6hw3cxy32pk" path="res://resources/items/wood_log.tres" id="6_wood"]
+[ext_resource type="Script" uid="uid://fbnax6jp6py2" path="res://scripts/inventory/loot_table.gd" id="7_loot_table"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uqsbt"]
-albedo_color = Color(0, 1, 0.23921569, 1)
+[sub_resource type="CylinderMesh" id="CylinderMesh_gizmo"]
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_uqsbt"]
-material = SubResource("StandardMaterial3D_uqsbt")
+[sub_resource type="Resource" id="Resource_loot_entry"]
+script = ExtResource("5_loot_entry")
+item = ExtResource("6_wood")
 
-[sub_resource type="Resource" id="Resource_2qvkx"]
-script = ExtResource("2_i4fol")
-item = ExtResource("3_2qvkx")
-metadata/_custom_type_script = "uid://cn6bx4dcnt1nk"
+[sub_resource type="Resource" id="Resource_loot_table"]
+script = ExtResource("7_loot_table")
+entries = Array[ExtResource("5_loot_entry")]([SubResource("Resource_loot_entry")])
 
-[sub_resource type="Resource" id="Resource_st1mx"]
-script = ExtResource("4_i4fol")
-entries = Array[ExtResource("2_i4fol")]([SubResource("Resource_2qvkx")])
-metadata/_custom_type_script = "uid://fbnax6jp6py2"
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_trunk"]
+height = 4.0
+radius = 0.45
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_uqsbt"]
-
-[sub_resource type="SphereShape3D" id="SphereShape3D_2qvkx"]
+[sub_resource type="SphereShape3D" id="SphereShape3D_highlight"]
 radius = 3.0
 
-[node name="Tree" type="Node3D" unique_id=968043563]
+[node name="Tree" type="Node3D" unique_id=1634693960]
+script = ExtResource("2_prop_root")
+fade_when_occluding_player = true
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=145523584]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
-mesh = SubResource("CylinderMesh_uqsbt")
+[node name="VisualRoot" type="Node3D" parent="." unique_id=1161269882]
 
-[node name="OutlineMesh" type="MeshInstance3D" parent="." unique_id=1254650949]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+[node name="OutlineMesh" type="MeshInstance3D" parent="." unique_id=559857005]
 visible = false
-mesh = SubResource("CylinderMesh_uqsbt")
-surface_material_override/0 = ExtResource("1_2qvkx")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1428753839 groups=["harvestable"]]
+[node name="EditorPlacementGizmo" type="MeshInstance3D" parent="." unique_id=1778340089]
+mesh = SubResource("CylinderMesh_gizmo")
+script = ExtResource("3_gizmo")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=97734560 groups=["harvestable"]]
 collision_layer = 17
 collision_mask = 16
-script = ExtResource("1_7xii0")
-loot_table = SubResource("Resource_st1mx")
+script = ExtResource("4_harvestable")
+loot_table = SubResource("Resource_loot_table")
 max_health = 4.0
 required_tool_type = "axe"
 required_harvest_type = "tree"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=160892960]
-shape = SubResource("CylinderShape3D_uqsbt")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1480060247]
+shape = SubResource("CylinderShape3D_trunk")
 
-[node name="HighlightArea" type="Area3D" parent="." unique_id=2008016165]
+[node name="HighlightArea" type="Area3D" parent="." unique_id=1236512780]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="HighlightArea" unique_id=1222496755]
-shape = SubResource("SphereShape3D_2qvkx")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HighlightArea" unique_id=687631028]
+shape = SubResource("SphereShape3D_highlight")
 
 [connection signal="body_entered" from="HighlightArea" to="StaticBody3D" method="_on_highlight_area_body_entered"]
 [connection signal="body_exited" from="HighlightArea" to="StaticBody3D" method="_on_highlight_area_body_exited"]

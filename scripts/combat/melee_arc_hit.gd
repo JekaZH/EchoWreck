@@ -13,7 +13,8 @@ static func collect_damage_targets(
 	arc_radius: float,
 	arc_angle_deg: float,
 	sample_count: int = 7,
-	collision_mask: int = DEFAULT_MASK
+	collision_mask: int = DEFAULT_MASK,
+	hit_center_ratio: float = 0.55
 ) -> Array[Node]:
 	var result: Array[Node] = []
 	if attacker == null or forward.length_squared() < 0.0001:
@@ -31,7 +32,7 @@ static func collect_damage_targets(
 	for i in range(samples):
 		var t := lerpf(-half_angle, half_angle, float(i) / float(samples - 1))
 		var dir := forward.rotated(Vector3.UP, t)
-		var center := origin + dir * reach * 0.55
+		var center := origin + dir * reach * hit_center_ratio
 		var shape := SphereShape3D.new()
 		shape.radius = arc_radius
 		var params := PhysicsShapeQueryParameters3D.new()

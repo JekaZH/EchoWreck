@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/inventory/item_data.gd" id="1_item"]
+[ext_resource type="Texture2D" path="res://assets/icons/stylized_item/All/SODA_Icon_System_Misc_Ice.png" id="2_icon"]
+[ext_resource type="Resource" path="res://resources/combat/ice_arrow_projectile.tres" id="3_proj"]
+
+[resource]
+script = ExtResource("1_item")
+id = "sphere_ice"
+display_name = "Сфера льда"
+description = "Ледяная стрела: ЛКМ — одиночный урон. Урон задаётся полем «Урон по врагам» на предмете."
+icon = ExtResource("2_icon")
+max_stack = 1
+category = "Weapon"
+is_weapon = true
+entity_damage = 22.0
+attack_speed = 1.8
+weapon_type = "ranged"
+primary_action_animation = 3
+action_anim_speed_scale = 1.2
+action_hit_time_ratio = 0.2
+magic_sphere_type = 2
+magic_projectile = ExtResource("3_proj")
+magic_hide_hand_model = true
+spell_cast_speed_scale = 1.5

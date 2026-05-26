@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://d2w1aq1d1o37d"
+path="res://.godot/imported/Floor_WoodLight_OverhangCorner.obj-0d97dd13c439ce9779cb96c36ef5aad1.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Floor_WoodLight_OverhangCorner.obj-0d97dd13c439ce9779cb96c36ef5aad1.mesh"]
+
+source_file="res://assets/medieval_village_kit_standard/OBJ/Floor_WoodLight_OverhangCorner.obj"
+dest_files=["res://.godot/imported/Floor_WoodLight_OverhangCorner.obj-0d97dd13c439ce9779cb96c36ef5aad1.mesh", "res://.godot/imported/Floor_WoodLight_OverhangCorner.obj-0d97dd13c439ce9779cb96c36ef5aad1.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

@@ -107,6 +107,7 @@ func _register_removed(field: String, rel_path: String) -> void:
 	if not arr.has(rel_path):
 		arr.append(rel_path)
 	entry[field] = arr
+	SaveManager.mark_unsaved_changes()
 
 
 func get_removed_paths(main: Node) -> Array:

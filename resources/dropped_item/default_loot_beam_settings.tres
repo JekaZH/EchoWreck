@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="DroppedItemLootBeamSettings" format=3 uid="uid://duxxbkbvkb7ah"]
+
+[ext_resource type="Script" uid="uid://clxhmhp1vn7dj" path="res://scripts/dropped_item/dropped_item_loot_beam_settings.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+beam_alpha = 0.58

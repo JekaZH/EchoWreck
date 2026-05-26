@@ -4,6 +4,9 @@
 [ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="1_item"]
 [ext_resource type="PackedScene" uid="uid://c8swordwood01" path="res://scenes/tools/sword_wood.tscn" id="2_scene"]
 [ext_resource type="Texture2D" uid="uid://dp2ap8b2mfj7v" path="res://assets/icons/weapon asset pack/Iron Adventurer Sword.png" id="3_icon"]
+[ext_resource type="Resource" uid="uid://dgfmgcoud0k4e" path="res://resources/items/sword_wood_slash_vfx.tres" id="4_vfx"]
+[ext_resource type="AudioStream" uid="uid://dido0el45o6k0" path="res://assets/audio/weapon_hit.wav" id="6_crjem"]
+[ext_resource type="AudioStream" uid="uid://cmbg6c63tch1n" path="res://assets/audio/weapon_sword.mp3" id="6_tpit1"]
 
 [resource]
 script = ExtResource("1_item")
@@ -15,13 +18,19 @@ max_stack = 1
 category = "Weapon"
 is_equippable = true
 equipped_scene = ExtResource("2_scene")
-hand_offset = Vector3(0.02, 0.06, 0.05)
+hand_offset = Vector3(0.02, 0.08, 0.03)
 tool_type = "sword"
+tool_durability = 60
+block_damage = 0.0
 is_weapon = true
 entity_damage = 8.0
+attack_speed = 1.15
 weapon_type = "melee"
 melee_arc_reach = 2.2
 melee_arc_radius = 1.2
 melee_arc_angle_deg = 115.0
+slash_vfx = ExtResource("4_vfx")
 primary_action_animation = 2
 action_hit_time_ratio = 0.3
+tool_hit_sound = ExtResource("6_crjem")
+weapon_hit_sound = ExtResource("6_tpit1")

@@ -15,6 +15,23 @@ sky_material = SubResource("ProceduralSkyMaterial_0wfyh")
 [sub_resource type="Environment" id="Environment_jyhfs"]
 background_mode = 2
 sky = SubResource("Sky_sugp2")
+ambient_light_source = 2
+ambient_light_color = Color(0.55, 0.62, 0.72, 1)
+ambient_light_energy = 0.35
+tonemap_mode = 2
+tonemap_exposure = 1.05
+ssao_enabled = true
+ssao_radius = 1.2
+ssao_intensity = 1.4
+glow_enabled = true
+glow_intensity = 1.15
+glow_strength = 0.95
+glow_bloom = 0.12
+glow_hdr_threshold = 0.85
+fog_enabled = true
+fog_light_color = Color(0.72, 0.78, 0.86, 1)
+fog_density = 0.0022
+fog_aerial_perspective = 0.35
 
 [node name="Main" type="Node3D" unique_id=1502297984]
 script = ExtResource("4_boot")
@@ -30,6 +47,9 @@ offset = Vector3(5, 10, 5)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=81474994]
 transform = Transform3D(0.70710677, 0.49999997, -0.49999997, 0, 0.70710677, 0.70710677, 0.70710677, -0.49999997, 0.49999997, 0, 0, 0)
+light_color = Color(1, 0.96, 0.88, 1)
+light_energy = 1.35
+shadow_enabled = true
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=749349398]
 environment = SubResource("Environment_jyhfs")

@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://00h55kb6cxue"]
+
+[ext_resource type="Script" uid="uid://bomvn80j1enwl" path="res://scripts/world/terrain/terrain3d_world.gd" id="1_script"]
+[ext_resource type="Terrain3DAssets" uid="uid://d2nusnshemtlk" path="res://resources/world/terrain/world_terrain_assets.tres" id="2_assets"]
+
+[sub_resource type="Gradient" id="Gradient_p2c1v"]
+offsets = PackedFloat32Array(0.2, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_o7q8a"]
+noise_type = 2
+frequency = 0.03
+cellular_jitter = 3.0
+cellular_return_type = 0
+domain_warp_enabled = true
+domain_warp_type = 1
+domain_warp_amplitude = 50.0
+domain_warp_fractal_type = 2
+domain_warp_fractal_lacunarity = 1.5
+domain_warp_fractal_gain = 1.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_55omu"]
+noise = SubResource("FastNoiseLite_o7q8a")
+color_ramp = SubResource("Gradient_p2c1v")
+seamless = true
+
+[sub_resource type="Terrain3DMaterial" id="Terrain3DMaterial_wedde"]
+_shader_parameters = {
+&"auto_base_texture": null,
+&"auto_height_reduction": null,
+&"auto_overlay_texture": null,
+&"auto_slope": 11.0,
+&"bias_distance": null,
+&"blend_sharpness": 0.92,
+&"depth_blur": null,
+&"enable_macro_variation": null,
+&"enable_projection": null,
+&"flat_terrain_normals": null,
+&"macro_variation1": null,
+&"macro_variation2": null,
+&"macro_variation_slope": null,
+&"mipmap_bias": null,
+&"noise1_angle": null,
+&"noise1_offset": null,
+&"noise1_scale": null,
+&"noise2_scale": null,
+&"noise_texture": SubResource("NoiseTexture2D_55omu"),
+&"projection_threshold": null
+}
+world_background = 0
+auto_shader = true
+
+[node name="WorldTerrain" type="Terrain3D" unique_id=2071916082]
+data_directory = "res://terrain"
+material = SubResource("Terrain3DMaterial_wedde")
+assets = ExtResource("2_assets")
+collision_mask = 49
+script = ExtResource("1_script")
+terrain_assets = ExtResource("2_assets")
+hill_centers_m = PackedVector2Array(42, 42, -42, 42, -42, -42, 42, -42)
+metadata/_edit_lock_ = true
+metadata/ew_terrain_layout_ready = false

@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://bw11ww64fysid"
+path="res://.godot/imported/Flower_4_Single.obj-03768f3a0077e1adc69206a2de49c1ef.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Flower_4_Single.obj-03768f3a0077e1adc69206a2de49c1ef.mesh"]
+
+source_file="res://assets/stylized_nature_kit_standard/OBJ/Flower_4_Single.obj"
+dest_files=["res://.godot/imported/Flower_4_Single.obj-03768f3a0077e1adc69206a2de49c1ef.mesh", "res://.godot/imported/Flower_4_Single.obj-03768f3a0077e1adc69206a2de49c1ef.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

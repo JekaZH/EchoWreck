@@ -21,6 +21,7 @@ var _save_browser: SaveSlotsBrowser
 var _settings_root: Control
 
 var _pause_was_visible_for_screenshot: bool = false
+var _exit_unsaved_confirm: ConfirmationDialog
 
 
 func _ready() -> void:
@@ -28,6 +29,7 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	hide()
 	_build_subscreens()
+	_setup_exit_confirm()
 	_continue_btn.pressed.connect(close_menu)
 	_save_btn.pressed.connect(_show_save_browser)
 	_load_btn.pressed.connect(_show_load_browser)
@@ -153,7 +155,26 @@ func _on_save_slot(slot: int) -> void:
 	_hide_subscreens()
 
 
+func _setup_exit_confirm() -> void:
+	_exit_unsaved_confirm = ConfirmationDialog.new()
+	_exit_unsaved_confirm.title = "Несохранённые изменения"
+	_exit_unsaved_confirm.dialog_text = (
+		"Есть несохранённые изменения.\nВыйти в главное меню без сохранения?"
+	)
+	_exit_unsaved_confirm.ok_button_text = "Выйти"
+	_exit_unsaved_confirm.cancel_button_text = "Остаться"
+	_exit_unsaved_confirm.confirmed.connect(_do_exit_to_menu)
+	add_child(_exit_unsaved_confirm)
+
+
 func _on_exit_to_menu() -> void:
+	if SaveManager.should_warn_unsaved_on_exit():
+		_exit_unsaved_confirm.popup_centered()
+		return
+	_do_exit_to_menu()
+
+
+func _do_exit_to_menu() -> void:
 	close_menu()
 	SaveManager.go_to_main_menu()
 

@@ -170,10 +170,19 @@ func _set_bar_visible(visible: bool) -> void:
 
 static func estimate_top_offset(root: Node3D, padding: float = 0.4) -> float:
 	var top_y := 0.0
-	for child in root.get_children():
-		if child is MeshInstance3D:
-			var mesh := child as MeshInstance3D
-			var aabb := mesh.get_aabb()
-			var local_top := mesh.position.y + aabb.position.y + aabb.size.y
-			top_y = maxf(top_y, local_top)
+	for mesh in _collect_mesh_instances(root):
+		var aabb := mesh.get_aabb()
+		var local_top := mesh.position.y + aabb.position.y + aabb.size.y
+		top_y = maxf(top_y, local_top)
 	return top_y + padding
+
+
+static func _collect_mesh_instances(node: Node) -> Array[MeshInstance3D]:
+	var result: Array[MeshInstance3D] = []
+	if node is MeshInstance3D:
+		var mesh := node as MeshInstance3D
+		if mesh.mesh != null:
+			result.append(mesh)
+	for child in node.get_children():
+		result.append_array(_collect_mesh_instances(child))
+	return result

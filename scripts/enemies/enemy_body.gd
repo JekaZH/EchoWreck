@@ -230,6 +230,7 @@ func _spawn_dropped_item(host: Node, item: ItemData, count: int, spawn_pos: Vect
 	host.add_child(dropped)
 	dropped.global_position = spawn_pos
 	dropped.add_to_group("dropped_items")
+	dropped.call_deferred("apply_spawn_pop")
 
 
 func _setup_visual_material() -> void:

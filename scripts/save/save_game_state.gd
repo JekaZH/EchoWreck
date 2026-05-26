@@ -41,11 +41,14 @@ static func _build_item_id_cache() -> void:
 static func item_stack_to_dict(stack: ItemStack) -> Dictionary:
 	if stack == null or stack.item == null:
 		return {}
-	return {
+	var d := {
 		"path": stack.item.resource_path,
 		"id": stack.item.id,
 		"count": stack.count,
 	}
+	if stack.uses_durability():
+		d["durability"] = stack.durability
+	return d
 
 
 static func dict_to_stack(d: Dictionary) -> ItemStack:
@@ -54,7 +57,12 @@ static func dict_to_stack(d: Dictionary) -> ItemStack:
 		return null
 	var c: int = int(d.get("count", 1))
 	var mx: int = maxi(item.max_stack, 1)
-	return ItemStack.new(item, clampi(c, 1, mx))
+	var stack := ItemStack.new(item, clampi(c, 1, mx))
+	if d.has("durability"):
+		stack.durability = int(d.get("durability", stack.durability))
+		if stack.durability <= 0 and item.uses_durability():
+			return null
+	return stack
 
 
 static func serialize_inventory(inv: Inventory) -> Array:
@@ -254,6 +262,18 @@ static func clear_dropped_items(main: Node) -> void:
 		n.queue_free()
 
 
+static func _find_ground_items_parent(main: Node) -> Node:
+	if main == null:
+		return main
+	var world := main.get_node_or_null("World")
+	if world != null:
+		var ground_items := world.find_child("GroundItems", true, false)
+		if ground_items != null:
+			return ground_items
+	var fallback := main.find_child("GroundItems", true, false)
+	return fallback if fallback != null else main
+
+
 static func spawn_dropped_items(main: Node, data: Variant) -> void:
 	if main == null or not (data is Array):
 		return
@@ -277,10 +297,12 @@ static func spawn_dropped_items(main: Node, data: Variant) -> void:
 		var dropped := DROPPED_SCENE.instantiate() as DroppedItem
 		dropped.item_data = st.item
 		dropped.count = st.count
-		tree.current_scene.add_child(dropped)
+		var parent := _find_ground_items_parent(main)
+		parent.add_child(dropped)
 		dropped.global_position = pos
 		dropped.global_rotation = Vector3(0.0, rot_y, 0.0)
 		dropped.add_to_group("dropped_items")
+		dropped.call_deferred("stabilize_for_save_load")
 
 
 static func apply_destroyed_harvestables(main: Node, paths: Variant) -> void:

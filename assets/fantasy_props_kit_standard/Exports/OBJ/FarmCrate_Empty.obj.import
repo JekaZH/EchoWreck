@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://bhdgr0sw5ypca"
+path="res://.godot/imported/FarmCrate_Empty.obj-42707498153d71a719ca4f42276404c4.mesh"
+
+[deps]
+
+files=["res://.godot/imported/FarmCrate_Empty.obj-42707498153d71a719ca4f42276404c4.mesh"]
+
+source_file="res://assets/fantasy_props_kit_standard/Exports/OBJ/FarmCrate_Empty.obj"
+dest_files=["res://.godot/imported/FarmCrate_Empty.obj-42707498153d71a719ca4f42276404c4.mesh", "res://.godot/imported/FarmCrate_Empty.obj-42707498153d71a719ca4f42276404c4.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

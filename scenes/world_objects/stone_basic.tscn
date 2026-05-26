@@ -1,65 +1,62 @@
 [gd_scene format=3 uid="uid://cc3xch787bmp4"]
 
-[ext_resource type="Material" uid="uid://b5c70hsp2mq8a" path="res://shaders/outline_material.tres" id="1_a2twf"]
-[ext_resource type="Script" uid="uid://lqwyemd20jd" path="res://scripts/interaction/harvestable.gd" id="2_8w0kp"]
-[ext_resource type="Script" uid="uid://cn6bx4dcnt1nk" path="res://scripts/inventory/loot_entry.gd" id="3_85udq"]
-[ext_resource type="Resource" uid="uid://1gq0ards1dq4" path="res://resources/items/stone.tres" id="4_a2twf"]
-[ext_resource type="Script" uid="uid://fbnax6jp6py2" path="res://scripts/inventory/loot_table.gd" id="5_yff66"]
+[ext_resource type="Script" uid="uid://dcyqiqkq2vb5y" path="res://scripts/world_objects/harvestable_prop_root.gd" id="2_prop_root"]
+[ext_resource type="Script" uid="uid://uuop3unqu46g" path="res://scripts/world_objects/harvestable_editor_gizmo.gd" id="3_gizmo"]
+[ext_resource type="Script" uid="uid://lqwyemd20jd" path="res://scripts/interaction/harvestable.gd" id="4_harvestable"]
+[ext_resource type="Script" uid="uid://cn6bx4dcnt1nk" path="res://scripts/inventory/loot_entry.gd" id="5_loot_entry"]
+[ext_resource type="Resource" uid="uid://1gq0ards1dq4" path="res://resources/items/stone.tres" id="6_stone"]
+[ext_resource type="Script" uid="uid://fbnax6jp6py2" path="res://scripts/inventory/loot_table.gd" id="7_loot_table"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a2twf"]
-albedo_color = Color(0.29954746, 0.29954746, 0.29954743, 1)
+[sub_resource type="CylinderMesh" id="CylinderMesh_gizmo"]
+height = 1.0
 
-[sub_resource type="SphereMesh" id="SphereMesh_8w0kp"]
-material = SubResource("StandardMaterial3D_a2twf")
-radius = 1.0
+[sub_resource type="Resource" id="Resource_loot_entry"]
+script = ExtResource("5_loot_entry")
+item = ExtResource("6_stone")
 
-[sub_resource type="SphereMesh" id="SphereMesh_a2twf"]
-radius = 1.0
+[sub_resource type="Resource" id="Resource_loot_table"]
+script = ExtResource("7_loot_table")
+entries = Array[ExtResource("5_loot_entry")]([SubResource("Resource_loot_entry")])
 
-[sub_resource type="Resource" id="Resource_2qvkx"]
-script = ExtResource("3_85udq")
-item = ExtResource("4_a2twf")
-metadata/_custom_type_script = "uid://cn6bx4dcnt1nk"
+[sub_resource type="SphereShape3D" id="SphereShape3D_body"]
+radius = 2.0
 
-[sub_resource type="Resource" id="Resource_st1mx"]
-script = ExtResource("5_yff66")
-entries = Array[ExtResource("3_85udq")]([SubResource("Resource_2qvkx")])
-metadata/_custom_type_script = "uid://fbnax6jp6py2"
+[sub_resource type="SphereShape3D" id="SphereShape3D_highlight"]
+radius = 3.2271361
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_a2twf"]
-radius = 1.0
+[node name="Stone" type="Node3D" unique_id=174765412]
+script = ExtResource("2_prop_root")
+preset = 1
+collision_fit_mode = 1
+collision_radius_scale = 1.0
+highlight_radius_scale = 1.2
+editor_gizmo_color = Color(0.55, 0.55, 0.6, 0.25)
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_2qvkx"]
-radius = 3.0
+[node name="VisualRoot" type="Node3D" parent="." unique_id=327296151]
 
-[node name="Stone" type="Node3D" unique_id=968043563]
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=145523584]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
-mesh = SubResource("SphereMesh_8w0kp")
-
-[node name="OutlineMesh" type="MeshInstance3D" parent="." unique_id=1254650949]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+[node name="OutlineMesh" type="MeshInstance3D" parent="." unique_id=417968318]
 visible = false
-mesh = SubResource("SphereMesh_a2twf")
-surface_material_override/0 = ExtResource("1_a2twf")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1428753839 groups=["harvestable"]]
+[node name="EditorPlacementGizmo" type="MeshInstance3D" parent="." unique_id=2142138934]
+mesh = SubResource("CylinderMesh_gizmo")
+script = ExtResource("3_gizmo")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1214005177 groups=["harvestable"]]
 collision_layer = 17
 collision_mask = 16
-script = ExtResource("2_8w0kp")
-loot_table = SubResource("Resource_st1mx")
+script = ExtResource("4_harvestable")
+loot_table = SubResource("Resource_loot_table")
 max_health = 3.0
 required_tool_type = "pickaxe"
 required_harvest_type = "stone"
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=160892960]
-shape = SubResource("SphereShape3D_a2twf")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=2051364735]
+shape = SubResource("SphereShape3D_body")
 
-[node name="HighlightArea" type="Area3D" parent="." unique_id=2008016165]
+[node name="HighlightArea" type="Area3D" parent="." unique_id=136276886]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="HighlightArea" unique_id=1222496755]
-shape = SubResource("SphereShape3D_2qvkx")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HighlightArea" unique_id=673992863]
+shape = SubResource("SphereShape3D_highlight")
 
 [connection signal="body_entered" from="HighlightArea" to="StaticBody3D" method="_on_highlight_area_body_entered"]
 [connection signal="body_exited" from="HighlightArea" to="StaticBody3D" method="_on_highlight_area_body_exited"]

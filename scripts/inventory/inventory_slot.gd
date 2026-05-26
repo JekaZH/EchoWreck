@@ -143,8 +143,12 @@ func _gui_input(event: InputEvent) -> void:
 	
 	if event.button_index == MOUSE_BUTTON_LEFT:
 		if not get_viewport().gui_get_hovered_control() is InventorySlot:
-				manager.clear_selected_slot()
-		
+			manager.clear_selected_slot()
+
+		if manager.held_item and not take_only and inventory.inventory_type != "OUTPUT":
+			_place_held_item_with_lmb(current)
+			return
+
 		if Input.is_key_pressed(KEY_SHIFT) and current:
 			# ───── SHIFT + ЛКМ = ПЕРЕЛОЖИТЬ В ДРУГОЙ ИНВЕНТАРЬ ─────
 			var other_inventory = null
@@ -180,13 +184,7 @@ func _gui_input(event: InputEvent) -> void:
 						player.player_equipment.equip_from_inventory(inventory, slot_index)
 					return
 				
-				# Иначе — обычный выброс
-				var player = get_tree().get_first_node_in_group("player")
-				if player and player.is_inside_tree():
-					var angle: float = player.rotation.y
-					var look_dir: Vector3 = Vector3(sin(angle), 0.0, cos(angle)).normalized()
-					var spawn_pos: Vector3 = player.global_position + look_dir * 2.5 + Vector3(0.0, 0.8, 0.0)
-					inventory.drop_from_slot(slot_index, current.count, spawn_pos, look_dir)
+				_drop_slot_to_world(current.count)
 				return
 
 		# Обычный левый клик (взять / положить)
@@ -219,7 +217,11 @@ func _gui_input(event: InputEvent) -> void:
 			manager.clear_selected_slot()
 
 	elif event.button_index == MOUSE_BUTTON_RIGHT:
-		# Правый клик (кладём 1 или разделяем) — без изменений
+		if Input.is_key_pressed(KEY_SHIFT) and current and not take_only and inventory.inventory_type != "OUTPUT":
+			_drop_slot_to_world(current.count)
+			return
+
+		# Правый клик (кладём 1 или разделяем)
 		if manager.held_item:
 			if take_only or (inventory and inventory.inventory_type == "OUTPUT"):
 				return
@@ -377,7 +379,8 @@ func _refresh_tooltip() -> void:
 	
 	_last_compare_ctrl = ctrl_now
 	_last_tooltip_item_id = stack.item.id
-	tooltip.show_tooltip(stack.item, compare_item)
+	var dur: int = stack.durability if stack.uses_durability() else -1
+	tooltip.show_tooltip(stack.item, compare_item, dur)
 
 func update_selection():
 	if selection:
@@ -425,3 +428,38 @@ func cancel_use():
 		var progress_ui = manager.get_use_progress_ui()
 		if progress_ui:
 			progress_ui.cancel()
+
+
+func _place_held_item_with_lmb(current: ItemStack) -> void:
+	var held: ItemStack = manager.held_item
+	if held == null:
+		return
+	if current == null:
+		inventory.set_slot(slot_index, held)
+		manager.clear_held_item()
+	elif current.can_stack_with(held):
+		var added: int = current.try_add(held.count)
+		held.count -= added
+		if held.count <= 0:
+			manager.clear_held_item()
+		else:
+			manager.set_held_item(held)
+	else:
+		var temp: ItemStack = current
+		inventory.set_slot(slot_index, held)
+		manager.set_held_item(temp)
+	inventory.changed.emit()
+
+
+func _drop_slot_to_world(amount: int = -1) -> void:
+	var stack := inventory.get_slot(slot_index)
+	if stack == null or stack.item == null:
+		return
+	var player := get_tree().get_first_node_in_group("player")
+	if player == null or not player.is_inside_tree():
+		return
+	var angle: float = player.rotation.y
+	var look_dir: Vector3 = Vector3(sin(angle), 0.0, cos(angle)).normalized()
+	var spawn_pos: Vector3 = player.global_position + look_dir * 2.5 + Vector3(0.0, 0.8, 0.0)
+	inventory.drop_from_slot(slot_index, amount, spawn_pos, look_dir)
+	manager.clear_selected_slot()

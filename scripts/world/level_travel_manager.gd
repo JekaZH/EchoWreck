@@ -13,6 +13,7 @@ var _loading_ui: LevelLoadingScreen = null
 var _awaiting_bootstrap: bool = false
 ## Снимок игрока при переходе между уровнями (без записи на диск).
 var _travel_player_snapshot: Dictionary = {}
+var _pending_post_travel_autosave: bool = false
 
 
 func _ready() -> void:
@@ -28,6 +29,7 @@ func _ready() -> void:
 func clear_travel_state() -> void:
 	_pending_arrival_portal_id = ""
 	_travel_player_snapshot.clear()
+	_pending_post_travel_autosave = false
 	_active_zone = null
 	_awaiting_bootstrap = false
 	if _confirm_ui:
@@ -82,7 +84,16 @@ func _run_commit_travel(zone: LevelTransitionZone = null) -> void:
 		LevelWorldCache.capture_level(main_scene)
 
 	_capture_player_snapshot_before_travel()
+	var save_settings := SaveManager.get_settings()
+	if save_settings.autosave_enabled and save_settings.autosave_on_level_transition:
+		_pending_post_travel_autosave = true
 	await transition_to_level(path)
+
+
+func consume_post_travel_autosave() -> bool:
+	var v := _pending_post_travel_autosave
+	_pending_post_travel_autosave = false
+	return v
 
 
 func transition_to_level(path: String, status_message: String = "Загрузка уровня...") -> void:
@@ -241,7 +252,9 @@ func apply_arrival_to_player(main_root: Node3D) -> bool:
 			"LevelTravelManager: на уровне нет LevelSpawnPoint с portal_id='%s'" % portal
 		)
 		return false
-	player.global_transform = spawn.get_spawn_transform()
+	var xf := spawn.get_spawn_transform()
+	player.global_transform = xf
+	TerrainHeightQuery.snap_node_to_ground(player, 0.05)
 	return true
 
 

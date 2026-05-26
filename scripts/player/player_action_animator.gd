@@ -13,6 +13,9 @@ const ANIM_HARVEST := "TreeChopping"
 const ANIM_SWORD := "Sword_Attack"
 const ANIM_PICKUP := "PickUp_Table"
 const ANIM_DEATH := "Death01"
+const ANIM_SPELL_ENTER := "Spell_Simple_Enter"
+const ANIM_SPELL_SHOOT := "Spell_Simple_Shoot"
+const ANIM_SPELL_EXIT := "Spell_Simple_Exit"
 
 ## Базовая скорость клипа (>1 — быстрее). Умножается на action_anim_speed_scale предмета.
 const DEFAULT_SPEED := {
@@ -20,11 +23,16 @@ const DEFAULT_SPEED := {
 	ANIM_SWORD: 1.85,
 	ANIM_PICKUP: 1.55,
 	ANIM_DEATH: 1.0,
+	ANIM_SPELL_ENTER: 2.5,
+	ANIM_SPELL_SHOOT: 3.2,
+	ANIM_SPELL_EXIT: 2.3,
 }
 
 ## Доля длительности клипа: раньше отпускаем ввод, раньше обрываем клип (меньше пауза между ударами).
 const RECOVERY_AT := 0.58
 const END_AT := 0.72
+## Заклинание: Exit должен доиграть до нейтральной позы.
+const SPELL_END_AT := 1.0
 
 const STATE_IDLE := &"Idle"
 
@@ -37,6 +45,10 @@ var _current_anim: StringName = &""
 var _hit_emitted: bool = false
 var _action_generation: int = 0
 var _saved_loop_mode: Dictionary = {}  # anim_name -> loop_mode
+var _spell_chain: bool = false
+var _spell_hit_ratio: float = 0.4
+var _spell_speed_mul: float = 1.0
+var _last_cleanup_generation: int = -1
 
 
 func setup(player: Player, anim_tree: AnimationTree, anim_player: AnimationPlayer) -> void:
@@ -58,6 +70,8 @@ func play_item_action(item: ItemData) -> bool:
 	if anim_name.is_empty():
 		return false
 	var speed_mul := item.action_anim_speed_scale if item.action_anim_speed_scale > 0.0 else 1.0
+	if item.attack_speed > 0.0:
+		speed_mul *= item.attack_speed
 	var base := float(DEFAULT_SPEED.get(anim_name, 1.0))
 	return _begin_action(anim_name, base * speed_mul, item.action_hit_time_ratio, "attack")
 
@@ -68,6 +82,65 @@ func try_play_pickup() -> bool:
 
 func play_death() -> void:
 	_begin_action(ANIM_DEATH, DEFAULT_SPEED[ANIM_DEATH], 1.0, "death", false)
+
+
+func is_spell_chain_active() -> bool:
+	return _spell_chain
+
+
+func play_spell_cast(item: ItemData) -> bool:
+	if item == null or _busy:
+		return false
+	if _anim_player == null:
+		return false
+	for anim_name in [ANIM_SPELL_ENTER, ANIM_SPELL_SHOOT, ANIM_SPELL_EXIT]:
+		if not _anim_player.has_animation(anim_name):
+			push_warning("PlayerActionAnimator: нет анимации '%s'" % anim_name)
+			return false
+	_spell_chain = true
+	_spell_hit_ratio = clampf(item.action_hit_time_ratio, 0.12, 0.55)
+	var cast_scale := maxf(item.spell_cast_speed_scale, 0.5)
+	_spell_speed_mul = cast_scale
+	_spell_speed_mul *= item.action_anim_speed_scale if item.action_anim_speed_scale > 0.0 else 1.0
+	_spell_speed_mul *= maxf(item.attack_speed, 0.5)
+	return _begin_action(
+		ANIM_SPELL_ENTER,
+		DEFAULT_SPEED[ANIM_SPELL_ENTER] * _spell_speed_mul,
+		0.0,
+		"spell_enter",
+		false
+	)
+
+
+func _chain_spell_shoot() -> bool:
+	return _begin_action(
+		ANIM_SPELL_SHOOT,
+		DEFAULT_SPEED[ANIM_SPELL_SHOOT] * _spell_speed_mul,
+		_spell_hit_ratio,
+		"spell_shoot",
+		false
+	)
+
+
+func _chain_spell_exit() -> bool:
+	return _begin_action(
+		ANIM_SPELL_EXIT,
+		DEFAULT_SPEED[ANIM_SPELL_EXIT] * _spell_speed_mul,
+		0.0,
+		"spell_exit",
+		false
+	)
+
+
+func _abort_spell_chain() -> void:
+	_spell_chain = false
+	_busy = false
+	_current_kind = ""
+	_current_anim = &""
+	_snap_to_locomotion_idle()
+	action_finished.emit("spell")
+	if _player != null and _player.has_method("clear_locked_spell_aim"):
+		_player.clear_locked_spell_aim()
 
 
 func _begin_action(
@@ -124,14 +197,29 @@ func _restore_anim_tree() -> void:
 		return
 	if _player != null and _player.is_dead():
 		return
+	_snap_to_locomotion_idle()
+
+
+func _snap_to_locomotion_idle() -> void:
+	if _anim_player:
+		_anim_player.stop()
+		_anim_player.speed_scale = 1.0
+		_anim_player.clear_queue()
+	if _anim_tree == null:
+		return
 	_anim_tree.set("parameters/conditions/is_tree_chopping", false)
+	_anim_tree.set("parameters/conditions/is_moving", false)
+	_anim_tree.set("parameters/conditions/is_running", false)
+	_anim_tree.set("parameters/conditions/is_not_moving", true)
+	_anim_tree.set("parameters/conditions/is_not_running", true)
+	_anim_tree.active = true
 	var playback: AnimationNodeStateMachinePlayback = _anim_tree.get(
 		"parameters/playback"
 	) as AnimationNodeStateMachinePlayback
 	if playback != null:
-		playback.travel(STATE_IDLE)
 		playback.start(STATE_IDLE)
-	_anim_tree.active = true
+		playback.travel(STATE_IDLE)
+	_anim_tree.advance(0.0)
 
 
 func _prepare_clip_no_loop(anim_name: String) -> void:
@@ -165,24 +253,30 @@ func _schedule_timers(duration: float, kind: String, hit_ratio: float) -> void:
 	get_tree().create_timer(duration * RECOVERY_AT).timeout.connect(
 		func() -> void: _on_recovery(gen), CONNECT_ONE_SHOT
 	)
-	get_tree().create_timer(duration * END_AT).timeout.connect(
+	var end_frac := SPELL_END_AT if kind == "spell_exit" else (
+		0.62 if kind == "spell_enter" else (0.72 if kind == "spell_shoot" else END_AT)
+	)
+	get_tree().create_timer(duration * end_frac).timeout.connect(
 		func() -> void: _on_duration_elapsed(gen), CONNECT_ONE_SHOT
 	)
 
-	if kind == "attack" and hit_ratio > 0.0:
-		var hit_t := clampf(hit_ratio, 0.1, 0.75) * duration
+	if (kind == "attack" or kind == "spell_shoot") and hit_ratio > 0.0:
+		var hit_cap := RECOVERY_AT - 0.06 if kind == "spell_shoot" else 0.75
+		var hit_t := clampf(hit_ratio, 0.1, hit_cap) * duration
 		get_tree().create_timer(hit_t).timeout.connect(_emit_hit, CONNECT_ONE_SHOT)
 
 
 func _on_recovery(gen: int) -> void:
 	if gen != _action_generation:
 		return
+	if _spell_chain:
+		return
 	_busy = false
 	action_recovery.emit()
 
 
 func _emit_hit() -> void:
-	if _hit_emitted or _current_kind != "attack":
+	if _hit_emitted or (_current_kind != "attack" and _current_kind != "spell_shoot"):
 		return
 	_hit_emitted = true
 	action_hit_frame.emit()
@@ -203,15 +297,14 @@ func _finish_action() -> void:
 
 
 func _cleanup_action_end() -> void:
-	if _current_anim == &"" and not _busy:
+	if _current_anim == &"" and not _busy and not _spell_chain:
 		return
+	if _action_generation == _last_cleanup_generation:
+		return
+	_last_cleanup_generation = _action_generation
 
 	var kind := _current_kind
 	var anim_name := String(_current_anim)
-
-	_busy = false
-	_current_kind = ""
-	_current_anim = &""
 
 	if _anim_player:
 		_anim_player.stop()
@@ -219,5 +312,28 @@ func _cleanup_action_end() -> void:
 	if not anim_name.is_empty():
 		_restore_clip_loop(anim_name)
 
+	if _spell_chain:
+		_busy = false
+		_current_kind = ""
+		_current_anim = &""
+		match kind:
+			"spell_enter":
+				if not _chain_spell_shoot():
+					_abort_spell_chain()
+			"spell_shoot":
+				if not _chain_spell_exit():
+					_abort_spell_chain()
+			"spell_exit":
+				_spell_chain = false
+				_busy = false
+				_snap_to_locomotion_idle()
+				action_finished.emit("spell")
+			_:
+				_abort_spell_chain()
+		return
+
+	_busy = false
+	_current_kind = ""
+	_current_anim = &""
 	_restore_anim_tree()
 	action_finished.emit(kind)

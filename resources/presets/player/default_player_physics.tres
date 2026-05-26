@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PlayerPhysicsSettings" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player_physics_settings.gd" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+use_project_gravity = false
+custom_gravity_mps2 = 22.0
+max_fall_speed_mps = 40.0
+floor_stick_down_mps = -1.5
+floor_snap_length_m = 0.4
+floor_max_angle_deg = 50.0
+floor_stop_on_slope = false
+slide_along_floor = true

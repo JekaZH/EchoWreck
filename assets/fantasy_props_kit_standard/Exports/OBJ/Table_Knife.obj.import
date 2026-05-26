@@ -1,0 +1,25 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://hqp2p2pr8tlu"
+path="res://.godot/imported/Table_Knife.obj-15f9cd09c5eb42c48a7439fcd54cb75d.mesh"
+
+[deps]
+
+files=["res://.godot/imported/Table_Knife.obj-15f9cd09c5eb42c48a7439fcd54cb75d.mesh"]
+
+source_file="res://assets/fantasy_props_kit_standard/Exports/OBJ/Table_Knife.obj"
+dest_files=["res://.godot/imported/Table_Knife.obj-15f9cd09c5eb42c48a7439fcd54cb75d.mesh", "res://.godot/imported/Table_Knife.obj-15f9cd09c5eb42c48a7439fcd54cb75d.mesh"]
+
+[params]
+
+generate_tangents=true
+generate_lods=true
+generate_shadow_mesh=true
+generate_lightmap_uv2=false
+generate_lightmap_uv2_texel_size=0.2
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+force_disable_mesh_compression=false

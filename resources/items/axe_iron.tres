@@ -4,6 +4,8 @@
 [ext_resource type="PackedScene" uid="uid://b2plntgqccnl2" path="res://scenes/tools/axe_iron.tscn" id="2_0iu1h"]
 [ext_resource type="Texture2D" uid="uid://cp0f86d0y7jor" path="res://assets/icons/stylized_item/Weapons/SODA_Icon_Weapons_BattleAxe.png" id="3_0iu1h"]
 [ext_resource type="Script" uid="uid://p3b1q13fmee1" path="res://scripts/inventory/item_data.gd" id="4_fykeg"]
+[ext_resource type="AudioStream" uid="uid://cbxgi3u5hhx0j" path="res://assets/audio/tools_axe.ogg" id="5_xqwlr"]
+[ext_resource type="AudioStream" uid="uid://dido0el45o6k0" path="res://assets/audio/weapon_hit.wav" id="6_fykeg"]
 
 [resource]
 script = ExtResource("4_fykeg")
@@ -22,10 +24,12 @@ tool_efficiency = 2.0
 tool_durability = 200
 block_damage = 6.0
 tool_harvest_type = "tree"
-primary_action_animation = 1
-action_anim_speed_scale = 0.95
-action_hit_time_ratio = 0.38
 is_weapon = true
 entity_damage = 10.0
 attack_speed = 2.0
+primary_action_animation = 1
+action_anim_speed_scale = 0.95
+action_hit_time_ratio = 0.38
+tool_hit_sound = ExtResource("5_xqwlr")
+weapon_hit_sound = ExtResource("6_fykeg")
 metadata/_custom_type_script = "uid://p3b1q13fmee1"

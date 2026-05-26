@@ -1,0 +1,57 @@
+[gd_resource type="Resource" script_class="MagicProjectileSettings" format=3 uid="uid://na24h5slekpw"]
+
+[ext_resource type="AudioStream" uid="uid://ccai0myclredo" path="res://assets/audio/spell_iceball_cast.wav" id="1_ehktv"]
+[ext_resource type="Script" uid="uid://ca0cnq50q25av" path="res://scripts/combat/magic_projectile_settings.gd" id="1_script"]
+[ext_resource type="AudioStream" uid="uid://n54deuj3kfk0" path="res://assets/audio/spell_iceball_boom.wav" id="2_xnovs"]
+
+[resource]
+script = ExtResource("1_script")
+visual_style = 1
+speed = 26.0
+damage = 18.0
+collision_radius = 0.28
+max_travel_distance_m = 32.0
+spawn_offset_forward_m = 0.2
+core_color = Color(0.15, 0.5, 1, 1)
+core_hot_color = Color(0.75, 0.95, 1, 1)
+core_radius_m = 0.28
+core_emission = 5.0
+noise_scroll_speed = 5.0
+pulse_speed = 14.0
+core_light_range = 4.0
+core_forward_offset_m = 0.16
+crystal_length_m = 1.4
+crystal_shard_count = 5
+trail_color = Color(0.1, 0.35, 0.85, 0.25)
+trail_mid_color = Color(0.35, 0.75, 1, 0.85)
+tail_length_m = 1.75
+tail_ribbon_width_m = 0.38
+tail_ribbon_sections = 12
+tail_scroll_speed = 7.0
+tail_noise_strength = 0.38
+tail_emission_multiplier = 1.15
+ribbon_particle_count = 40
+trail_lifetime_sec = 0.32
+ribbon_trail_lifetime_multiplier = 2.0
+tail_emit_offset_forward_m = 0.04
+ember_particle_count = 48
+ember_lifetime_ratio = 0.8
+ember_emit_radius_m = 0.1
+ember_emit_offset_forward_m = 0.06
+ember_speed_min_mps = 0.5
+ember_speed_max_mps = 2.0
+ember_scale_min_m = 0.1
+ember_scale_max_m = 0.22
+ember_material_emission = 2.2
+ember_quad_size_m = 0.4
+cast_sound = ExtResource("1_ehktv")
+cast_sound_volume_db = -10.0
+hit_explosion_sound = ExtResource("2_xnovs")
+hit_explosion_volume_db = -10.0
+hit_damage_mode = 1
+area_damage_radius_m = 2.0
+hit_burst_color = Color(0.5, 0.85, 1, 0.9)
+hit_burst_duration = 0.2
+hit_burst_scale = 0.55
+hit_burst_emission = 5.5
+hit_ember_particles = 28
